@@ -22,6 +22,8 @@ I recently started the [scodec](http://github.com/mpilquist/scodec) project to s
 
 This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of [Shapeless](http://github.com/milessabing/shapeless).
 
+<!-- more -->
+
 ## Terminology
 
  - *encoding* - converting a value in to its binary representation

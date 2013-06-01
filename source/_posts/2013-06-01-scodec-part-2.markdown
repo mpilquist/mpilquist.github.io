@@ -90,7 +90,7 @@ trait NotQuiteFunctor[F[_]] {
 Now that we know the name for the typeclass we abstracted, let's examine the laws for it. An invariant functor has two laws:
 
   - identity - `xmap(ma)(identity, identity) == ma`
-  - composite - `xmap(xmap(ma, f1, g1), f2, g2) == xmap(ma, f2 compose f1, g1 compose g2)`
+  - composite - `xmap(xmap(ma)(f1, g1))(f2, g2) == xmap(ma)(f2 compose f1, g1 compose g2)`
 
 The identity law states that xmapping with identity does not modify the input. The composite law states that function composition distributes over the xmap operation.
 

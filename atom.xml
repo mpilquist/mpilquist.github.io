@@ -1,0 +1,1193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[mpilquist.github.io]]></title>
+  <link href="http://mpilquist.github.io/atom.xml" rel="self"/>
+  <link href="http://mpilquist.github.io/"/>
+  <updated>2015-05-30T10:46:11-04:00</updated>
+  <id>http://mpilquist.github.io/</id>
+  <author>
+    <name><![CDATA[Michael Pilquist]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Introduction to generic programming with Shapeless, with applications from scodec]]></title>
+    <link href="http://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/"/>
+    <updated>2015-04-22T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless</id>
+    <content type="html"><![CDATA[<p>Talk given at <a href="http://www.meetup.com/scala-phase/">PHASE</a>. Slides available on <a href="https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec">SpeakerDeck</a>.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/eNJ6ZbbrP2A" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Functional Structures in Scala Screencast Series]]></title>
+    <link href="http://mpilquist.github.io/blog/2015/04/22/functional-structures/"/>
+    <updated>2015-04-22T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2015/04/22/functional-structures</id>
+    <content type="html"><![CDATA[<p>Informal talk series that presents the major functional programming type classes in Scala.</p>
+
+<p>Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (<a href="http://www.manning.com/bjarnason/">http://www.manning.com/bjarnason/</a>).</p>
+
+<p>Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/Dsd4pc99FSY?list=PLFrwDVdSrYE6dy14XCmUtRAJuhCxuzJp0" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Explorations in Variance]]></title>
+    <link href="http://mpilquist.github.io/blog/2014/05/27/variance/"/>
+    <updated>2014-05-27T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2014/05/27/variance</id>
+    <content type="html"><![CDATA[<p>A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:</p>
+
+<ul>
+<li>A review of subtyping invariance</li>
+<li>Functor typeclass</li>
+<li>Contravariant functor typeclass</li>
+<li>Invariant functor typeclass</li>
+<li>Profunctor typeclass</li>
+<li>Correspondence between subtyping variance and functor variance</li>
+</ul>
+
+
+<p>Slides and code available on <a href="https://github.com/mpilquist/variance-explorations">GitHub</a>.</p>
+
+<p>Slides available on <a href="https://speakerdeck.com/mpilquist/explorations-in-variance">SpeakerDeck</a>.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/VZWLRepyNvo" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[scodec - Part 3 - Shapeless]]></title>
+    <link href="http://mpilquist.github.io/blog/2013/06/09/scodec-part-3/"/>
+    <updated>2013-06-09T22:10:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2013/06/09/scodec-part-3</id>
+    <content type="html"><![CDATA[<p>This is part 3 of a series of posts about <a href="http://github.com/mpilquist/scodec/">scodec</a>. In <a href="http://mpilquist.github.io/blog/2013/06/01/scodec-part-2/">Part 2</a>, we saw how to create a <code>Codec[A]</code> and xmap it in to a <code>Codec[B]</code>. In this post, we&rsquo;ll show how to use <a href="http://github.com/milessabin/shapeless/">Shapeless</a> to perform automatic xmapping to case classes.</p>
+
+<!-- more -->
+
+
+<h1>Shapeless HLists</h1>
+
+<p>Shapeless is a generic programming library by Miles Sabin. One of the primary abstractions in Shapeless is the HList, or heterogeneous list. An HList represents a list of values of arbitrary types where the type of each element is preserved during compilation. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">foo</span> <span class="k">=</span> <span class="mi">1</span> <span class="o">::</span> <span class="kc">true</span> <span class="o">::</span> <span class="s">&quot;yes&quot;</span> <span class="o">::</span> <span class="nc">Nil</span>
+</span><span class='line'><span class="k">val</span> <span class="n">bar</span> <span class="k">=</span> <span class="mi">1</span> <span class="o">::</span> <span class="kc">true</span> <span class="o">::</span> <span class="s">&quot;yes&quot;</span> <span class="o">::</span> <span class="nc">HNil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The type of <code>foo</code> is <code>List[Any]</code> because <code>Any</code> is the least upper bound of <code>Int</code>, <code>Boolean</code>, and <code>String</code>. The type of <code>bar</code> is <code>Int :: Boolean :: String :: HNil</code>. The number of list elements and the type of each element is preserved.</p>
+
+<p>For a fantastic introduction to HLists, see Miles&rsquo;s <a href="http://2013.flatmap.no/sabin.html">recent talk at flatMap(Oslo)</a>.</p>
+
+<p>Shapeless supports converting an HList of the proper type to a case class instance and vice-versa. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Point3D</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">z</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">pointIso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">Point3D</span>, <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>  <span class="nc">Iso</span><span class="o">.</span><span class="n">hlist</span><span class="o">(</span><span class="nc">Point3D</span><span class="o">.</span><span class="n">apply</span> <span class="k">_</span><span class="o">,</span> <span class="nc">Point3D</span><span class="o">.</span><span class="n">unapply</span> <span class="k">_</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">components</span> <span class="k">=</span> <span class="mi">1</span> <span class="o">::</span> <span class="mi">2</span> <span class="o">::</span> <span class="mi">3</span> <span class="o">::</span> <span class="nc">HNil</span>
+</span><span class='line'><span class="k">val</span> <span class="n">point</span> <span class="k">=</span> <span class="n">pointIso</span><span class="o">.</span><span class="n">from</span><span class="o">(</span><span class="n">components</span><span class="o">)</span> <span class="c1">// Point(1, 2, 3)</span>
+</span><span class='line'><span class="k">val</span> <span class="n">backToComponents</span> <span class="k">=</span> <span class="n">pointIso</span><span class="o">.</span><span class="n">to</span><span class="o">(</span><span class="n">point</span><span class="o">)</span> <span class="c1">// 1 :: 2 :: 3 :: HNil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The key abstraction here is <code>Iso</code>, which represents an isomorphism between two types. <code>Iso</code> is defined in Shapeless source like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Iso</span><span class="o">[</span><span class="kt">T</span>, <span class="kt">U</span><span class="o">]</span> <span class="o">{</span> <span class="n">self</span> <span class="k">=&gt;</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">to</span><span class="o">(</span><span class="n">t</span> <span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">:</span> <span class="kt">U</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">from</span><span class="o">(</span><span class="n">u</span> <span class="k">:</span> <span class="kt">U</span><span class="o">)</span> <span class="k">:</span> <span class="kt">T</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>Iso</code> companion object defines the <code>hlist</code> method, which returns an isomorphism between a case class and an HList of the appropriate shape given the case class&rsquo;s <code>apply</code> and <code>unapply</code> methods. Typically, the iso is defined as an implicit val in the companion object of the case class to allow other modules implicit access to it. Additionally, it&rsquo;s type is typically inferred. So we&rsquo;d actually write this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Point3D</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">z</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">Point3D</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">implicit</span> <span class="k">val</span> <span class="n">hlistIso</span> <span class="k">=</span> <span class="nc">Iso</span><span class="o">.</span><span class="n">hlist</span><span class="o">(</span><span class="nc">Point3D</span><span class="o">.</span><span class="n">apply</span> <span class="k">_</span><span class="o">,</span> <span class="nc">Point3D</span><span class="o">.</span><span class="n">unapply</span> <span class="k">_</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Note: the <a href="https://github.com/milessabin/shapeless/tree/topic/macro-paradise">macro-paradise</a> branch of Shapeless removes the need for this boilerplate. Instead, an equivalent isomorphism can be summoned when needed via <code>Iso[Point3D, Int :: Int :: Int :: HNil]</code>. The macro-paradise branch uses new macro features from <a href="http://docs.scala-lang.org/overviews/macros/paradise.html">Eugene Burmako&rsquo;s branch of Scala</a>. For more information, see <a href="http://marakana.com/s/post/1421/shapeless_meets_implicit_macros">Miles&rsquo;s talk at NEScala 2013</a>. For a discussion on new macro features, see <a href="https://groups.google.com/d/msg/scala-internals/91W0-PxMQ9Q/bTounkiouB8J">scala-internals</a>.)</p>
+
+<h1>HList Codecs</h1>
+
+<p>Given a codec for an HList and an iso between the HList type and a case class, we can use <code>xmap</code> to convert the codec:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">comps</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="k">val</span> <span class="n">points</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span> <span class="k">=</span> <span class="n">comps</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="nc">Point3D</span><span class="o">.</span><span class="n">hlistIso</span><span class="o">.</span><span class="n">from</span><span class="o">,</span> <span class="nc">Point3D</span><span class="o">.</span><span class="n">hlistIso</span><span class="o">.</span><span class="n">to</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is an extremely common operation, so we let&rsquo;s add direct support for it. We can add a method to <code>Codec</code> that takes an <code>Iso</code> and delegates to <code>xmap</code>. Further, we can make the iso parameter implicit, allowing the compiler to find the right iso automatically:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">BitVector</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">bits</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="n">as</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="k">implicit</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">B</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="k">this</span><span class="o">)(</span><span class="n">iso</span><span class="o">.</span><span class="n">from</span><span class="o">,</span> <span class="n">iso</span><span class="o">.</span><span class="n">to</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This allows our point example to be rewritten as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">comps</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="k">val</span> <span class="n">points</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span> <span class="k">=</span> <span class="n">comps</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Constructing HList Codecs</h1>
+
+<p>So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&rsquo;s always the option to extend <code>Codec</code> directly but we&rsquo;d prefer something more compositional in nature &mdash; some way to create the codec from smaller codecs.</p>
+
+<h2>HList of Codecs</h2>
+
+<p>One way of accomplishing this is to create an HList of codecs:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">int</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="o">...</span>
+</span><span class='line'><span class="k">val</span> <span class="n">threeInts</span> <span class="k">=</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="nc">HNil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The type of <code>threeInts</code> is <code>Codec[Int] :: Codec[Int] :: Codec[Int] :: HNil</code> but we want a <code>Codec[Int :: Int :: Int :: HNil]</code>. It looks like an <a href="http://stackoverflow.com/questions/16127360/sequencing-an-hlist">applicative sequence operation on the HList</a> would do the trick but there&rsquo;s no <code>Applicative</code> instance for <code>Codec</code> (remember in part 2, we showed that <code>Codec</code> does not have a covariant functor instance, therefore, there cannot be an <code>Applicative</code> instance). Instead, we can implement this conversion directly by folding right over the elements of the HList. Our starting value is simply a <code>Codec[HNil]</code> and the fold operation prepends a specific codec on to the accumulated HList codec.</p>
+
+<p>Let&rsquo;s start by implementing the empty case and the fold operation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">val</span> <span class="n">hnilCodec</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">hn</span><span class="k">:</span> <span class="kt">HNil</span><span class="o">)</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">BitVector</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">\/-((</span><span class="n">buffer</span><span class="o">,</span> <span class="nc">HNil</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">prepend</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">l</span><span class="o">)(</span><span class="n">xs</span><span class="o">.</span><span class="n">head</span><span class="o">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">tail</span><span class="o">)</span>
+</span><span class='line'>      <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">yield</span> <span class="n">decA</span> <span class="o">::</span> <span class="n">decL</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>prepend</code> method&rsquo;s type signature is interesting. Every specific HList (e.g., <code>Int :: Int :: Int :: HNil</code>) is a subtype of the HList type. The signature of <code>prepend</code> takes advantage of that in order to take a <code>Codec[L]</code> where <code>L</code> is any HList type. Further, it uses <code>L</code> in its return type, along with the cons (<code>::</code>) type operator, to declare that a <code>Codec[A :: L]</code> is returned. As a result, <code>encode</code> can split its argument in to an <code>A</code> and an <code>L</code> via <code>head</code> and <code>tail</code> respectively, and use the <code>encodeBoth</code> function we implemented in part 1. Similarly, <code>decode</code> can decode an <code>A</code> and an <code>L</code> and then put them together with the cons value operator.</p>
+
+<p>Now let&rsquo;s use these with <code>foldRight</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>    <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="n">prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are two issues with this implementation though. The first is that <code>foldRight</code> on HList takes a <code>Poly2</code> as its second argument, not a regular monomorhpic function. Second, our type signature claims to work with all HLists, regardless of their contents, but we only want to accept <code>HLists</code> where each element is a <code>Codec</code> of an arbitrary type.</p>
+
+<p>Let&rsquo;s lift <code>prepend</code> in to a <code>Poly2</code> instance:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">object</span> <span class="nc">Prepend</span> <span class="k">extends</span> <span class="nc">Poly2</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="k">def</span> <span class="n">caseCodecAndCodecHList</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>      <span class="n">at</span><span class="o">[</span><span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">]](</span><span class="n">prepend</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we need to limit the type of <code>HLists</code> that can be passed to apply. We can do this by asking (the compiler) for evidence that each member of <code>L</code> is a <code>Codec</code> of an arbitrary type. Shapeless supports this via <code>UnaryTCConstraint</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">import</span> <span class="nn">UnaryTCConstraint._</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span> <span class="kt">:</span> <span class="kt">*-&gt;*</span><span class="o">[</span><span class="kt">Codec</span><span class="o">]</span><span class="k">#</span><span class="kt">λ</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>    <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="nc">Prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Compiling this shows that we aren&rsquo;t quite done:
+<code>could not find implicit value for parameter folder: shapeless.RightFolder[L,scodec.Codec[shapeless.HNil],scodec.HListCodec.Prepend.type]</code></p>
+
+<p>This is due to the <code>foldRight</code> operation requiring an implicit <code>RightFolder</code> parameter. In general, when can solve these types of errors by adding implicit parameters to our function signature. In this case, by requiring an implicit <code>RightFolder</code> of the specified type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">import</span> <span class="nn">UnaryTCConstraint._</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span> <span class="kt">:</span> <span class="kt">*-&gt;*</span><span class="o">[</span><span class="kt">Codec</span><span class="o">]</span><span class="k">#</span><span class="kt">λ</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)(</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">folder</span><span class="k">:</span> <span class="kt">RightFolder</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span>, <span class="kt">Prepend.</span><span class="k">type</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">)</span> <span class="k">=</span> <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="nc">Prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can stop at this point if we want &ndash; the implementation is now fully functional. If we want to be explicit about the return type of <code>apply</code>, we have one more step. Namely, we need to indicate that <code>apply</code> returns a <code>Codec[M]</code> where <code>M</code> is an HList. Further, we need to describe the relationship between <code>L</code> and <code>M</code>, which is provided by <code>RightFolderAux</code> &ndash; an alternative to <code>RightFolder</code> that lets us use the result type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">import</span> <span class="nn">UnaryTCConstraint._</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span> <span class="kt">:</span> <span class="kt">*-&gt;*</span><span class="o">[</span><span class="kt">Codec</span><span class="o">]</span><span class="k">#</span><span class="kt">λ</span>, <span class="kt">M</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)(</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">folder</span><span class="k">:</span> <span class="kt">RightFolderAux</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span>, <span class="kt">Prepend.</span><span class="k">type</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">M</span><span class="o">]]</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">M</span><span class="o">]</span> <span class="k">=</span> <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="nc">Prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Prepending a codec on to an HList codec</h2>
+
+<p>Now that we have a way to construct HList codecs, let&rsquo;s consider other operations on them. For starters, consider combining a <code>Codec[A]</code> with a <code>Codec[L]</code> where <code>L</code> is an HList. We built this combinator earlier &mdash; the <code>prepend</code> method used in the call to <code>foldRight</code> when constructing an HList codec. We can add an operator to HList codecs that aliases <code>prepend</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedHListCodec</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">::[</span><span class="kt">A</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">]</span> <span class="k">=</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">prepend</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can cons codecs on the the front of an HList codec with <code>::</code>. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">comps</span> <span class="k">=</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">hnilCodec</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can further simplify this by defining the <code>::</code> operator on a non-HList codec as well. Calling <code>::</code> on a non-HList codec should prepend the left codec on to the result of the right codec prepended to <code>Codec[HNil]</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedCodec</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">::[</span><span class="kt">B</span><span class="o">](</span><span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span> <span class="kt">::</span> <span class="kt">A</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">HListCodec</span><span class="o">.</span><span class="n">prepend</span><span class="o">(</span><span class="n">codecB</span><span class="o">,</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">prepend</span><span class="o">(</span><span class="n">codecA</span><span class="o">,</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">hnilCodec</span><span class="o">))</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This lets us write the <code>Points3D</code> codec as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">points</span> <span class="k">=</span> <span class="o">(</span><span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span><span class="o">).</span><span class="n">as</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Appending a codec on to an HList codec</h2>
+
+<p>Similarly, we can imagine the need to append a <code>Codec[A]</code> on to the end of a <code>Codec[L]</code>. We don&rsquo;t have a convenient type operator to represent the result of appending <code>A</code> to <code>L</code> so we&rsquo;ll just define a new type parameter <code>LA</code> and require implicit evidence that ensures <code>LA</code> represents the list with <code>A</code> appended to the end of <code>L</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">append</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span>
+</span><span class='line'>    <span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">],</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">)(</span><span class="k">implicit</span> <span class="o">???</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">LA</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s start with the implementation of decode. We can decode with <code>l</code> and then with <code>a</code> and then append the result from <code>a</code> on to the end of the result from <code>l</code>. For the implementation of encode, we need to take everything but the last element out of the provided value of type <code>LA</code> and encode it with <code>l</code>. Then we need to take the last element from the value of type <code>LA</code> and encode it with <code>a</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">append</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span>
+</span><span class='line'>    <span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">],</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">)(</span><span class="k">implicit</span> <span class="o">???</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">LA</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">a</span><span class="o">)(</span><span class="n">xs</span><span class="o">.</span><span class="n">init</span><span class="o">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">last</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">yield</span> <span class="n">decL</span> <span class="o">:+</span> <span class="n">decA</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Compiling this and inspecting the implicits that Shapeless needs causes us to add an implicit for the call to <code>init</code>, and implicit for the call to <code>last</code>, and an implicit for the call to <code>:+</code>. For the implicits supporting <code>init</code> and <code>last</code>, we need to further refine the return type of each by specifying the output type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">append</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">],</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>    <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">A</span> <span class="kt">::</span> <span class="kt">HNil</span>, <span class="kt">LA</span><span class="o">],</span>
+</span><span class='line'>    <span class="n">init</span><span class="k">:</span> <span class="kt">Init</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">L</span> <span class="o">},</span>
+</span><span class='line'>    <span class="n">last</span><span class="k">:</span> <span class="kt">Last</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">LA</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">a</span><span class="o">)(</span><span class="n">xs</span><span class="o">.</span><span class="n">init</span><span class="o">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">last</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">yield</span> <span class="n">decL</span> <span class="o">:+</span> <span class="n">decA</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And we can provide syntax support for this as well:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedHListCodec</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">:+[</span><span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>    <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">A</span> <span class="kt">::</span> <span class="kt">HNil</span>, <span class="kt">LA</span><span class="o">],</span>
+</span><span class='line'>    <span class="n">init</span><span class="k">:</span> <span class="kt">Init</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">L</span> <span class="o">},</span>
+</span><span class='line'>    <span class="n">last</span><span class="k">:</span> <span class="kt">Last</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="n">append</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Concatenating HList codecs</h2>
+
+<p>Finally, we can concatenate two HList codecs. We can concatenate a <code>Codec[K]</code> with a <code>Codec[L]</code> in to a <code>Codec[KL]</code>. In the same way we did with the <code>append</code> method, we&rsquo;ll just invent the type parameter <code>KL</code> and then require evidence that it has the structure of <code>K</code> concatenated with <code>L</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">concat</span><span class="o">[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">ck</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">],</span> <span class="n">cl</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])(</span>
+</span><span class='line'>  <span class="k">implicit</span> <span class="o">???</span>
+</span><span class='line'><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">KL</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As usual, we&rsquo;ll start with the implementation of decode. We can use the same basic template as we used in <code>append</code> but instead of appending a single element, we&rsquo;ll just concatenate the result of each decode operation. The compiler informs us that we need a <code>Prepend</code> implicit in scope. This time, we want to bind the result of concatenation to the <code>KL</code> type parameter so we&rsquo;ll use <code>PrependAux</code> instead:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">concat</span><span class="o">[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KLen</span> <span class="k">&lt;:</span> <span class="kt">Nat</span><span class="o">](</span><span class="n">ck</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">],</span> <span class="n">cl</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>  <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">L</span>, <span class="kt">KL</span><span class="o">]</span>
+</span><span class='line'><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">KL</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">decK</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">ck</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">cl</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">decK</span> <span class="o">:::</span> <span class="n">decL</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To encode, we need to split the provided HList of type <code>KL</code> in to two HLists &mdash; one of <code>K</code> and one of <code>L</code>. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of <code>K</code> and split the provided <code>KL</code> at that position, yielding two HLists &mdash; one of type <code>K</code> and another of type <code>L</code>. Because we are splitting <code>KL</code> with a statically known length, the <code>split</code> method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list <code>K</code> &ndash; called &lsquo;KLen&rsquo;. We then need to bind the length of <code>K</code> to that parameter. Finally, we need an implicit <code>Split</code> parameter for splitting <code>KL</code> at position <code>KLen</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">concat</span><span class="o">[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KLen</span> <span class="k">&lt;:</span> <span class="kt">Nat</span><span class="o">](</span>
+</span><span class='line'>  <span class="n">ck</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">],</span> <span class="n">cl</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">]</span>
+</span><span class='line'><span class="o">)(</span><span class="k">implicit</span>
+</span><span class='line'>  <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">L</span>, <span class="kt">KL</span><span class="o">],</span>
+</span><span class='line'>  <span class="n">lengthK</span><span class="k">:</span> <span class="kt">Length</span><span class="o">[</span><span class="kt">K</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="nc">KLen</span> <span class="o">},</span>
+</span><span class='line'>  <span class="n">split</span><span class="k">:</span> <span class="kt">Split</span><span class="o">[</span><span class="kt">KL</span>, <span class="kt">KLen</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">P</span> <span class="o">=</span> <span class="n">K</span><span class="o">;</span> <span class="k">type</span> <span class="kt">S</span> <span class="o">=</span> <span class="n">L</span> <span class="o">}</span>
+</span><span class='line'><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">KL</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="o">(</span><span class="n">k</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span> <span class="k">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">split</span><span class="o">[</span><span class="kt">KLen</span><span class="o">]</span>
+</span><span class='line'>    <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">ck</span><span class="o">,</span> <span class="n">cl</span><span class="o">)(</span><span class="n">k</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">decK</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">ck</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">cl</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">decK</span> <span class="o">:::</span> <span class="n">decL</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Syntax support follow the same pattern as before:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedHListCodec</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">:::[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KLen</span> <span class="k">&lt;:</span> <span class="kt">Nat</span><span class="o">](</span><span class="n">k</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>    <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">L</span>, <span class="kt">KL</span><span class="o">],</span>
+</span><span class='line'>    <span class="n">lengthK</span><span class="k">:</span> <span class="kt">Length</span><span class="o">[</span><span class="kt">K</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="nc">KLen</span> <span class="o">},</span>
+</span><span class='line'>    <span class="n">split</span><span class="k">:</span> <span class="kt">Split</span><span class="o">[</span><span class="kt">KL</span>, <span class="kt">KLen</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">P</span> <span class="o">=</span> <span class="n">K</span><span class="o">;</span> <span class="k">type</span> <span class="kt">S</span> <span class="o">=</span> <span class="n">L</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="n">concat</span><span class="o">(</span><span class="n">k</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Wrap Up</h1>
+
+<p>In this post we looked at how scodec uses Shapeless to provide type-safe binding of binary structures to case classes. In the process, we&rsquo;ve explored some type-level generic programming.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[scodec - Part 2 - Conversions]]></title>
+    <link href="http://mpilquist.github.io/blog/2013/06/01/scodec-part-2/"/>
+    <updated>2013-06-01T10:40:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2013/06/01/scodec-part-2</id>
+    <content type="html"><![CDATA[<p>In <a href="http://mpilquist.github.io/blog/2013/05/27/scodec-intro/">Part 1</a>, we looked at the codec trait and a way to create a <code>Codec[(A, B)]</code> out of a <code>Codec[A]</code> and a <code>Codec[B]</code>. In this post, we&rsquo;ll look at converting a <code>Codec[A]</code> to a <code>Codec[B]</code> using a type driven approach and we&rsquo;ll get our feet wet with some category theory.</p>
+
+<!-- more -->
+
+
+<p>Consider this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Point2D</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If we have a codec for an integer, we can create a <code>Codec[(Int, Int)]</code> easily using the <code>TupleCodec</code> from Part 1:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">int</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="o">...</span>
+</span><span class='line'><span class="k">val</span> <span class="n">tuple</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">Int</span><span class="o">)]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">TupleCodec</span><span class="o">(</span><span class="n">int</span><span class="o">,</span> <span class="n">int</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Working directly with tuples isn&rsquo;t pleasant, so we&rsquo;d like to be able to create a <code>Codec[Point2D]</code> from a <code>Codec[(Int, Int)]</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">point</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Point2D</span><span class="o">]</span> <span class="k">=</span> <span class="o">???</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hence, we need a function that can convert a <code>Codec[A]</code> to a <code>Codec[B]</code>. This looks like functor map, so let&rsquo;s try it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">ca</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buf</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">B</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s start with the implementation of <code>decode</code>. We have:</p>
+
+<ul>
+<li><code>buf</code>, a value of <code>BitVector</code></li>
+<li><code>f</code>, a function <code>A =&gt; B</code></li>
+<li><code>ca</code>, a <code>Codec[A]</code></li>
+</ul>
+
+
+<p>Using those values, we need to produce a <code>String \/ (BitVector, B)</code>. We can use the values as jigsaw puzzle pieces and find a way to put all the proper shapes together. In this case, we can call <code>decode</code> on <code>ca</code> to get back a value of <code>String \/ (BitVector, A)</code>. Then we can map <code>f</code> over the inner <code>A</code> to get a <code>String \/ (BitVector, B)</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">ca</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buf</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">B</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>    <span class="n">ca</span><span class="o">.</span><span class="n">decode</span><span class="o">(</span><span class="n">buf</span><span class="o">)</span> <span class="n">map</span> <span class="o">{</span> <span class="k">case</span> <span class="o">(</span><span class="n">rest</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">rest</span><span class="o">,</span> <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))</span> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So far so good. Let&rsquo;s try the same type driven approach with the implementation of <code>encode</code>. We have:</p>
+
+<ul>
+<li><code>b</code>, a value of <code>B</code></li>
+<li><code>f</code>, a function <code>A =&gt; B</code></li>
+<li><code>ca</code>, a <code>Codec[A]</code></li>
+</ul>
+
+
+<p>It seems we are at an impasse &mdash; no matter which value we start with, there&rsquo;s no way to combine it with the other values. Intuitively, we know that encode should use <code>ca.encode</code> in its implementation, so let&rsquo;s try that:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">ca</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span>
+</span><span class='line'>    <span class="n">ca</span><span class="o">.</span><span class="n">encode</span><span class="o">(???)</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In order to call encode, we need a value of <code>A</code> but we only have a value of <code>B</code>. Again, relying on intuition, we know we should use <code>b</code> to generate a value of type <code>A</code>. To do so, we can just <em>materialize</em> a function <code>B =&gt; A</code> by asking for it in the signature of <code>map</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">ca</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">,</span> <span class="n">g</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span>
+</span><span class='line'>    <span class="n">ca</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">g</span><span class="o">(</span><span class="n">b</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Detour in to category theory</h3>
+
+<p>We now have a working way to convert a <code>Codec[A]</code> to a <code>Codec[B]</code> but naming the function <code>map</code> is awkward. We started with the name map because the problem felt like a functor map. But by the time we finished, we ended up needing two functions, <code>f: A =&gt; B</code> and <code>g: B =&gt; A</code>. Let&rsquo;s rename this function to <code>sortOfMap</code> for now and consider a typeclass for types that support the general signature:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">NotQuiteFunctor</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">sortOfMap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">,</span> <span class="n">g</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://www.haskell.org/hoogle/?hoogle=%28a+-%3E+b%29-%3E%28b-%3Ea%29-%3E%28f+a%29-%3E%28f+b%29">Searching Hoogle</a> for this type signature doesn&rsquo;t find any exact matches. Lars Hupel pointed out to me that this typeclass is actually an <em>invariant functor</em> or <em>exponential functor</em>. The <code>sortOfMap</code> operation is typically called <code>invmap</code> or <code>xmap</code>. Edward Kmett has a <a href="http://comonad.com/reader/2008/rotten-bananas/">fascinating blog post exploring exponential functors</a> (note: currently offline, see <a href="http://webcache.googleusercontent.com/search?q=cache%3Acomonad.com%2Freader%2F2008%2Frotten-bananas%2F&amp;oq=cache%3Acomonad.com%2Freader%2F2008%2Frotten-bananas%2F&amp;aqs=chrome.0.57j58.3499j0&amp;sourceid=chrome&amp;ie=UTF-8">cached version</a>). Additionally, <a href="http://tmorris.net/posts/functors-and-things-using-scala/index.html">Tony Morris&rsquo;s index of functor types</a> lists the invariant/exponential functor as well.</p>
+
+<p>Now that we know the name for the typeclass we abstracted, let&rsquo;s examine the laws for it. An invariant functor has two laws:</p>
+
+<ul>
+<li>identity &ndash; <code>xmap(ma)(identity, identity) == ma</code></li>
+<li>composite &ndash; <code>xmap(xmap(ma)(f1, g1))(f2, g2) == xmap(ma)(f2 compose f1, g1 compose g2)</code></li>
+</ul>
+
+
+<p>The identity law states that xmapping with identity does not modify the input. The composite law states that function composition distributes over the xmap operation.</p>
+
+<p>Note that every <em>covariant functor</em> (the kind of functor that us Scala developers are most familiar with) gives rise to an <em>invariant functor</em> that ignores the <code>g</code> function. Similarly, every <em>contravariant functor</em> (which defines <code>def contramap[A, B](f: B =&gt; A): F[B]</code>) gives rise to an <em>invariant functor</em> that ignores the <code>f</code> function.</p>
+
+<p>Unfortunately, Scalaz 7 does not provide an <code>InvariantFunctor</code> typeclass. It was present in Scalaz 6 though, and as far as I can tell, it wasn&rsquo;t removed deliberately. Hence, we can <a href="https://github.com/scalaz/scalaz/pull/351">integrate it in to the Scalaz 7 typeclass hierarchy</a>.</p>
+
+<h3>Integrating xmap</h3>
+
+<p>Now that we have a handle on what this operation is, we can complete the implementation in scodec:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">Codec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">xmap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">codec</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">,</span> <span class="n">g</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span>
+</span><span class='line'>      <span class="n">codec</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">g</span><span class="o">(</span><span class="n">b</span><span class="o">))</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">B</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>      <span class="n">codec</span><span class="o">.</span><span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="k">case</span> <span class="o">(</span><span class="n">rest</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">rest</span><span class="o">,</span> <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can also add <code>xmap</code> directly to the <code>Codec</code> trait to allow OO style method usage:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="n">xmap</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">,</span> <span class="n">g</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">Codec</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="k">this</span><span class="o">)(</span><span class="n">f</span><span class="o">,</span> <span class="n">g</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Returning to our original example, we can now easily convert a <code>Codec[(Int, Int)]</code> in to a <code>Codec[Point2D]</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">tuple</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[(</span><span class="kt">Int</span>, <span class="kt">Int</span><span class="o">)]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">TupleCodec</span><span class="o">(</span><span class="n">int</span><span class="o">,</span> <span class="n">int</span><span class="o">)</span>
+</span><span class='line'><span class="k">val</span> <span class="n">point</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Point2D</span><span class="o">]</span> <span class="k">=</span> <span class="n">tuple</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span>
+</span><span class='line'>  <span class="o">{</span> <span class="k">case</span> <span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Point2D</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="o">},</span>
+</span><span class='line'>  <span class="o">{</span> <span class="n">p</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="o">,</span> <span class="n">p</span><span class="o">.</span><span class="n">y</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Wrap Up</h3>
+
+<p>In this post, we used a type driven approach plus some intuition to implement the xmap operation. By abstracting out a typeclass, we learned about invariant functors.</p>
+
+<p>In the next post, we&rsquo;ll look at using <a href="https://github.com/milessabin/shapeless">Shapeless</a> to simplify codec definitions and xmapping.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[scodec - Part 1 - Introduction]]></title>
+    <link href="http://mpilquist.github.io/blog/2013/05/27/scodec-intro/"/>
+    <updated>2013-05-27T15:47:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2013/05/27/scodec-intro</id>
+    <content type="html"><![CDATA[<p>I recently started the <a href="http://github.com/mpilquist/scodec">scodec</a> project to simplify handling of binary data in Scala. From the project page:</p>
+
+<blockquote><p>This library focuses on contract-first and pure functional encoding and decoding of binary data.
+The following design constraints are considered:</p>
+
+<ul>
+<li>Binary structure should mirror protocol definitions and be self-evident under casual reading</li>
+<li>Mapping binary structures to types should be statically verified</li>
+<li>Encoding and decoding should be purely functional</li>
+<li>Failures in encoding and decoding should provide descriptive errors</li>
+<li>Compiler plugin should not be used</li>
+</ul>
+
+
+<p>As a result, the library is implemented as a combinator based DSL.
+Performance is considered but yields to the above design constraints.</p></blockquote>
+
+<p>This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of <a href="http://github.com/milessabing/shapeless">Shapeless</a>.</p>
+
+<!-- more -->
+
+
+<h2>Terminology</h2>
+
+<ul>
+<li><em>encoding</em> &ndash; converting a value in to its binary representation</li>
+<li><em>decoding</em> &ndash; converting binary data in to a value</li>
+<li><em>codec</em> &ndash; a value that can encode and decode values of a given Scala type</li>
+</ul>
+
+
+<h2>Representing Binary</h2>
+
+<p>Binary data is passed around a lot in scodec. As such, a representation of binary data is needed. The representation must satisfy a number of constraints:</p>
+
+<ul>
+<li>Must be immutable</li>
+<li>Must support bit operations such as <code>take(bitCount)</code>, <code>drop(bitCount)</code>, and typical bitwise operators (negation, and, or, xor, &hellip;)</li>
+<li>Must support fast concatenation in order to handle encoding a number of values in to a single binary structure</li>
+<li>Must support fast <code>take(bitCount)</code>/<code>drop(bitCount)</code> operations in order to allow fast decoding</li>
+</ul>
+
+
+<p>Focusing on individual bits as the fundamental element instead of bytes is the most unique constraint. By focusing on bits instead of bytes or words, the combinator DSL is able to support a more natural description of bit fields.</p>
+
+<p><code>Array[Byte]</code> is an unsuitable representation given that it meets none of the stated constraints. <code>java.nio.ByteBuffer</code> does not provide a way to enforce immutable at the type level and fails on the other constraints. <code>Vector[Byte]</code> satisfies all constraints except for providing bit operations.</p>
+
+<p>To satisfy these constraints, scodec includes the <code>BitVector</code> and <code>ByteVector</code> data types and the <code>BitwiseOperation</code> supporting trait. This approach allows the API provided to codec authors to be more focused than generic collections. Additionally, the backing implementation of <code>BitVector</code> and <code>ByteVector</code> can be changed for performance reasons without impacting users.</p>
+
+<h3>BitwiseOperations</h3>
+
+<p><code>BitwiseOperations</code> is a supporting trait that&rsquo;s extended by both <code>BitVector</code> and <code>ByteVector</code>. It provides bitwise shifting operators as well as bitwise negation, bitwise and, bitwise or, and bitwise xor.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">BitwiseOperations</span><span class="o">[</span><span class="kt">Repr</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="o">&lt;&lt;(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">leftShift</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">leftShift</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="o">&gt;&gt;(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">rightShift</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="kc">true</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="o">&gt;&gt;&gt;(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">rightShift</span><span class="o">(</span><span class="n">n</span><span class="o">,</span> <span class="kc">false</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">rightShift</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">signExtension</span><span class="k">:</span> <span class="kt">Boolean</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="n">unary_~</span><span class="o">()</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">not</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">not</span><span class="k">:</span> <span class="kt">Repr</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="o">&amp;(</span><span class="n">other</span><span class="k">:</span> <span class="kt">Repr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">and</span><span class="o">(</span><span class="n">other</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">and</span><span class="o">(</span><span class="n">other</span><span class="k">:</span> <span class="kt">Repr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="o">|(</span><span class="n">other</span><span class="k">:</span> <span class="kt">Repr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">or</span><span class="o">(</span><span class="n">other</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">or</span><span class="o">(</span><span class="n">other</span><span class="k">:</span> <span class="kt">Repr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="o">^(</span><span class="n">other</span><span class="k">:</span> <span class="kt">Repr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span> <span class="o">=</span> <span class="n">xor</span><span class="o">(</span><span class="n">other</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">xor</span><span class="o">(</span><span class="n">other</span><span class="k">:</span> <span class="kt">Repr</span><span class="o">)</span><span class="k">:</span> <span class="kt">Repr</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>BitVector</h3>
+
+<p><code>BitVector</code> represents an immutable sequence of bits. By extending the <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.IndexedSeqOptimized"><code>IndexedSeqOptimized[Boolean, BitVector]</code></a> trait from the Scala collection library, a bit vector can be used as a collection of booleans. As a bonus, most of the implementation is provided by <code>IndexedSeqOptimized</code> &ndash; albeit, sometimes inefficiently.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">BitVector</span> <span class="k">extends</span> <span class="nc">IndexedSeqOptimized</span><span class="o">[</span><span class="kt">Boolean</span>, <span class="kt">BitVector</span><span class="o">]</span> <span class="k">with</span> <span class="nc">BitwiseOperations</span><span class="o">[</span><span class="kt">BitVector</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toByteVector</span><span class="k">:</span> <span class="kt">ByteVector</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toByteArray</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toByteBuffer</span><span class="k">:</span> <span class="kt">ByteBuffer</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Constructing a bit vector can be done in a number of ways. The <code>apply</code> method on the bit vector companion allows direct wrapping of a <code>ByteVector</code>, <code>Array[Byte]</code>, or <code>java.nio.ByteBuffer</code>. To create a bit vector from literal bytes, the literal bytes can be passed directly to apply. For example, <code>BitVector(0x55, 0x2a)</code>.</p>
+
+<p>When decoding, many codecs need to take a certain number of bits and convert them to a value. For example, a codec for a signed 32-bit integer might take 32 bits and return those bits converted to an <code>Int</code> along with the remaining bits in the input vector (via <code>input.drop(32)</code>). <code>BitVector#take</code> is insufficient for this task because taking <code>n</code> bits from a <code>m</code> bit vector where <code>n &gt; m</code> results in <code>m</code> bits being returned. As a result, every codec would need similar error handling for this case.</p>
+
+<p>To simplify this case, <code>BitVector</code> has an <code>acquire</code> method, which gets a bit vector of exactly <code>n</code> bits or returns an error.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">acquire</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">n</span><span class="o">)</span> <span class="o">\/</span> <span class="n">left</span> <span class="n">s</span><span class="s">&quot;cannot acquire $n bits from a vector that contains $size bits&quot;</span>
+</span><span class='line'>  <span class="k">else</span> <span class="o">\/</span> <span class="n">right</span> <span class="n">take</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Note the use of Scalaz&rsquo;s disjunction (i.e., <code>\/</code>) data type, instead of <code>Option[BitVector]</code> or throwing an exception. By providing a disjunction that has a descriptive error message, overall error reporting is improved. (In general, I think Scalaz&rsquo;s disjunction is one of the most undervalued parts of Scalaz.)</p>
+
+<p>The <code>acquire</code> method only handles getting the necessary bits. Converting the acquired bits to a value may fail. Combining bit acquisition with failure checked type conversion can be refactored in to:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">consume</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)(</span><span class="n">decode</span><span class="k">:</span> <span class="kt">BitVector</span> <span class="o">=&gt;</span> <span class="nc">String</span> <span class="o">\/</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">toDecode</span> <span class="k">&lt;-</span> <span class="n">acquire</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">decoded</span> <span class="k">&lt;-</span> <span class="n">decode</span><span class="o">(</span><span class="n">toDecode</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">drop</span><span class="o">(</span><span class="n">n</span><span class="o">),</span> <span class="n">decoded</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ByteVector</h3>
+
+<p><code>ByteVector</code> represents an immutable sequence of bytes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">ByteVector</span> <span class="k">extends</span> <span class="nc">IndexedSeqOptimized</span><span class="o">[</span><span class="kt">Byte</span>, <span class="kt">ByteVector</span><span class="o">]</span> <span class="k">with</span> <span class="nc">BitwiseOperations</span><span class="o">[</span><span class="kt">ByteVector</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toArray</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toByteBuffer</span><span class="k">:</span> <span class="kt">ByteBuffer</span> <span class="o">=</span> <span class="nc">ByteBuffer</span><span class="o">.</span><span class="n">wrap</span><span class="o">(</span><span class="n">toArray</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toBitVector</span><span class="k">:</span> <span class="kt">BitVector</span> <span class="o">=</span> <span class="nc">BitVector</span><span class="o">(</span><span class="k">this</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">toHexadecimal</span><span class="k">:</span> <span class="kt">String</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Unsurprisingly, <code>ByteVector</code> is currently implemented by delegating to a <code>Vector[Byte]</code>. There are a number of potential improvements, including:</p>
+
+<ul>
+<li>for vectors with length &lt;= 8, use a special byte vector implementaiton backed by a single <code>Long</code> value</li>
+<li>delegate to Akka&rsquo;s <a href="https://github.com/akka/akka/blob/master/akka-actor/src/main/scala/akka/util/ByteString.scala"><code>ByteString</code></a></li>
+<li>write a custom vector-like structure that&rsquo;s manually specialized for bytes</li>
+</ul>
+
+
+<p>Before any of these performance improvements are implemented, benchmarks will be developed in order to measure impacts.</p>
+
+<h2>Codecs</h2>
+
+<p>With the basic data types out of the way, we can concretize the definition of a codec.</p>
+
+<p>Encoding is represented by a function <code>A =&gt; String \/ BitVector</code>. By modeling encoding this way, a failure to encode a value of type <code>A</code> can be communicated without throwing an exception. For example, given a <code>Codec[Int]</code> that encodes unsigned 24-bit integers, calling encode with a negative integer would return an error message on the left side of the disjunction.</p>
+
+<p>Decoding is represented by a function <code>BitVector =&gt; String \/ (BitVector, A)</code>. Similar to the rationale for encoding, a failure
+to decode a value of type <code>A</code> results in an error message on the left side of the disjunction. Successful decoding results in a tuple of the remaining (non-consumed) bits and the decoded value.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Tuple Codec</h3>
+
+<p>Consider a codec for a tuple <code>(A, B)</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">class</span> <span class="nc">TupleCodec</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span> <span class="k">extends</span> <span class="nc">Codec</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="o">(</span><span class="kt">A</span><span class="o">,</span> <span class="kt">B</span><span class="o">))</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">codecA</span><span class="o">,</span> <span class="n">codecB</span><span class="o">)(</span><span class="n">t</span><span class="o">.</span><span class="n">_1</span><span class="o">,</span> <span class="n">t</span><span class="o">.</span><span class="n">_2</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">Codec</span><span class="o">.</span><span class="n">decodeBoth</span><span class="o">(</span><span class="n">codecA</span><span class="o">,</span> <span class="n">codecB</span><span class="o">)(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s implement <code>Codec.encodeBoth</code> and <code>Codec.decodeBoth</code>.</p>
+
+<p>First, encoding:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">encodeBoth</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span>
+</span><span class='line'>  <span class="o">???</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Encoding is fairly straightforward. First, <code>a</code> is encoded, then <code>b</code> is encoded, and then the resulting vectors are concatenated. Any error results in the overall encoding failing. This is easily accomplished with a for-comprehension:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">encodeBoth</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="kt">BitVector</span> <span class="o">=</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">encA</span> <span class="k">&lt;-</span> <span class="n">codecA</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">encB</span> <span class="k">&lt;-</span> <span class="n">codecB</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">encA</span> <span class="o">++</span> <span class="n">encB</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Second, decoding:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">decodeBoth</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">(</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span>
+</span><span class='line'>  <span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="o">(</span><span class="kt">A</span><span class="o">,</span> <span class="kt">B</span><span class="o">))</span> <span class="k">=</span> <span class="o">???</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Decoding is accomplished by first decoding with <code>codecA</code>, then, assuming successful decoding, decoding the remaining bits with <code>codecB</code>, and finally returning both decoded values in a tuple. Any error results in the overall decoding failing. This could be implemented directly:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">decodeBoth</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">(</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span>
+</span><span class='line'>  <span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="o">(</span><span class="kt">A</span><span class="o">,</span> <span class="kt">B</span><span class="o">))</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">decA</span> <span class="k">=</span> <span class="n">codecA</span><span class="o">.</span><span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">decA</span> <span class="n">flatMap</span> <span class="o">{</span> <span class="k">case</span> <span class="o">(</span><span class="n">afterA</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">decB</span> <span class="k">=</span> <span class="n">codecB</span><span class="o">.</span><span class="n">decode</span><span class="o">(</span><span class="n">afterA</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">decB</span> <span class="n">map</span> <span class="o">{</span> <span class="k">case</span> <span class="o">(</span><span class="n">afterB</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">afterB</span><span class="o">,</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">B</span><span class="o">))</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can do better than this though. Note the type signature of <code>Codec#decode</code>: <code>BitVector =&gt; String \/ (BitVector, A)</code>. The <a href="https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/StateT.scala"><code>scalaz.StateT</code></a> monad transformer wraps functions of the form <code>S =&gt; F[(S, A)]</code> for a monad <code>F</code>. We can set <code>F</code> to <code>String \/ ?</code> resulting in <code>StateT[({type λ[+α] = Error \/ α})#λ, BitVector, A]</code>. This pattern occurs often enough when working with codecs to warrant special support:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">type</span> <span class="kt">DecodingContext</span><span class="o">[</span><span class="kt">+A</span><span class="o">]</span> <span class="k">=</span> <span class="nc">StateT</span><span class="o">[({</span><span class="k">type</span> <span class="kt">λ</span><span class="o">[</span><span class="kt">+α</span><span class="o">]</span> <span class="kt">=</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">α</span><span class="o">})</span><span class="k">#</span><span class="kt">λ</span>, <span class="kt">BitVector</span>, <span class="kt">A</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">DecodingContext</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">f</span><span class="k">:</span> <span class="kt">BitVector</span> <span class="o">=&gt;</span> <span class="nc">Error</span> <span class="o">\/</span> <span class="o">(</span><span class="nc">BitVector</span><span class="o">,</span> <span class="n">A</span><span class="o">))</span><span class="k">:</span> <span class="kt">DecodingContext</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">StateT</span><span class="o">[({</span><span class="k">type</span> <span class="kt">λ</span><span class="o">[</span><span class="kt">+α</span><span class="o">]</span> <span class="kt">=</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">α</span><span class="o">})</span><span class="k">#</span><span class="kt">λ</span>, <span class="kt">BitVector</span>, <span class="kt">A</span><span class="o">](</span><span class="n">f</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Returning to <code>decodeBoth</code>, we can use <code>DecodingContext</code> to implement it simply:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">decodeBoth</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">(</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span>
+</span><span class='line'>  <span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="o">(</span><span class="kt">A</span><span class="o">,</span> <span class="kt">B</span><span class="o">))</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">a</span> <span class="k">&lt;-</span> <span class="nc">DecodingContext</span><span class="o">(</span><span class="n">codecA</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">b</span> <span class="k">&lt;-</span> <span class="nc">DecodingContext</span><span class="o">(</span><span class="n">codecB</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>
+</span><span class='line'><span class="o">}.</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Wrap up</h2>
+
+<p>This article presented the basic data types used in scodec. In part 2, we&rsquo;ll look at the <code>Codec</code> trait in more detail and investigate how to convert a <code>Codec[A]</code> in to a <code>Codec[B]</code> given some relations between <code>A</code> and <code>B</code>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Future of the JVM Panel Discussion]]></title>
+    <link href="http://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel/"/>
+    <updated>2013-04-03T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel</id>
+    <content type="html"><![CDATA[<p>Panel discussion at <a href="http://phillyemergingtech.com/2013">Philly ETE 2013</a> with Jamie Allen, Doug Lea, Cliff Click, Charlie Hunt, and myself.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+<iframe src="http://player.vimeo.com/video/65474054?title=0&amp;byline=0&amp;portrait=0" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/65474054">The Future of the JVM</a> from <a href="http://vimeo.com/chariotsolutions">Chariot Solutions</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Scalaz State Monad]]></title>
+    <link href="http://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/"/>
+    <updated>2012-08-28T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad</id>
+    <content type="html"><![CDATA[<p>Introduction to the State Monad in Scalaz 7. Slides available on <a href="https://speakerdeck.com/mpilquist/scalaz-state-monad">SpeakerDeck</a>.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="http://www.youtube.com/embed/Jg3Uv_YWJqI" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Intro to Scalaz 7]]></title>
+    <link href="http://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/"/>
+    <updated>2012-05-24T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7</id>
+    <content type="html"><![CDATA[<p>Introduction to Scalaz 7. Slides available on <a href="http://www.slideshare.net/mpilquist/scalaz-13068563">Slideshare</a> and <a href="https://speakerdeck.com/mpilquist/intro-to-scalaz">SpeakerDeck</a>.</p>
+
+<!-- more -->
+
+
+<script async class="speakerdeck-embed" data-id="2056222046ee0130dacf12313d03008e" data-ratio="1.33333333333333" src="http://mpilquist.github.io//speakerdeck.com/assets/embed.js"></script>
+
+]]></content>
+  </entry>
+  
+</feed>

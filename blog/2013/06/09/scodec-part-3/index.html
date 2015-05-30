@@ -1,0 +1,685 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>scodec - Part 3 - Shapeless - mpilquist.github.io</title>
+	<meta name="author" content="Michael Pilquist">
+
+	
+	<meta name="description" content="This is part 3 of a series of posts about scodec. In Part 2, we saw how to create a Codec[A] and xmap it in to a Codec[B]. In this post, we&rsquo;ll &hellip;">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<link href="/atom.xml" rel="alternate" title="mpilquist.github.io" type="application/atom+xml">
+	<link rel="canonical" href="">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	
+</head>
+
+<body>
+	<header id="header" class="inner"><h1><a href="/">mpilquist.github.io</a></h1>
+<nav id="main-nav"><ul class="main">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/blog/categories/talks">Talks</a></li>
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/blog/categories/talks">Talks</a></li>
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="http://google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:mpilquist.github.io">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		
+		
+		<a class="google" href="https://plus.google.com/106335582774991536012?rel=author" title="Google+">Google+</a>
+		
+		
+		<a class="twitter" href="http://twitter.com/mpilquist" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/mpilquist" title="GitHub">GitHub</a>
+		
+    
+		
+		
+		
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+	<form class="search" action="http://google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:mpilquist.github.io">
+	</form>
+</nav>
+
+</header>
+	
+		
+	
+	<div id="content" class="inner"><article class="post">
+	<h2 class="title">Scodec - Part 3 - Shapeless</h2>
+	<div class="entry-content"><p>This is part 3 of a series of posts about <a href="http://github.com/mpilquist/scodec/">scodec</a>. In <a href="/blog/2013/06/01/scodec-part-2/">Part 2</a>, we saw how to create a <code>Codec[A]</code> and xmap it in to a <code>Codec[B]</code>. In this post, we&rsquo;ll show how to use <a href="http://github.com/milessabin/shapeless/">Shapeless</a> to perform automatic xmapping to case classes.</p>
+
+<!-- more -->
+
+
+<h1>Shapeless HLists</h1>
+
+<p>Shapeless is a generic programming library by Miles Sabin. One of the primary abstractions in Shapeless is the HList, or heterogeneous list. An HList represents a list of values of arbitrary types where the type of each element is preserved during compilation. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">foo</span> <span class="k">=</span> <span class="mi">1</span> <span class="o">::</span> <span class="kc">true</span> <span class="o">::</span> <span class="s">&quot;yes&quot;</span> <span class="o">::</span> <span class="nc">Nil</span>
+</span><span class='line'><span class="k">val</span> <span class="n">bar</span> <span class="k">=</span> <span class="mi">1</span> <span class="o">::</span> <span class="kc">true</span> <span class="o">::</span> <span class="s">&quot;yes&quot;</span> <span class="o">::</span> <span class="nc">HNil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The type of <code>foo</code> is <code>List[Any]</code> because <code>Any</code> is the least upper bound of <code>Int</code>, <code>Boolean</code>, and <code>String</code>. The type of <code>bar</code> is <code>Int :: Boolean :: String :: HNil</code>. The number of list elements and the type of each element is preserved.</p>
+
+<p>For a fantastic introduction to HLists, see Miles&rsquo;s <a href="http://2013.flatmap.no/sabin.html">recent talk at flatMap(Oslo)</a>.</p>
+
+<p>Shapeless supports converting an HList of the proper type to a case class instance and vice-versa. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Point3D</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">z</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">pointIso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">Point3D</span>, <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>  <span class="nc">Iso</span><span class="o">.</span><span class="n">hlist</span><span class="o">(</span><span class="nc">Point3D</span><span class="o">.</span><span class="n">apply</span> <span class="k">_</span><span class="o">,</span> <span class="nc">Point3D</span><span class="o">.</span><span class="n">unapply</span> <span class="k">_</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">components</span> <span class="k">=</span> <span class="mi">1</span> <span class="o">::</span> <span class="mi">2</span> <span class="o">::</span> <span class="mi">3</span> <span class="o">::</span> <span class="nc">HNil</span>
+</span><span class='line'><span class="k">val</span> <span class="n">point</span> <span class="k">=</span> <span class="n">pointIso</span><span class="o">.</span><span class="n">from</span><span class="o">(</span><span class="n">components</span><span class="o">)</span> <span class="c1">// Point(1, 2, 3)</span>
+</span><span class='line'><span class="k">val</span> <span class="n">backToComponents</span> <span class="k">=</span> <span class="n">pointIso</span><span class="o">.</span><span class="n">to</span><span class="o">(</span><span class="n">point</span><span class="o">)</span> <span class="c1">// 1 :: 2 :: 3 :: HNil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The key abstraction here is <code>Iso</code>, which represents an isomorphism between two types. <code>Iso</code> is defined in Shapeless source like this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Iso</span><span class="o">[</span><span class="kt">T</span>, <span class="kt">U</span><span class="o">]</span> <span class="o">{</span> <span class="n">self</span> <span class="k">=&gt;</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">to</span><span class="o">(</span><span class="n">t</span> <span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">:</span> <span class="kt">U</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">from</span><span class="o">(</span><span class="n">u</span> <span class="k">:</span> <span class="kt">U</span><span class="o">)</span> <span class="k">:</span> <span class="kt">T</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>Iso</code> companion object defines the <code>hlist</code> method, which returns an isomorphism between a case class and an HList of the appropriate shape given the case class&rsquo;s <code>apply</code> and <code>unapply</code> methods. Typically, the iso is defined as an implicit val in the companion object of the case class to allow other modules implicit access to it. Additionally, it&rsquo;s type is typically inferred. So we&rsquo;d actually write this:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">Point3D</span><span class="o">(</span><span class="n">x</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">z</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">Point3D</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">implicit</span> <span class="k">val</span> <span class="n">hlistIso</span> <span class="k">=</span> <span class="nc">Iso</span><span class="o">.</span><span class="n">hlist</span><span class="o">(</span><span class="nc">Point3D</span><span class="o">.</span><span class="n">apply</span> <span class="k">_</span><span class="o">,</span> <span class="nc">Point3D</span><span class="o">.</span><span class="n">unapply</span> <span class="k">_</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>(Note: the <a href="https://github.com/milessabin/shapeless/tree/topic/macro-paradise">macro-paradise</a> branch of Shapeless removes the need for this boilerplate. Instead, an equivalent isomorphism can be summoned when needed via <code>Iso[Point3D, Int :: Int :: Int :: HNil]</code>. The macro-paradise branch uses new macro features from <a href="http://docs.scala-lang.org/overviews/macros/paradise.html">Eugene Burmako&rsquo;s branch of Scala</a>. For more information, see <a href="http://marakana.com/s/post/1421/shapeless_meets_implicit_macros">Miles&rsquo;s talk at NEScala 2013</a>. For a discussion on new macro features, see <a href="https://groups.google.com/d/msg/scala-internals/91W0-PxMQ9Q/bTounkiouB8J">scala-internals</a>.)</p>
+
+<h1>HList Codecs</h1>
+
+<p>Given a codec for an HList and an iso between the HList type and a case class, we can use <code>xmap</code> to convert the codec:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">comps</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="k">val</span> <span class="n">points</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span> <span class="k">=</span> <span class="n">comps</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="nc">Point3D</span><span class="o">.</span><span class="n">hlistIso</span><span class="o">.</span><span class="n">from</span><span class="o">,</span> <span class="nc">Point3D</span><span class="o">.</span><span class="n">hlistIso</span><span class="o">.</span><span class="n">to</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is an extremely common operation, so we let&rsquo;s add direct support for it. We can add a method to <code>Codec</code> that takes an <code>Iso</code> and delegates to <code>xmap</code>. Further, we can make the iso parameter implicit, allowing the compiler to find the right iso automatically:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="kt">BitVector</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">bits</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span><span class="k">:</span> <span class="kt">Error</span> <span class="kt">\/</span> <span class="o">(</span><span class="kt">BitVector</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">final</span> <span class="k">def</span> <span class="n">as</span><span class="o">[</span><span class="kt">B</span><span class="o">](</span><span class="k">implicit</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">B</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="k">this</span><span class="o">)(</span><span class="n">iso</span><span class="o">.</span><span class="n">from</span><span class="o">,</span> <span class="n">iso</span><span class="o">.</span><span class="n">to</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This allows our point example to be rewritten as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">comps</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">Int</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="k">val</span> <span class="n">points</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span> <span class="k">=</span> <span class="n">comps</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Constructing HList Codecs</h1>
+
+<p>So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&rsquo;s always the option to extend <code>Codec</code> directly but we&rsquo;d prefer something more compositional in nature &mdash; some way to create the codec from smaller codecs.</p>
+
+<h2>HList of Codecs</h2>
+
+<p>One way of accomplishing this is to create an HList of codecs:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">int</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="o">...</span>
+</span><span class='line'><span class="k">val</span> <span class="n">threeInts</span> <span class="k">=</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="nc">HNil</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The type of <code>threeInts</code> is <code>Codec[Int] :: Codec[Int] :: Codec[Int] :: HNil</code> but we want a <code>Codec[Int :: Int :: Int :: HNil]</code>. It looks like an <a href="http://stackoverflow.com/questions/16127360/sequencing-an-hlist">applicative sequence operation on the HList</a> would do the trick but there&rsquo;s no <code>Applicative</code> instance for <code>Codec</code> (remember in part 2, we showed that <code>Codec</code> does not have a covariant functor instance, therefore, there cannot be an <code>Applicative</code> instance). Instead, we can implement this conversion directly by folding right over the elements of the HList. Our starting value is simply a <code>Codec[HNil]</code> and the fold operation prepends a specific codec on to the accumulated HList codec.</p>
+
+<p>Let&rsquo;s start by implementing the empty case and the fold operation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">val</span> <span class="n">hnilCodec</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">hn</span><span class="k">:</span> <span class="kt">HNil</span><span class="o">)</span> <span class="k">=</span> <span class="o">\/-(</span><span class="nc">BitVector</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">\/-((</span><span class="n">buffer</span><span class="o">,</span> <span class="nc">HNil</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">prepend</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">l</span><span class="o">)(</span><span class="n">xs</span><span class="o">.</span><span class="n">head</span><span class="o">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">tail</span><span class="o">)</span>
+</span><span class='line'>      <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">yield</span> <span class="n">decA</span> <span class="o">::</span> <span class="n">decL</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>prepend</code> method&rsquo;s type signature is interesting. Every specific HList (e.g., <code>Int :: Int :: Int :: HNil</code>) is a subtype of the HList type. The signature of <code>prepend</code> takes advantage of that in order to take a <code>Codec[L]</code> where <code>L</code> is any HList type. Further, it uses <code>L</code> in its return type, along with the cons (<code>::</code>) type operator, to declare that a <code>Codec[A :: L]</code> is returned. As a result, <code>encode</code> can split its argument in to an <code>A</code> and an <code>L</code> via <code>head</code> and <code>tail</code> respectively, and use the <code>encodeBoth</code> function we implemented in part 1. Similarly, <code>decode</code> can decode an <code>A</code> and an <code>L</code> and then put them together with the cons value operator.</p>
+
+<p>Now let&rsquo;s use these with <code>foldRight</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>    <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="n">prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are two issues with this implementation though. The first is that <code>foldRight</code> on HList takes a <code>Poly2</code> as its second argument, not a regular monomorhpic function. Second, our type signature claims to work with all HLists, regardless of their contents, but we only want to accept <code>HLists</code> where each element is a <code>Codec</code> of an arbitrary type.</p>
+
+<p>Let&rsquo;s lift <code>prepend</code> in to a <code>Poly2</code> instance:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">object</span> <span class="nc">Prepend</span> <span class="k">extends</span> <span class="nc">Poly2</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="k">def</span> <span class="n">caseCodecAndCodecHList</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>      <span class="n">at</span><span class="o">[</span><span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">]](</span><span class="n">prepend</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we need to limit the type of <code>HLists</code> that can be passed to apply. We can do this by asking (the compiler) for evidence that each member of <code>L</code> is a <code>Codec</code> of an arbitrary type. Shapeless supports this via <code>UnaryTCConstraint</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">import</span> <span class="nn">UnaryTCConstraint._</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span> <span class="kt">:</span> <span class="kt">*-&gt;*</span><span class="o">[</span><span class="kt">Codec</span><span class="o">]</span><span class="k">#</span><span class="kt">λ</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)</span> <span class="k">=</span>
+</span><span class='line'>    <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="nc">Prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Compiling this shows that we aren&rsquo;t quite done:
+<code>could not find implicit value for parameter folder: shapeless.RightFolder[L,scodec.Codec[shapeless.HNil],scodec.HListCodec.Prepend.type]</code></p>
+
+<p>This is due to the <code>foldRight</code> operation requiring an implicit <code>RightFolder</code> parameter. In general, when can solve these types of errors by adding implicit parameters to our function signature. In this case, by requiring an implicit <code>RightFolder</code> of the specified type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">import</span> <span class="nn">UnaryTCConstraint._</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span> <span class="kt">:</span> <span class="kt">*-&gt;*</span><span class="o">[</span><span class="kt">Codec</span><span class="o">]</span><span class="k">#</span><span class="kt">λ</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)(</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">folder</span><span class="k">:</span> <span class="kt">RightFolder</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span>, <span class="kt">Prepend.</span><span class="k">type</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">)</span> <span class="k">=</span> <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="nc">Prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can stop at this point if we want &ndash; the implementation is now fully functional. If we want to be explicit about the return type of <code>apply</code>, we have one more step. Namely, we need to indicate that <code>apply</code> returns a <code>Codec[M]</code> where <code>M</code> is an HList. Further, we need to describe the relationship between <code>L</code> and <code>M</code>, which is provided by <code>RightFolderAux</code> &ndash; an alternative to <code>RightFolder</code> that lets us use the result type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">import</span> <span class="nn">UnaryTCConstraint._</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span> <span class="kt">:</span> <span class="kt">*-&gt;*</span><span class="o">[</span><span class="kt">Codec</span><span class="o">]</span><span class="k">#</span><span class="kt">λ</span>, <span class="kt">M</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">L</span><span class="o">)(</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">folder</span><span class="k">:</span> <span class="kt">RightFolderAux</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">HNil</span><span class="o">]</span>, <span class="kt">Prepend.</span><span class="k">type</span>, <span class="kt">Codec</span><span class="o">[</span><span class="kt">M</span><span class="o">]]</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">M</span><span class="o">]</span> <span class="k">=</span> <span class="n">l</span><span class="o">.</span><span class="n">foldRight</span><span class="o">(</span><span class="n">hnilCodec</span><span class="o">)(</span><span class="nc">Prepend</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Prepending a codec on to an HList codec</h2>
+
+<p>Now that we have a way to construct HList codecs, let&rsquo;s consider other operations on them. For starters, consider combining a <code>Codec[A]</code> with a <code>Codec[L]</code> where <code>L</code> is an HList. We built this combinator earlier &mdash; the <code>prepend</code> method used in the call to <code>foldRight</code> when constructing an HList codec. We can add an operator to HList codecs that aliases <code>prepend</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedHListCodec</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">::[</span><span class="kt">A</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="kt">::</span> <span class="kt">L</span><span class="o">]</span> <span class="k">=</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">prepend</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can cons codecs on the the front of an HList codec with <code>::</code>. For example:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">comps</span> <span class="k">=</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">hnilCodec</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We can further simplify this by defining the <code>::</code> operator on a non-HList codec as well. Calling <code>::</code> on a non-HList codec should prepend the left codec on to the result of the right codec prepended to <code>Codec[HNil]</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedCodec</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">codecA</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">::[</span><span class="kt">B</span><span class="o">](</span><span class="n">codecB</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span> <span class="kt">::</span> <span class="kt">A</span> <span class="kt">::</span> <span class="kt">HNil</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">HListCodec</span><span class="o">.</span><span class="n">prepend</span><span class="o">(</span><span class="n">codecB</span><span class="o">,</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">prepend</span><span class="o">(</span><span class="n">codecA</span><span class="o">,</span> <span class="nc">HListCodec</span><span class="o">.</span><span class="n">hnilCodec</span><span class="o">))</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This lets us write the <code>Points3D</code> codec as:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">points</span> <span class="k">=</span> <span class="o">(</span><span class="n">int</span> <span class="o">::</span> <span class="n">int</span> <span class="o">::</span> <span class="n">int</span><span class="o">).</span><span class="n">as</span><span class="o">[</span><span class="kt">Points3D</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Appending a codec on to an HList codec</h2>
+
+<p>Similarly, we can imagine the need to append a <code>Codec[A]</code> on to the end of a <code>Codec[L]</code>. We don&rsquo;t have a convenient type operator to represent the result of appending <code>A</code> to <code>L</code> so we&rsquo;ll just define a new type parameter <code>LA</code> and require implicit evidence that ensures <code>LA</code> represents the list with <code>A</code> appended to the end of <code>L</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">append</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span>
+</span><span class='line'>    <span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">],</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">)(</span><span class="k">implicit</span> <span class="o">???</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">LA</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s start with the implementation of decode. We can decode with <code>l</code> and then with <code>a</code> and then append the result from <code>a</code> on to the end of the result from <code>l</code>. For the implementation of encode, we need to take everything but the last element out of the provided value of type <code>LA</code> and encode it with <code>l</code>. Then we need to take the last element from the value of type <code>LA</code> and encode it with <code>a</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">append</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span>
+</span><span class='line'>    <span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">],</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+</span><span class='line'>  <span class="o">)(</span><span class="k">implicit</span> <span class="o">???</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">LA</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">a</span><span class="o">)(</span><span class="n">xs</span><span class="o">.</span><span class="n">init</span><span class="o">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">last</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">yield</span> <span class="n">decL</span> <span class="o">:+</span> <span class="n">decA</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Compiling this and inspecting the implicits that Shapeless needs causes us to add an implicit for the call to <code>init</code>, and implicit for the call to <code>last</code>, and an implicit for the call to <code>:+</code>. For the implicits supporting <code>init</code> and <code>last</code>, we need to further refine the return type of each by specifying the output type:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">HListCodec</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">append</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">],</span> <span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>    <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">A</span> <span class="kt">::</span> <span class="kt">HNil</span>, <span class="kt">LA</span><span class="o">],</span>
+</span><span class='line'>    <span class="n">init</span><span class="k">:</span> <span class="kt">Init</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">L</span> <span class="o">},</span>
+</span><span class='line'>    <span class="n">last</span><span class="k">:</span> <span class="kt">Last</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">LA</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">a</span><span class="o">)(</span><span class="n">xs</span><span class="o">.</span><span class="n">init</span><span class="o">,</span> <span class="n">xs</span><span class="o">.</span><span class="n">last</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">a</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">yield</span> <span class="n">decL</span> <span class="o">:+</span> <span class="n">decA</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And we can provide syntax support for this as well:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedHListCodec</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">:+[</span><span class="kt">A</span>, <span class="kt">LA</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>    <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">L</span>, <span class="kt">A</span> <span class="kt">::</span> <span class="kt">HNil</span>, <span class="kt">LA</span><span class="o">],</span>
+</span><span class='line'>    <span class="n">init</span><span class="k">:</span> <span class="kt">Init</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">L</span> <span class="o">},</span>
+</span><span class='line'>    <span class="n">last</span><span class="k">:</span> <span class="kt">Last</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="n">A</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">LA</span><span class="o">]</span> <span class="k">=</span> <span class="n">append</span><span class="o">(</span><span class="n">l</span><span class="o">,</span> <span class="n">a</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Concatenating HList codecs</h2>
+
+<p>Finally, we can concatenate two HList codecs. We can concatenate a <code>Codec[K]</code> with a <code>Codec[L]</code> in to a <code>Codec[KL]</code>. In the same way we did with the <code>append</code> method, we&rsquo;ll just invent the type parameter <code>KL</code> and then require evidence that it has the structure of <code>K</code> concatenated with <code>L</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">concat</span><span class="o">[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">ck</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">],</span> <span class="n">cl</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])(</span>
+</span><span class='line'>  <span class="k">implicit</span> <span class="o">???</span>
+</span><span class='line'><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">KL</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As usual, we&rsquo;ll start with the implementation of decode. We can use the same basic template as we used in <code>append</code> but instead of appending a single element, we&rsquo;ll just concatenate the result of each decode operation. The compiler informs us that we need a <code>Prepend</code> implicit in scope. This time, we want to bind the result of concatenation to the <code>KL</code> type parameter so we&rsquo;ll use <code>PrependAux</code> instead:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">concat</span><span class="o">[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KLen</span> <span class="k">&lt;:</span> <span class="kt">Nat</span><span class="o">](</span><span class="n">ck</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">],</span> <span class="n">cl</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>  <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">L</span>, <span class="kt">KL</span><span class="o">]</span>
+</span><span class='line'><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">KL</span><span class="o">)</span> <span class="k">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">decK</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">ck</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">cl</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">decK</span> <span class="o">:::</span> <span class="n">decL</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To encode, we need to split the provided HList of type <code>KL</code> in to two HLists &mdash; one of <code>K</code> and one of <code>L</code>. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of <code>K</code> and split the provided <code>KL</code> at that position, yielding two HLists &mdash; one of type <code>K</code> and another of type <code>L</code>. Because we are splitting <code>KL</code> with a statically known length, the <code>split</code> method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list <code>K</code> &ndash; called &lsquo;KLen&rsquo;. We then need to bind the length of <code>K</code> to that parameter. Finally, we need an implicit <code>Split</code> parameter for splitting <code>KL</code> at position <code>KLen</code>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">concat</span><span class="o">[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KLen</span> <span class="k">&lt;:</span> <span class="kt">Nat</span><span class="o">](</span>
+</span><span class='line'>  <span class="n">ck</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">],</span> <span class="n">cl</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">]</span>
+</span><span class='line'><span class="o">)(</span><span class="k">implicit</span>
+</span><span class='line'>  <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">L</span>, <span class="kt">KL</span><span class="o">],</span>
+</span><span class='line'>  <span class="n">lengthK</span><span class="k">:</span> <span class="kt">Length</span><span class="o">[</span><span class="kt">K</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="nc">KLen</span> <span class="o">},</span>
+</span><span class='line'>  <span class="n">split</span><span class="k">:</span> <span class="kt">Split</span><span class="o">[</span><span class="kt">KL</span>, <span class="kt">KLen</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">P</span> <span class="o">=</span> <span class="n">K</span><span class="o">;</span> <span class="k">type</span> <span class="kt">S</span> <span class="o">=</span> <span class="n">L</span> <span class="o">}</span>
+</span><span class='line'><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">xs</span><span class="k">:</span> <span class="kt">KL</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="o">(</span><span class="n">k</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span> <span class="k">=</span> <span class="n">xs</span><span class="o">.</span><span class="n">split</span><span class="o">[</span><span class="kt">KLen</span><span class="o">]</span>
+</span><span class='line'>    <span class="nc">Codec</span><span class="o">.</span><span class="n">encodeBoth</span><span class="o">(</span><span class="n">ck</span><span class="o">,</span> <span class="n">cl</span><span class="o">)(</span><span class="n">k</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">buffer</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">decK</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">ck</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">decL</span> <span class="k">&lt;-</span> <span class="nc">Codec</span><span class="o">.</span><span class="nc">DecodingContext</span><span class="o">(</span><span class="n">cl</span><span class="o">.</span><span class="n">decode</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">decK</span> <span class="o">:::</span> <span class="n">decL</span><span class="o">).</span><span class="n">run</span><span class="o">(</span><span class="n">buffer</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Syntax support follow the same pattern as before:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">EnrichedHListCodec</span><span class="o">[</span><span class="kt">L</span> <span class="k">&lt;:</span> <span class="kt">HList</span><span class="o">](</span><span class="n">l</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">L</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="o">:::[</span><span class="kt">K</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KL</span> <span class="k">&lt;:</span> <span class="kt">HList</span>, <span class="kt">KLen</span> <span class="k">&lt;:</span> <span class="kt">Nat</span><span class="o">](</span><span class="n">k</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">K</span><span class="o">])(</span><span class="k">implicit</span>
+</span><span class='line'>    <span class="n">prepend</span><span class="k">:</span> <span class="kt">PrependAux</span><span class="o">[</span><span class="kt">K</span>, <span class="kt">L</span>, <span class="kt">KL</span><span class="o">],</span>
+</span><span class='line'>    <span class="n">lengthK</span><span class="k">:</span> <span class="kt">Length</span><span class="o">[</span><span class="kt">K</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">Out</span> <span class="o">=</span> <span class="nc">KLen</span> <span class="o">},</span>
+</span><span class='line'>    <span class="n">split</span><span class="k">:</span> <span class="kt">Split</span><span class="o">[</span><span class="kt">KL</span>, <span class="kt">KLen</span><span class="o">]</span> <span class="o">{</span> <span class="k">type</span> <span class="kt">P</span> <span class="o">=</span> <span class="n">K</span><span class="o">;</span> <span class="k">type</span> <span class="kt">S</span> <span class="o">=</span> <span class="n">L</span> <span class="o">}</span>
+</span><span class='line'>  <span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">KL</span><span class="o">]</span> <span class="k">=</span> <span class="n">concat</span><span class="o">(</span><span class="n">k</span><span class="o">,</span> <span class="n">l</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Wrap Up</h1>
+
+<p>In this post we looked at how scodec uses Shapeless to provide type-safe binding of binary structures to case classes. In the process, we&rsquo;ve explored some type-level generic programming.</p>
+</div>
+
+
+<div class="meta">
+	<div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-09T22:10:00-04:00" pubdate data-updated="true">Jun 9<span>th</span>, 2013</time></div>
+	<div class="tags">
+
+
+	<a class='category' href='/blog/categories/scala/'>scala</a>, <a class='category' href='/blog/categories/scodec/'>scodec</a>
+
+
+</div>
+	
+</div></article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+	
+	
+	<a class="addthis_button_tweet"></a>
+	
+	
+	<a class="addthis_counter addthis_pill_style"></a>
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h2 class="title">Comments</h2>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+</div>
+	<footer id="footer" class="inner">Copyright &copy; 2015
+
+    Michael Pilquist
+
+</footer>
+	<script src="/javascripts/slash.js"></script>
+<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+(function($){
+	$('.fancybox').fancybox();
+})(jQuery);
+</script> <!-- Delete or comment this line to disable Fancybox -->
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'liftM';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://mpilquist.github.io/blog/2013/06/09/scodec-part-3/';
+        var disqus_url = 'http://mpilquist.github.io/blog/2013/06/09/scodec-part-3/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+	<script type="text/javascript">
+		var _gaq = _gaq || [];
+		_gaq.push(['_setAccount', 'UA-41236326-1']);
+		_gaq.push(['_trackPageview']);
+
+		(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		})();
+	</script>
+
+
+
+</body>
+</html>

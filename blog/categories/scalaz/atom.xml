@@ -4,7 +4,7 @@
   <title><![CDATA[Category: scalaz | mpilquist.github.io]]></title>
   <link href="http://mpilquist.github.io/blog/categories/scalaz/atom.xml" rel="self"/>
   <link href="http://mpilquist.github.io/"/>
-  <updated>2015-05-30T10:46:11-04:00</updated>
+  <updated>2015-06-18T17:49:26-04:00</updated>
   <id>http://mpilquist.github.io/</id>
   <author>
     <name><![CDATA[Michael Pilquist]]></name>
@@ -42,7 +42,7 @@
 <!-- more -->
 
 
-<script async class="speakerdeck-embed" data-id="2056222046ee0130dacf12313d03008e" data-ratio="1.33333333333333" src="http://mpilquist.github.io//speakerdeck.com/assets/embed.js"></script>
+<script async class="speakerdeck-embed" data-id="2056222046ee0130dacf12313d03008e" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
 ]]></content>
   </entry>

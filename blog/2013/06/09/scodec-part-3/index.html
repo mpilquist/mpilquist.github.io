@@ -193,7 +193,7 @@
 
 <h1>Constructing HList Codecs</h1>
 
-<p>So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&rsquo;s always the option to extend <code>Codec</code> directly but we&rsquo;d prefer something more compositional in nature &mdash; some way to create the codec from smaller codecs.</p>
+<p>So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&rsquo;s always the option to extend <code>Codec</code> directly but we&rsquo;d prefer something more compositional in nature &ndash; some way to create the codec from smaller codecs.</p>
 
 <h2>HList of Codecs</h2>
 
@@ -322,7 +322,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>We can stop at this point if we want &ndash; the implementation is now fully functional. If we want to be explicit about the return type of <code>apply</code>, we have one more step. Namely, we need to indicate that <code>apply</code> returns a <code>Codec[M]</code> where <code>M</code> is an HList. Further, we need to describe the relationship between <code>L</code> and <code>M</code>, which is provided by <code>RightFolderAux</code> &ndash; an alternative to <code>RightFolder</code> that lets us use the result type:</p>
+<p>We can stop at this point if we want - the implementation is now fully functional. If we want to be explicit about the return type of <code>apply</code>, we have one more step. Namely, we need to indicate that <code>apply</code> returns a <code>Codec[M]</code> where <code>M</code> is an HList. Further, we need to describe the relationship between <code>L</code> and <code>M</code>, which is provided by <code>RightFolderAux</code> - an alternative to <code>RightFolder</code> that lets us use the result type:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -343,7 +343,7 @@
 
 <h2>Prepending a codec on to an HList codec</h2>
 
-<p>Now that we have a way to construct HList codecs, let&rsquo;s consider other operations on them. For starters, consider combining a <code>Codec[A]</code> with a <code>Codec[L]</code> where <code>L</code> is an HList. We built this combinator earlier &mdash; the <code>prepend</code> method used in the call to <code>foldRight</code> when constructing an HList codec. We can add an operator to HList codecs that aliases <code>prepend</code>:</p>
+<p>Now that we have a way to construct HList codecs, let&rsquo;s consider other operations on them. For starters, consider combining a <code>Codec[A]</code> with a <code>Codec[L]</code> where <code>L</code> is an HList. We built this combinator earlier &ndash; the <code>prepend</code> method used in the call to <code>foldRight</code> when constructing an HList codec. We can add an operator to HList codecs that aliases <code>prepend</code>:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -529,7 +529,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>To encode, we need to split the provided HList of type <code>KL</code> in to two HLists &mdash; one of <code>K</code> and one of <code>L</code>. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of <code>K</code> and split the provided <code>KL</code> at that position, yielding two HLists &mdash; one of type <code>K</code> and another of type <code>L</code>. Because we are splitting <code>KL</code> with a statically known length, the <code>split</code> method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list <code>K</code> &ndash; called &lsquo;KLen&rsquo;. We then need to bind the length of <code>K</code> to that parameter. Finally, we need an implicit <code>Split</code> parameter for splitting <code>KL</code> at position <code>KLen</code>:</p>
+<p>To encode, we need to split the provided HList of type <code>KL</code> in to two HLists &ndash; one of <code>K</code> and one of <code>L</code>. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of <code>K</code> and split the provided <code>KL</code> at that position, yielding two HLists &ndash; one of type <code>K</code> and another of type <code>L</code>. Because we are splitting <code>KL</code> with a statically known length, the <code>split</code> method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list <code>K</code> - called &lsquo;KLen&rsquo;. We then need to bind the length of <code>K</code> to that parameter. Finally, we need an implicit <code>Split</code> parameter for splitting <code>KL</code> at position <code>KLen</code>:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -604,7 +604,7 @@
   
 
 
-<time datetime="2013-06-09T22:10:00-04:00" pubdate data-updated="true">Jun 9<span>th</span>, 2013</time></div>
+<time datetime="2013-06-09T22:10:00-04:00" pubdate data-updated="true"></time></div>
 	<div class="tags">
 
 

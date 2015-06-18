@@ -4,7 +4,7 @@
   <title><![CDATA[mpilquist.github.io]]></title>
   <link href="http://mpilquist.github.io/atom.xml" rel="self"/>
   <link href="http://mpilquist.github.io/"/>
-  <updated>2015-05-30T10:46:11-04:00</updated>
+  <updated>2015-06-18T17:49:26-04:00</updated>
   <id>http://mpilquist.github.io/</id>
   <author>
     <name><![CDATA[Michael Pilquist]]></name>
@@ -205,7 +205,7 @@
 
 <h1>Constructing HList Codecs</h1>
 
-<p>So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&rsquo;s always the option to extend <code>Codec</code> directly but we&rsquo;d prefer something more compositional in nature &mdash; some way to create the codec from smaller codecs.</p>
+<p>So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&rsquo;s always the option to extend <code>Codec</code> directly but we&rsquo;d prefer something more compositional in nature &ndash; some way to create the codec from smaller codecs.</p>
 
 <h2>HList of Codecs</h2>
 
@@ -334,7 +334,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>We can stop at this point if we want &ndash; the implementation is now fully functional. If we want to be explicit about the return type of <code>apply</code>, we have one more step. Namely, we need to indicate that <code>apply</code> returns a <code>Codec[M]</code> where <code>M</code> is an HList. Further, we need to describe the relationship between <code>L</code> and <code>M</code>, which is provided by <code>RightFolderAux</code> &ndash; an alternative to <code>RightFolder</code> that lets us use the result type:</p>
+<p>We can stop at this point if we want - the implementation is now fully functional. If we want to be explicit about the return type of <code>apply</code>, we have one more step. Namely, we need to indicate that <code>apply</code> returns a <code>Codec[M]</code> where <code>M</code> is an HList. Further, we need to describe the relationship between <code>L</code> and <code>M</code>, which is provided by <code>RightFolderAux</code> - an alternative to <code>RightFolder</code> that lets us use the result type:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -355,7 +355,7 @@
 
 <h2>Prepending a codec on to an HList codec</h2>
 
-<p>Now that we have a way to construct HList codecs, let&rsquo;s consider other operations on them. For starters, consider combining a <code>Codec[A]</code> with a <code>Codec[L]</code> where <code>L</code> is an HList. We built this combinator earlier &mdash; the <code>prepend</code> method used in the call to <code>foldRight</code> when constructing an HList codec. We can add an operator to HList codecs that aliases <code>prepend</code>:</p>
+<p>Now that we have a way to construct HList codecs, let&rsquo;s consider other operations on them. For starters, consider combining a <code>Codec[A]</code> with a <code>Codec[L]</code> where <code>L</code> is an HList. We built this combinator earlier &ndash; the <code>prepend</code> method used in the call to <code>foldRight</code> when constructing an HList codec. We can add an operator to HList codecs that aliases <code>prepend</code>:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -541,7 +541,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>To encode, we need to split the provided HList of type <code>KL</code> in to two HLists &mdash; one of <code>K</code> and one of <code>L</code>. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of <code>K</code> and split the provided <code>KL</code> at that position, yielding two HLists &mdash; one of type <code>K</code> and another of type <code>L</code>. Because we are splitting <code>KL</code> with a statically known length, the <code>split</code> method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list <code>K</code> &ndash; called &lsquo;KLen&rsquo;. We then need to bind the length of <code>K</code> to that parameter. Finally, we need an implicit <code>Split</code> parameter for splitting <code>KL</code> at position <code>KLen</code>:</p>
+<p>To encode, we need to split the provided HList of type <code>KL</code> in to two HLists &ndash; one of <code>K</code> and one of <code>L</code>. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of <code>K</code> and split the provided <code>KL</code> at that position, yielding two HLists &ndash; one of type <code>K</code> and another of type <code>L</code>. Because we are splitting <code>KL</code> with a statically known length, the <code>split</code> method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list <code>K</code> - called &lsquo;KLen&rsquo;. We then need to bind the length of <code>K</code> to that parameter. Finally, we need an implicit <code>Split</code> parameter for splitting <code>KL</code> at position <code>KLen</code>:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -682,7 +682,7 @@
 </ul>
 
 
-<p>It seems we are at an impasse &mdash; no matter which value we start with, there&rsquo;s no way to combine it with the other values. Intuitively, we know that encode should use <code>ca.encode</code> in its implementation, so let&rsquo;s try that:</p>
+<p>It seems we are at an impasse &ndash; no matter which value we start with, there&rsquo;s no way to combine it with the other values. Intuitively, we know that encode should use <code>ca.encode</code> in its implementation, so let&rsquo;s try that:</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -730,8 +730,8 @@
 <p>Now that we know the name for the typeclass we abstracted, let&rsquo;s examine the laws for it. An invariant functor has two laws:</p>
 
 <ul>
-<li>identity &ndash; <code>xmap(ma)(identity, identity) == ma</code></li>
-<li>composite &ndash; <code>xmap(xmap(ma)(f1, g1))(f2, g2) == xmap(ma)(f2 compose f1, g1 compose g2)</code></li>
+<li>identity - <code>xmap(ma)(identity, identity) == ma</code></li>
+<li>composite - <code>xmap(xmap(ma)(f1, g1))(f2, g2) == xmap(ma)(f2 compose f1, g1 compose g2)</code></li>
 </ul>
 
 
@@ -836,9 +836,9 @@ Performance is considered but yields to the above design constraints.</p></block
 <h2>Terminology</h2>
 
 <ul>
-<li><em>encoding</em> &ndash; converting a value in to its binary representation</li>
-<li><em>decoding</em> &ndash; converting binary data in to a value</li>
-<li><em>codec</em> &ndash; a value that can encode and decode values of a given Scala type</li>
+<li><em>encoding</em> - converting a value in to its binary representation</li>
+<li><em>decoding</em> - converting binary data in to a value</li>
+<li><em>codec</em> - a value that can encode and decode values of a given Scala type</li>
 </ul>
 
 
@@ -911,7 +911,7 @@ Performance is considered but yields to the above design constraints.</p></block
 
 <h3>BitVector</h3>
 
-<p><code>BitVector</code> represents an immutable sequence of bits. By extending the <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.IndexedSeqOptimized"><code>IndexedSeqOptimized[Boolean, BitVector]</code></a> trait from the Scala collection library, a bit vector can be used as a collection of booleans. As a bonus, most of the implementation is provided by <code>IndexedSeqOptimized</code> &ndash; albeit, sometimes inefficiently.</p>
+<p><code>BitVector</code> represents an immutable sequence of bits. By extending the <a href="http://www.scala-lang.org/api/current/index.html#scala.collection.IndexedSeqOptimized"><code>IndexedSeqOptimized[Boolean, BitVector]</code></a> trait from the Scala collection library, a bit vector can be used as a collection of booleans. As a bonus, most of the implementation is provided by <code>IndexedSeqOptimized</code> - albeit, sometimes inefficiently.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -1185,7 +1185,7 @@ to decode a value of type <code>A</code> results in an error message on the left
 <!-- more -->
 
 
-<script async class="speakerdeck-embed" data-id="2056222046ee0130dacf12313d03008e" data-ratio="1.33333333333333" src="http://mpilquist.github.io//speakerdeck.com/assets/embed.js"></script>
+<script async class="speakerdeck-embed" data-id="2056222046ee0130dacf12313d03008e" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
 ]]></content>
   </entry>

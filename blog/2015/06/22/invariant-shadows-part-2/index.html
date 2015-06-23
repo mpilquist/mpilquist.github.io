@@ -320,7 +320,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Wait, so what are we missing? We have an implementation of <code>unit</code> and <code>zip</code> and yet we know we can&rsquo;t have a lawful <code>Applicative[Codec]</code> instance due to the fact that there&rsquo;s no covariant functor for <code>Codec</code>. Monoidal functors have <em>three</em> abstract operations though, not two (like <code>Applicative</code>) &ndash; <code>unit</code>, <code>zip</code>, and <code>map</code>. So in order to have a monoidal functor for <code>Codec</code>, we need to define <code>map</code>, which we know we can&rsquo;t do!</p>
+<p>Wait, so what are we missing? We have an implementation of <code>unit</code> and <code>zip</code> and yet we know we can&rsquo;t have a lawful <code>Monoidal[Codec]</code> instance due to the fact that there&rsquo;s no covariant functor for <code>Codec</code>. Monoidal functors have <em>three</em> abstract operations though, not two (like <code>Applicative</code>) &ndash; <code>unit</code>, <code>zip</code>, and <code>map</code>. So in order to have a monoidal functor for <code>Codec</code>, we need to define <code>map</code>, which we know we can&rsquo;t do!</p>
 
 <p>However, we do have <code>xmap</code>. What happens if we pair <code>xmap</code> with <code>unit</code> and <code>zip</code>?</p>
 

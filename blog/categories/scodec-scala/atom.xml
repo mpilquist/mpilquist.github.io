@@ -4,7 +4,7 @@
   <title><![CDATA[Category: scodec,scala | mpilquist.github.io]]></title>
   <link href="http://mpilquist.github.io/blog/categories/scodec-scala/atom.xml" rel="self"/>
   <link href="http://mpilquist.github.io/"/>
-  <updated>2015-06-23T00:15:30-04:00</updated>
+  <updated>2015-06-23T00:43:42-04:00</updated>
   <id>http://mpilquist.github.io/</id>
   <author>
     <name><![CDATA[Michael Pilquist]]></name>
@@ -163,7 +163,7 @@ implicit def monoidalToApplicative[F[_]](implicit F: Monoidal[F]): Applicative[F
 }
 </code></pre>
 
-<p>Wait, so what are we missing? We have an implementation of <code>unit</code> and <code>zip</code> and yet we know we can&rsquo;t have a lawful <code>Applicative[Codec]</code> instance due to the fact that there&rsquo;s no covariant functor for <code>Codec</code>. Monoidal functors have <em>three</em> abstract operations though, not two (like <code>Applicative</code>) &ndash; <code>unit</code>, <code>zip</code>, and <code>map</code>. So in order to have a monoidal functor for <code>Codec</code>, we need to define <code>map</code>, which we know we can&rsquo;t do!</p>
+<p>Wait, so what are we missing? We have an implementation of <code>unit</code> and <code>zip</code> and yet we know we can&rsquo;t have a lawful <code>Monoidal[Codec]</code> instance due to the fact that there&rsquo;s no covariant functor for <code>Codec</code>. Monoidal functors have <em>three</em> abstract operations though, not two (like <code>Applicative</code>) &ndash; <code>unit</code>, <code>zip</code>, and <code>map</code>. So in order to have a monoidal functor for <code>Codec</code>, we need to define <code>map</code>, which we know we can&rsquo;t do!</p>
 
 <p>However, we do have <code>xmap</code>. What happens if we pair <code>xmap</code> with <code>unit</code> and <code>zip</code>?</p>
 

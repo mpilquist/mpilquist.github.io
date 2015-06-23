@@ -160,7 +160,7 @@ def zip[A, B](ca: Codec[A], cb: Codec[B]): Codec[(A, B)] = new Codec[(A, B)] {
 }
 ```
 
-Wait, so what are we missing? We have an implementation of `unit` and `zip` and yet we know we can't have a lawful `Applicative[Codec]` instance due to the fact that there's no covariant functor for `Codec`. Monoidal functors have *three* abstract operations though, not two (like `Applicative`) -- `unit`, `zip`, and `map`. So in order to have a monoidal functor for `Codec`, we need to define `map`, which we know we can't do!
+Wait, so what are we missing? We have an implementation of `unit` and `zip` and yet we know we can't have a lawful `Monoidal[Codec]` instance due to the fact that there's no covariant functor for `Codec`. Monoidal functors have *three* abstract operations though, not two (like `Applicative`) -- `unit`, `zip`, and `map`. So in order to have a monoidal functor for `Codec`, we need to define `map`, which we know we can't do!
 
 However, we do have `xmap`. What happens if we pair `xmap` with `unit` and `zip`?
 

@@ -4,7 +4,7 @@
   <title><![CDATA[mpilquist.github.io]]></title>
   <link href="http://mpilquist.github.io/atom.xml" rel="self"/>
   <link href="http://mpilquist.github.io/"/>
-  <updated>2015-10-29T20:23:40-04:00</updated>
+  <updated>2016-12-06T09:30:10-05:00</updated>
   <id>http://mpilquist.github.io/</id>
   <author>
     <name><![CDATA[Michael Pilquist]]></name>
@@ -12,6 +12,63 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Compositional Streaming with FS2]]></title>
+    <link href="http://mpilquist.github.io/blog/2016/11/13/fs2/"/>
+    <updated>2016-11-13T12:00:00-05:00</updated>
+    <id>http://mpilquist.github.io/blog/2016/11/13/fs2</id>
+    <content type="html"><![CDATA[<p>Talk given at <a href="http://scala.bythebay.io">Scalae By The Bay 2016</a>. Slides available on <a href="https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2">SpeakerDeck</a>.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/oFk8-a1FSP0" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Intro to Functional Streams for Scala (FS2)]]></title>
+    <link href="http://mpilquist.github.io/blog/2016/05/20/fs2/"/>
+    <updated>2016-05-20T12:00:00-04:00</updated>
+    <id>http://mpilquist.github.io/blog/2016/05/20/fs2</id>
+    <content type="html"><![CDATA[<p>Informal talk series that introduces Functional Streams for Scala (FS2).</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/cahvyadYfX8?list=PLFrwDVdSrYE6PVD_p6YQLAbNaEHagx9bW" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[From Simulacrum to Typeclassic]]></title>
+    <link href="http://mpilquist.github.io/blog/2016/03/02/simulacrum/"/>
+    <updated>2016-03-02T12:00:00-05:00</updated>
+    <id>http://mpilquist.github.io/blog/2016/03/02/simulacrum</id>
+    <content type="html"><![CDATA[<p>Talk given at the <a href="http://typelevel.org/event/2016-03-summit-philadelphia/">Typelevel Summit Philadelphia</a>. Slides available on <a href="https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic">SpeakerDeck</a>.</p>
+
+<!-- more -->
+
+
+<div class="video-container">
+  <iframe width="560" height="315" src="https://www.youtube.com/embed/Crc2RHWrcLI" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Practical Binary with Scodec: Applying Typelevel Programming and Shapeless to the Mundane]]></title>

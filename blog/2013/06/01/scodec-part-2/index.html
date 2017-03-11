@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  
+  <meta charset="utf-8">
+  <title>scodec - Part 2 - Conversions</title>
+  <meta name="description" content="scodec - Part 2 - Conversions">
+  <meta name="author" content="Michael Pilquist">
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://mpilquist.github.io/css/fonts.css">
+  
+  
+  <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.1/build/pure-min.css" integrity="sha384-CCTZv2q9I9m3UOxRLaJneXrrqKwUNOzZ6NGEUMwHtShDJ+nCoiXJCAgi05KfkLGY" crossorigin="anonymous">
+  
+  
+    <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.1/build/grids-responsive-min.css">
+  
+  <link rel="stylesheet" href="https://mpilquist.github.io/css/custom.css">
+
+  
+  
+  <link rel="stylesheet" href="https://mpilquist.github.io/highlight/styles/solarized_dark.css">
+  
+  <script src="https://mpilquist.github.io/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta name="generator" content="Hugo 0.19" />
+  
+</head>
+<body>
+
+<div class="header pure-g">
+    <div class="pure-u-1-24 pure-u-md-5-24"></div>
+    <div class="pure-u-11-12 pure-u-md-5-8">
+        <div class="desktop pure-menu pure-menu-horizontal nav-menu">
+            
+            <a href="https://mpilquist.github.io/" class="site-title pure-menu-heading">mpilquist</a>
+            <ul class="pure-menu-list">
+				
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/articles" class="pure-menu-link">Articles</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/screencasts" class="pure-menu-link">Screencasts</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/talks" class="pure-menu-link">Talks</a>
+                </li>
+                
+				
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/about/" class="pure-menu-link">About</a>
+                </li>
+            </ul>
+        </div>
+        <div class="mobile pure-menu nav-menu">
+            <a href="/" class="pure-menu-heading" id="toggle-home">mpilquist</a>
+            <a href="#" id="toggle-btn">&#9776;</a>
+            <ul class="pure-menu-list" id="toggle-content" style="display:none;">
+                
+				
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/articles" class="pure-menu-link">Articles</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/screencasts" class="pure-menu-link">Screencasts</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/talks" class="pure-menu-link">Talks</a>
+                </li>
+                
+				
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/about" class="pure-menu-link">About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="pure-u-1-24 pure-u-md-1-6"></div>
+</div>
+
+<div class="pure-g">
+    <div class="pure-u-1-24 pure-u-md-5-24"></div>
+	<div class="pure-u-11-12 pure-u-md-5-8">
+        <div class="post">
+
+            <div class="post-title">
+                <p class="footnote">
+                    <time class="">2013-06-01</time>
+		            
+                    
+                    |
+                    
+                    
+                    tags:<a href="https://mpilquist.github.io/tags/scala">scala</a> <a href="https://mpilquist.github.io/tags/scodec">scodec</a> 
+                    
+
+                    
+                    categories:<a href="https://mpilquist.github.io/categories/articles">articles</a> 
+                    
+
+                    
+                </p>
+                <h1>scodec - Part 2 - Conversions</h1>
+            </div>
+
+            <div class="post-content">
+                <p>In <a href="/blog/2013/05/27/scodec-intro/">Part 1</a>, we looked at the codec trait and a way to create a <code>Codec[(A, B)]</code> out of a <code>Codec[A]</code> and a <code>Codec[B]</code>. In this post, we&rsquo;ll look at converting a <code>Codec[A]</code> to a <code>Codec[B]</code> using a type driven approach and we&rsquo;ll get our feet wet with some category theory.</p>
+
+<p></p>
+
+<p>Consider this:</p>
+
+<pre><code class="language-scala">case class Point2D(x: Int, y: Int)
+</code></pre>
+
+<p>If we have a codec for an integer, we can create a <code>Codec[(Int, Int)]</code> easily using the <code>TupleCodec</code> from Part 1:</p>
+
+<pre><code class="language-scala">val int: Codec[Int] = ...
+val tuple: Codec[(Int, Int)] = new TupleCodec(int, int)
+</code></pre>
+
+<p>Working directly with tuples isn&rsquo;t pleasant, so we&rsquo;d like to be able to create a <code>Codec[Point2D]</code> from a <code>Codec[(Int, Int)]</code>:</p>
+
+<pre><code class="language-scala">val point: Codec[Point2D] = ???
+</code></pre>
+
+<p>Hence, we need a function that can convert a <code>Codec[A]</code> to a <code>Codec[B]</code>. This looks like functor map, so let&rsquo;s try it:</p>
+
+<pre><code class="language-scala">def map[A, B](ca: Codec[A])(f: A =&gt; B): Codec[B] = new Codec[B] {
+  def encode(b: B): String \/ BitVector = ???
+  def decode(buf: BitVector): String \/ (BitVector, B) = ???
+}
+</code></pre>
+
+<p>Let&rsquo;s start with the implementation of <code>decode</code>. We have:</p>
+
+<ul>
+<li><code>buf</code>, a value of <code>BitVector</code></li>
+<li><code>f</code>, a function <code>A =&gt; B</code></li>
+<li><code>ca</code>, a <code>Codec[A]</code></li>
+</ul>
+
+<p>Using those values, we need to produce a <code>String \/ (BitVector, B)</code>. We can use the values as jigsaw puzzle pieces and find a way to put all the proper shapes together. In this case, we can call <code>decode</code> on <code>ca</code> to get back a value of <code>String \/ (BitVector, A)</code>. Then we can map <code>f</code> over the inner <code>A</code> to get a <code>String \/ (BitVector, B)</code>:</p>
+
+<pre><code class="language-scala">def map[A, B](ca: Codec[A])(f: A =&gt; B): Codec[B] = new Codec[B] {
+  def encode(b: B): String \/ BitVector = ???
+  def decode(buf: BitVector): String \/ (BitVector, B) =
+    ca.decode(buf) map { case (rest, a) =&gt; (rest, f(a)) }
+}
+</code></pre>
+
+<p>So far so good. Let&rsquo;s try the same type driven approach with the implementation of <code>encode</code>. We have:</p>
+
+<ul>
+<li><code>b</code>, a value of <code>B</code></li>
+<li><code>f</code>, a function <code>A =&gt; B</code></li>
+<li><code>ca</code>, a <code>Codec[A]</code></li>
+</ul>
+
+<p>It seems we are at an impasse &ndash; no matter which value we start with, there&rsquo;s no way to combine it with the other values. Intuitively, we know that encode should use <code>ca.encode</code> in its implementation, so let&rsquo;s try that:</p>
+
+<pre><code class="language-scala">def map[A, B](ca: Codec[A])(f: A =&gt; B): Codec[B] = new Codec[B] {
+  def encode(b: B): String \/ BitVector =
+    ca.encode(???)
+  ...
+}
+</code></pre>
+
+<p>In order to call encode, we need a value of <code>A</code> but we only have a value of <code>B</code>. Again, relying on intuition, we know we should use <code>b</code> to generate a value of type <code>A</code>. To do so, we can just <em>materialize</em> a function <code>B =&gt; A</code> by asking for it in the signature of <code>map</code>:</p>
+
+<pre><code class="language-scala">def map[A, B](ca: Codec[A])(f: A =&gt; B, g: B =&gt; A): Codec[B] = new Codec[B] {
+  def encode(b: B): String \/ BitVector =
+    ca.encode(g(b))
+  ...
+}
+</code></pre>
+
+<h3 id="detour-in-to-category-theory">Detour in to category theory</h3>
+
+<p>We now have a working way to convert a <code>Codec[A]</code> to a <code>Codec[B]</code> but naming the function <code>map</code> is awkward. We started with the name map because the problem felt like a functor map. But by the time we finished, we ended up needing two functions, <code>f: A =&gt; B</code> and <code>g: B =&gt; A</code>. Let&rsquo;s rename this function to <code>sortOfMap</code> for now and consider a typeclass for types that support the general signature:</p>
+
+<pre><code class="language-scala">trait NotQuiteFunctor[F[_]] {
+  def sortOfMap[A, B](fa: F[A])(f: A =&gt; B, g: B =&gt; A): F[B]
+}
+</code></pre>
+
+<p><a href="http://www.haskell.org/hoogle/?hoogle=%28a+-%3E+b%29-%3E%28b-%3Ea%29-%3E%28f+a%29-%3E%28f+b%29">Searching Hoogle</a> for this type signature doesn&rsquo;t find any exact matches. Lars Hupel pointed out to me that this typeclass is actually an <em>invariant functor</em> or <em>exponential functor</em>. The <code>sortOfMap</code> operation is typically called <code>invmap</code> or <code>xmap</code>. Edward Kmett has a <a href="http://comonad.com/reader/2008/rotten-bananas/">fascinating blog post exploring exponential functors</a> (note: currently offline, see <a href="http://webcache.googleusercontent.com/search?q=cache%3Acomonad.com%2Freader%2F2008%2Frotten-bananas%2F&amp;oq=cache%3Acomonad.com%2Freader%2F2008%2Frotten-bananas%2F&amp;aqs=chrome.0.57j58.3499j0&amp;sourceid=chrome&amp;ie=UTF-8">cached version</a>). Additionally, <a href="http://tmorris.net/posts/functors-and-things-using-scala/index.html">Tony Morris&rsquo;s index of functor types</a> lists the invariant/exponential functor as well.</p>
+
+<p>Now that we know the name for the typeclass we abstracted, let&rsquo;s examine the laws for it. An invariant functor has two laws:</p>
+
+<ul>
+<li>identity - <code>xmap(ma)(identity, identity) == ma</code></li>
+<li>composite - <code>xmap(xmap(ma)(f1, g1))(f2, g2) == xmap(ma)(f2 compose f1, g1 compose g2)</code></li>
+</ul>
+
+<p>The identity law states that xmapping with identity does not modify the input. The composite law states that function composition distributes over the xmap operation.</p>
+
+<p>Note that every <em>covariant functor</em> (the kind of functor that us Scala developers are most familiar with) gives rise to an <em>invariant functor</em> that ignores the <code>g</code> function. Similarly, every <em>contravariant functor</em> (which defines <code>def contramap[A, B](f: B =&gt; A): F[B]</code>) gives rise to an <em>invariant functor</em> that ignores the <code>f</code> function.</p>
+
+<p>Unfortunately, Scalaz 7 does not provide an <code>InvariantFunctor</code> typeclass. It was present in Scalaz 6 though, and as far as I can tell, it wasn&rsquo;t removed deliberately. Hence, we can <a href="https://github.com/scalaz/scalaz/pull/351">integrate it in to the Scalaz 7 typeclass hierarchy</a>.</p>
+
+<h3 id="integrating-xmap">Integrating xmap</h3>
+
+<p>Now that we have a handle on what this operation is, we can complete the implementation in scodec:</p>
+
+<pre><code class="language-scala">object Codec {
+  def xmap[A, B](codec: Codec[A])(f: A =&gt; B, g: B =&gt; A): Codec[B] = new Codec[B] {
+    def encode(b: B): String \/ BitVector =
+      codec.encode(g(b))
+    def decode(buffer: BitVector): String \/ (BitVector, B) =
+      codec.decode(buffer).map { case (rest, a) =&gt; (rest, f(a)) }
+  }
+  ...
+}
+</code></pre>
+
+<p>We can also add <code>xmap</code> directly to the <code>Codec</code> trait to allow OO style method usage:</p>
+
+<pre><code class="language-scala">trait Codec[A] {
+  def encode(a: A): String \/ BitVector
+  def decode(b: BitVector): String \/ (BitVector, A)
+  final def xmap[B](f: A =&gt; B, g: B =&gt; A): Codec[B] =
+    Codec.xmap(this)(f, g)
+}
+</code></pre>
+
+<p>Returning to our original example, we can now easily convert a <code>Codec[(Int, Int)]</code> in to a <code>Codec[Point2D]</code>:</p>
+
+<pre><code class="language-scala">val tuple: Codec[(Int, Int)] = new TupleCodec(int, int)
+val point: Codec[Point2D] = tuple.xmap(
+  { case (x, y) =&gt; Point2D(x, y) },
+  { p =&gt; (p.y, p.y) }
+)
+</code></pre>
+
+<h3 id="wrap-up">Wrap Up</h3>
+
+<p>In this post, we used a type driven approach plus some intuition to implement the xmap operation. By abstracting out a typeclass, we learned about invariant functors.</p>
+
+<p>In the next post, we&rsquo;ll look at using <a href="https://github.com/milessabin/shapeless">Shapeless</a> to simplify codec definitions and xmapping.</p>
+            </div>
+        </div>
+	</div>
+    <div class="pure-u-1-24 pure-u-md-1-6"></div>
+</div>
+
+<div class="footer pure-g">
+    <div class="pure-u-1-24 pure-u-md-5-24"></div>
+    <div class="pure-u-11-12 pure-u-md-5-8">
+        <div class="footer-content">
+		  <div class="pure-menu pure-menu-horizontal">
+              <ul>
+			      
+                  <li class="pure-menu-heading" id="foot-name">Michael Pilquist:</li>
+                  
+				  
+                  
+          
+                  
+                  <li class="pure-menu-item">
+                      <a href="https://github.com/mpilquist" class="pure-menu-link">GitHub</a>
+                  </li>
+                  
+          
+                  
+          
+                  
+          
+                  
+                  <li class="pure-menu-item">
+                      <a href="https://twitter.com/mpilquist" class="pure-menu-link">Twitter</a>
+                  </li>
+                  
+          
+              </ul>
+              <a href="#" class="pure-menu-heading pull-right" id="gototop-btn">↑↑</a>
+          </div>
+		  
+		  <p id="foot-copyright">Copyright (c) 2012 - 2017 Michael Pilquist</p>
+		  
+		</div>
+	  </div>
+      <div class="pure-u-1-24 pure-u-md-1-6"></div>
+</div>
+
+
+<script src="https://mpilquist.github.io/js/jquery.min.js" type="text/javascript"></script>
+<script src="https://mpilquist.github.io/js/jquery.timeago.js" type="text/javascript"></script>
+<script type="text/javascript">
+  $(function(){
+    $("time.timeago").timeago();
+  })
+  $("#toggle-btn").click(function(){
+    $("#toggle-content").toggle();
+    if($(this).html() === "☰") {
+        $(this).html("X")
+    } else {
+        $(this).html("☰")
+    }
+  });
+  $(window).resize(function(){
+    if(window.innerWidth > 768) {
+      $(".desktop").removeAttr("style");
+    }
+  });
+</script>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-41236326-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</body>
+</html>
+

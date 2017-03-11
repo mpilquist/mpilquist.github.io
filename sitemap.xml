@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2016/11/13/fs2/</loc>
+    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2016/05/20/fs2/</loc>
+    <lastmod>2016-05-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</loc>
+    <lastmod>2016-03-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</loc>
+    <lastmod>2015-09-21T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2015/08/14/sbtb/</loc>
+    <lastmod>2015-08-14T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</loc>
+    <lastmod>2015-06-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2015/06/18/invariant-shadows/</loc>
+    <lastmod>2015-06-18T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</loc>
+    <lastmod>2015-04-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</loc>
+    <lastmod>2015-04-22T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2014/05/27/variance/</loc>
+    <lastmod>2014-05-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2013/06/09/scodec-part-3/</loc>
+    <lastmod>2013-06-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/</loc>
+    <lastmod>2013-06-01T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2013/05/27/scodec-intro/</loc>
+    <lastmod>2013-05-27T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel/</loc>
+    <lastmod>2013-04-03T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</loc>
+    <lastmod>2012-08-28T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</loc>
+    <lastmod>2012-05-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/categories/articles/</loc>
+    <lastmod>2015-06-22T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/tags/fp/</loc>
+    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/post/</loc>
+    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/tags/scala/</loc>
+    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/tags/scodec/</loc>
+    <lastmod>2015-09-21T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/categories/screencasts/</loc>
+    <lastmod>2016-05-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/categories/talks/</loc>
+    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://mpilquist.github.io/</loc>
+    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

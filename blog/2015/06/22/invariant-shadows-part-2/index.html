@@ -1,496 +1,404 @@
-
-<!DOCTYPE HTML>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Invariant Shadows - Part 2: Monoidals - mpilquist.github.io</title>
-	<meta name="author" content="Michael Pilquist">
 
-	
-	<meta name="description" content="In the last post, we built type classes for a subset of invariant functors &ndash; namely, type classes that drew inspiration from the covariant &hellip;">
-	
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  <meta charset="utf-8">
+  <title>Invariant Shadows - Part 2: Monoidals</title>
+  <meta name="description" content="Invariant Shadows - Part 2: Monoidals">
+  <meta name="author" content="Michael Pilquist">
 
-	<link href="/atom.xml" rel="alternate" title="mpilquist.github.io" type="application/atom+xml">
-	<link rel="canonical" href="">
-	<link href="/favicon.png" rel="shortcut icon">
-	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
-	<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-	
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://mpilquist.github.io/css/fonts.css">
+  
+  
+  <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.1/build/pure-min.css" integrity="sha384-CCTZv2q9I9m3UOxRLaJneXrrqKwUNOzZ6NGEUMwHtShDJ+nCoiXJCAgi05KfkLGY" crossorigin="anonymous">
+  
+  
+    <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.1/build/grids-responsive-min.css">
+  
+  <link rel="stylesheet" href="https://mpilquist.github.io/css/custom.css">
+
+  
+  
+  <link rel="stylesheet" href="https://mpilquist.github.io/highlight/styles/solarized_dark.css">
+  
+  <script src="https://mpilquist.github.io/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <meta name="generator" content="Hugo 0.19" />
+  
 </head>
-
-
 <body>
-	<header id="header" class="inner"><h1><a href="/">mpilquist.github.io</a></h1>
-<nav id="main-nav"><ul class="main">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/blog/categories/talks">Talks</a></li>
-</ul>
-</nav>
-<nav id="mobile-nav">
-	<div class="alignleft menu">
-		<a class="button">Menu</a>
-		<div class="container"><ul class="main">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/blog/categories/talks">Talks</a></li>
-</ul>
-</div>
-	</div>
-	<div class="alignright search">
-		<a class="button"></a>
-		<div class="container">
-			<form action="http://google.com/search" method="get">
-				<input type="text" name="q" results="0">
-				<input type="hidden" name="q" value="site:mpilquist.github.io">
-			</form>
-		</div>
-	</div>
-</nav>
-<nav id="sub-nav" class="alignright">
-	<div class="social">
-		
-		
-		<a class="google" href="https://plus.google.com/106335582774991536012?rel=author" title="Google+">Google+</a>
-		
-		
-		<a class="twitter" href="http://twitter.com/mpilquist" title="Twitter">Twitter</a>
-		
-		
-		<a class="github" href="https://github.com/mpilquist" title="GitHub">GitHub</a>
-		
-    
-		
-		
-		
-		
-		
-		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
-		
-    
-	</div>
-	<form class="search" action="http://google.com/search" method="get">
-		<input class="alignright" type="text" name="q" results="0">
-		<input type="hidden" name="q" value="site:mpilquist.github.io">
-	</form>
-</nav>
 
-</header>
-	
-		
-	
-	<div id="content" class="inner"><article class="post">
-	<h2 class="title">Invariant Shadows - Part 2: Monoidals</h2>
-	<div class="entry-content"><p>In the <a href="/blog/2015/06/18/invariant-shadows/">last post</a>, we built type classes for a subset of invariant functors &ndash; namely, type classes that drew inspiration from the covariant <code>FlatMap</code> and <code>Monad</code>. In this article, we&rsquo;ll explore invariant shadows of the type classes supporting applicative functors.</p>
+<div class="header pure-g">
+    <div class="pure-u-1-24 pure-u-md-5-24"></div>
+    <div class="pure-u-11-12 pure-u-md-5-8">
+        <div class="desktop pure-menu pure-menu-horizontal nav-menu">
+            
+            <a href="https://mpilquist.github.io/" class="site-title pure-menu-heading">mpilquist</a>
+            <ul class="pure-menu-list">
+				
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/articles" class="pure-menu-link">Articles</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/screencasts" class="pure-menu-link">Screencasts</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/talks" class="pure-menu-link">Talks</a>
+                </li>
+                
+				
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/about/" class="pure-menu-link">About</a>
+                </li>
+            </ul>
+        </div>
+        <div class="mobile pure-menu nav-menu">
+            <a href="/" class="pure-menu-heading" id="toggle-home">mpilquist</a>
+            <a href="#" id="toggle-btn">&#9776;</a>
+            <ul class="pure-menu-list" id="toggle-content" style="display:none;">
+                
+				
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/articles" class="pure-menu-link">Articles</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/screencasts" class="pure-menu-link">Screencasts</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/talks" class="pure-menu-link">Talks</a>
+                </li>
+                
+				
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/about" class="pure-menu-link">About</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="pure-u-1-24 pure-u-md-1-6"></div>
+</div>
+
+<div class="pure-g">
+    <div class="pure-u-1-24 pure-u-md-5-24"></div>
+	<div class="pure-u-11-12 pure-u-md-5-8">
+        <div class="post">
+
+            <div class="post-title">
+                <p class="footnote">
+                    <time class="">2015-06-22</time>
+		            
+                    
+                    |
+                    
+                    
+                    tags:<a href="https://mpilquist.github.io/tags/scala">scala</a> <a href="https://mpilquist.github.io/tags/scodec">scodec</a> <a href="https://mpilquist.github.io/tags/fp">fp</a> 
+                    
+
+                    
+                    categories:<a href="https://mpilquist.github.io/categories/articles">articles</a> 
+                    
+
+                    
+                </p>
+                <h1>Invariant Shadows - Part 2: Monoidals</h1>
+            </div>
+
+            <div class="post-content">
+                
+
+<p>In the <a href="/blog/2015/06/18/invariant-shadows/">last post</a>, we built type classes for a subset of invariant functors &ndash; namely, type classes that drew inspiration from the covariant <code>FlatMap</code> and <code>Monad</code>. In this article, we&rsquo;ll explore invariant shadows of the type classes supporting applicative functors.</p>
 
 <p>Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</p>
 
 <p>First, let&rsquo;s review the definition of an applicative functor, using a type class hierachy similar to the one used in <a href="https://github.com/non/cats">Cats</a>. (These examples are simplified versions of the definitions in the Cats codebase.)</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Apply</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">Functor</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">ap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">ff</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span> <span class="k">=&gt;</span> <span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">trait</span> <span class="nc">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">Apply</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">pure</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="n">ap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">pure</span><span class="o">(</span><span class="n">f</span><span class="o">))</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">trait Apply[F[_]] extends Functor[F] {
+  def ap[A, B](fa: F[A])(ff: F[A =&gt; B]): F[B]
+}
 
+trait Applicative[F[_]] extends Apply[F] {
+  def pure[A](a: A): F[A]
+  def map[A, B](fa: F[A])(f: A =&gt; B): F[B] = ap(fa)(pure(f))
+}
+</code></pre>
 
 <p>Along with laws:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">applyComposition</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span>, <span class="kt">C</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fab</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span> <span class="k">=&gt;</span> <span class="kt">B</span><span class="o">],</span> <span class="n">fbc</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span> <span class="k">=&gt;</span> <span class="kt">C</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Apply</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">compose</span><span class="k">:</span> <span class="o">(</span><span class="kt">B</span> <span class="o">=&gt;</span> <span class="kt">C</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">A</span> <span class="k">=&gt;</span> <span class="n">B</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">A</span> <span class="k">=&gt;</span> <span class="n">C</span><span class="o">)</span> <span class="k">=</span> <span class="k">_</span><span class="o">.</span><span class="n">compose</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">fab</span><span class="o">))(</span><span class="n">fbc</span><span class="o">)</span> <span class="o">==</span> <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">fab</span><span class="o">)(</span><span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">fbc</span><span class="o">)(</span><span class="n">compose</span><span class="o">)))</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">applicativeIdentity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">((</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">a</span><span class="o">))</span> <span class="o">==</span> <span class="n">fa</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">applicativeHomomorphism</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(</span><span class="n">f</span><span class="o">))</span> <span class="o">==</span> <span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">applicativeInterchange</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">ff</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span> <span class="k">=&gt;</span> <span class="kt">B</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="n">ff</span><span class="o">)</span> <span class="o">==</span> <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">ff</span><span class="o">)(</span><span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">((</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">)))</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">applicativeMap</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">f</span><span class="o">)</span> <span class="o">==</span> <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(</span><span class="n">f</span><span class="o">))</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">def applyComposition[F[_], A, B, C](fa: F[A], fab: F[A =&gt; B], fbc: F[B =&gt; C])(implicit F: Apply[F]): Boolean = {
+  val compose: (B =&gt; C) =&gt; (A =&gt; B) =&gt; (A =&gt; C) = _.compose
+  F.ap(F.ap(fa)(fab))(fbc) == F.ap(fa)(F.ap(fab)(F.map(fbc)(compose)))
+}
 
+def applicativeIdentity[F[_], A](fa: F[A])(implicit F: Applicative[F]): Boolean =
+  F.ap(fa)(F.pure((a: A) =&gt; a)) == fa
 
-<h3>Applicative[Codec]</h3>
+def applicativeHomomorphism[F[_], A, B](a: A, f: A =&gt; B)(implicit F: Applicative[F]): Boolean =
+  F.ap(F.pure(a))(F.pure(f)) == F.pure(f(a))
+
+def applicativeInterchange[F[_], A, B](a: A, ff: F[A =&gt; B])(implicit F: Applicative[F]): Boolean =
+  F.ap(F.pure(a))(ff) == F.ap(ff)(F.pure((f: A =&gt; B) =&gt; f(a)))
+
+def applicativeMap[F[_], A, B](fa: F[A], f: A =&gt; B)(implicit F: Applicative[F]): Boolean =
+  F.map(fa)(f) == F.ap(fa)(F.pure(f))
+</code></pre>
+
+<h3 id="applicative-codec">Applicative[Codec]</h3>
 
 <p>Can we define an <code>Applicative[Codec]</code> instance?  We&rsquo;ve previously seen how <code>Codec</code> has an invariant functor instance but not a covariant functor instance. As such, we can rule out an <code>Applicative[Codec]</code>, for if we could define such an instance, it would give rise to a <code>Functor[Codec]</code>. Regardless, let&rsquo;s try to implement such an instance, as it is illustrative.</p>
 
 <p>In the last article, it was implied that we can implement pure for <code>Codec</code>. Here&rsquo;s an implementation:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">pure</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">sizeBound</span> <span class="k">=</span> <span class="nc">SizeBound</span><span class="o">.</span><span class="n">exact</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Attempt</span><span class="o">.</span><span class="n">successful</span><span class="o">(</span><span class="nc">BitVector</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Attempt</span><span class="o">.</span><span class="n">successful</span><span class="o">(</span><span class="nc">DecodeResult</span><span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">))</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="language-scala">def pure[A](a: A): Codec[A] = new Codec[A] {
+  def sizeBound = SizeBound.exact(0)
+  def encode(a: A) = Attempt.successful(BitVector.empty)
+  def decode(b: BitVector) = Attempt.successful(DecodeResult(a, b))
+}
+</code></pre>
 
 <p>The encode operation always returns an empty vector, while the decode operation always returns the full input as the remainder and returns the pure value as the decoded value.</p>
 
 <p>How about <code>ap</code>?</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">ap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">ca</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">cf</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span> <span class="k">=&gt;</span> <span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">sizeBound</span> <span class="k">=</span> <span class="nc">SizeBound</span><span class="o">.</span><span class="n">unknown</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">decA</span> <span class="k">&lt;-</span> <span class="nc">DecodingContext</span><span class="o">(</span><span class="n">ca</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">defF</span> <span class="k">&lt;-</span> <span class="nc">DecodingContext</span><span class="o">(</span><span class="n">cb</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">decF</span><span class="o">(</span><span class="n">decA</span><span class="o">)).</span><span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="o">???</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="language-scala">def ap[A, B](ca: Codec[A])(cf: Codec[A =&gt; B]): Codec[B] = new Codec[B] {
+  def sizeBound = SizeBound.unknown
+  def decode(b: BitVector) = (for {
+    decA &lt;- DecodingContext(ca)
+    defF &lt;- DecodingContext(cb)
+  } yield decF(decA)).decode(b)
+  def encode(b: B) = {
+    ???
+  }
+}
+</code></pre>
 
 <p>The decode case is easy enough to define using the <code>DecodingContext</code> type from scodec, which is equivalent to a <code>StateT[Attempt, BitVector, ?]</code> monad transformer stack, threading the remainder of each decode as the state value. We encounter an impasse in <code>encode</code> though. We could try to add a <code>B =&gt; A</code> function, though it is not obvious as to how that would help. Instead, we can use an alternative form of applicative functors known as monoidal functors.</p>
 
-<h2>Monoidal Functors</h2>
+<h2 id="monoidal-functors">Monoidal Functors</h2>
 
 <p><a href="https://wiki.haskell.org/Typeclassopedia#Alternative_formulation">(Lax) monoidal functors</a> are an alternative form of applicative functors &ndash; similar to how monads can be represented with either <code>pure</code> and <code>flatMap</code> or <code>unit</code>, <code>flatten</code> (aka <code>join</code>), and <code>map</code>.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">Functor</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">unit</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">zip</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="language-scala">trait Monoidal[F[_]] extends Functor[F] {
+  def unit: F[Unit]
+  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)]
+}
+</code></pre>
 
 <p>Instead of defining <code>pure</code> and <code>ap</code>, monoidal functors are defined in terms of <code>unit</code>, <code>zip</code>, and <code>map</code>. Note that in the standard/typical definition, <code>map</code> is derived from <code>pure</code> and <code>ap</code> but in the monoidal definition, <code>map</code> is left abstract.</p>
 
 <p>The laws for monoidal functors are the following:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">Iso</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">]</span> <span class="o">{</span> <span class="k">def</span> <span class="n">apply</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">B</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">implicit</span> <span class="k">class</span> <span class="nc">IsoOps</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="k">val</span> <span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="o">~=[</span><span class="kt">B</span><span class="o">](</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="n">iso</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="o">==</span> <span class="n">b</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">monoidalLeftIdentity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">],</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">F</span><span class="o">[(</span><span class="kt">Unit</span>, <span class="kt">A</span><span class="o">)]</span>, <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">unit</span><span class="o">,</span> <span class="n">fa</span><span class="o">)</span> <span class="o">~=</span> <span class="n">fa</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">monoidalRightIdentity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">],</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">Unit</span><span class="o">)]</span>, <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">F</span><span class="o">.</span><span class="n">unit</span><span class="o">)</span> <span class="o">~=</span> <span class="n">fa</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">monoidalAssociativity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span>, <span class="kt">C</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">],</span> <span class="n">fc</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">C</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">],</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="o">(</span><span class="kt">B</span>, <span class="kt">C</span><span class="o">))]</span>, <span class="kt">F</span><span class="o">[((</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)</span>, <span class="kt">C</span><span class="o">)]])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fb</span><span class="o">,</span> <span class="n">fc</span><span class="o">))</span> <span class="o">~=</span> <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">fb</span><span class="o">),</span> <span class="n">fc</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">trait Iso[A, B] { def apply(a: A): B }
 
+implicit class IsoOps[A](val a: A) {
+  def ~=[B](b: B)(implicit iso: Iso[A, B]): Boolean = iso(a) == b
+}
+
+def monoidalLeftIdentity[F[_], A](fa: F[A])(implicit F: Monoidal[F], iso: Iso[F[(Unit, A)], F[A]]): Boolean =
+  F.zip(F.unit, fa) ~= fa
+
+def monoidalRightIdentity[F[_], A](fa: F[A])(implicit F: Monoidal[F], iso: Iso[F[(A, Unit)], F[A]]): Boolean =
+  F.zip(fa, F.unit) ~= fa
+
+def monoidalAssociativity[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])(implicit F: Monoidal[F], iso: Iso[F[(A, (B, C))], F[((A, B), C)]]): Boolean =
+  F.zip(fa, F.zip(fb, fc)) ~= F.zip(F.zip(fa, fb), fc)
+</code></pre>
 
 <p>The identity laws state that zipping a value with the unit value yields the original value, ignoring the tuple structure. The associativity law requires <code>zip</code> to be associative, again ignoring the tuple structure. Here, like in the Typeclassopedia definition, we defer the equality checking to an isomorphism that ignores the unwanted structure.</p>
 
 <p>We could further generalize this type class by removing the requirement for the <code>unit</code> and <code>map</code> operations, leaving simply <code>zip</code> along with the associativity law &ndash; this is exactly what Scalaz has done with the <code>scalaz.Zip</code> type class.</p>
 
-<h3>Converting applicative forms</h3>
+<h3 id="converting-applicative-forms">Converting applicative forms</h3>
 
 <p>We can convert any applicative functor to a monoidal functor and vice-versa:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">def</span> <span class="n">applicativeToMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]](</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">unit</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(())</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">zip</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">ap</span><span class="o">(</span><span class="n">fb</span><span class="o">)(</span><span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">B</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)))</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">map</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">f</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">implicit</span> <span class="k">def</span> <span class="n">monoidalToApplicative</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]](</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Applicative</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">pure</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">unit</span><span class="o">)(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="n">a</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">ap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">ff</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span> <span class="k">=&gt;</span> <span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">ff</span><span class="o">))</span> <span class="o">{</span> <span class="k">case</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">f</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">implicit def applicativeToMonoidal[F[_]](implicit F: Applicative[F]): Monoidal[F] = new Monoidal[F] {
+  def unit: F[Unit] = F.pure(())
+  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)] = F.ap(fb)(F.map(fa)(a =&gt; (b: B) =&gt; (a, b)))
+  def map[A, B](fa: F[A])(f: A =&gt; B): F[B] = F.map(fa)(f)
+}
 
+implicit def monoidalToApplicative[F[_]](implicit F: Monoidal[F]): Applicative[F] = new Applicative[F] {
+  def pure[A](a: A): F[A] = F.map(F.unit)(_ =&gt; a)
+  def ap[A, B](fa: F[A])(ff: F[A =&gt; B]): F[B] = F.map(F.zip(fa, ff)) { case (a, f) =&gt; f(a) }
+}
+</code></pre>
 
-<h2>Monoidal[Codec]</h2>
+<h2 id="monoidal-codec">Monoidal[Codec]</h2>
 
 <p>Let&rsquo;s try to implement a <code>Monoidal</code> instance for <code>Codec</code>.</p>
 
 <p>The definition of <code>unit</code> looks very similar to the definition of <code>pure</code>:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">unit</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">sizeBound</span> <span class="k">=</span> <span class="nc">SizeBound</span><span class="o">.</span><span class="n">exact</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Attempt</span><span class="o">.</span><span class="n">successful</span><span class="o">(</span><span class="nc">BitVector</span><span class="o">.</span><span class="n">empty</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Attempt</span><span class="o">.</span><span class="n">successful</span><span class="o">(</span><span class="nc">DecodeResult</span><span class="o">((),</span> <span class="n">b</span><span class="o">))</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="language-scala">def unit: Codec[Unit] = new Codec[Unit] {
+  def sizeBound = SizeBound.exact(0)
+  def encode(a: A) = Attempt.successful(BitVector.empty)
+  def decode(b: BitVector) = Attempt.successful(DecodeResult((), b))
+}
+</code></pre>
 
 <p>Now let&rsquo;s try to implement <code>zip</code> &ndash; note that we should not be able to, as we know <code>Codec</code> doesn&rsquo;t have a covariant functor.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">zip</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">ca</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">cb</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">Codec</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Codec</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">sizeBound</span> <span class="k">=</span> <span class="n">ca</span><span class="o">.</span><span class="n">sizeBound</span> <span class="o">+</span> <span class="n">cb</span><span class="o">.</span><span class="n">sizeBound</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="k">:</span> <span class="kt">BitVector</span><span class="o">)</span> <span class="k">=</span> <span class="o">(</span><span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">a</span> <span class="k">&lt;-</span> <span class="nc">DecodingContext</span><span class="o">(</span><span class="n">ca</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">b</span> <span class="k">&lt;-</span> <span class="nc">DecodingContext</span><span class="o">(</span><span class="n">cb</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">)).</span><span class="n">decode</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">encode</span><span class="o">(</span><span class="n">ab</span><span class="k">:</span> <span class="o">(</span><span class="kt">A</span><span class="o">,</span> <span class="kt">B</span><span class="o">))</span> <span class="k">=</span> <span class="k">for</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">encA</span> <span class="k">&lt;-</span> <span class="n">ca</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">ab</span><span class="o">.</span><span class="n">_1</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">encB</span> <span class="k">&lt;-</span> <span class="n">cb</span><span class="o">.</span><span class="n">encode</span><span class="o">(</span><span class="n">ab</span><span class="o">.</span><span class="n">_2</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span> <span class="k">yield</span> <span class="n">encA</span> <span class="o">++</span> <span class="n">encB</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="language-scala">def zip[A, B](ca: Codec[A], cb: Codec[B]): Codec[(A, B)] = new Codec[(A, B)] {
+  def sizeBound = ca.sizeBound + cb.sizeBound
+  def decode(b: BitVector) = (for {
+    a &lt;- DecodingContext(ca)
+    b &lt;- DecodingContext(cb)
+  } yield (a, b)).decode(b)
+  def encode(ab: (A, B)) = for {
+    encA &lt;- ca.encode(ab._1)
+    encB &lt;- cb.encode(ab._2)
+  } yield encA ++ encB
+}
+</code></pre>
 
 <p>Wait, so what are we missing? We have an implementation of <code>unit</code> and <code>zip</code> and yet we know we can&rsquo;t have a lawful <code>Monoidal[Codec]</code> instance due to the fact that there&rsquo;s no covariant functor for <code>Codec</code>. Monoidal functors have <em>three</em> abstract operations though, not two (like <code>Applicative</code>) &ndash; <code>unit</code>, <code>zip</code>, and <code>map</code>. So in order to have a monoidal functor for <code>Codec</code>, we need to define <code>map</code>, which we know we can&rsquo;t do!</p>
 
 <p>However, we do have <code>xmap</code>. What happens if we pair <code>xmap</code> with <code>unit</code> and <code>zip</code>?</p>
 
-<h2>Invariant monoidal functors</h2>
+<h2 id="invariant-monoidal-functors">Invariant monoidal functors</h2>
 
 <p>Let&rsquo;s define a new invariant shadow of <code>Monoidal</code> that extends <code>InvariantFunctor</code> instead of <code>Functor</code>:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">InvariantFunctor</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">unit</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">zip</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<pre><code class="language-scala">trait InvariantMonoidal[F[_]] extends InvariantFunctor[F] {
+  def unit: F[Unit]
+  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)]
+}
+</code></pre>
 
 <p>We can also port the laws from lax monoidal functors, which are identical except for requiring an <code>InvariantMonoidal</code> instance instead of a <code>Monoidal</code> instance:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">xmonoidalLeftIdentity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">],</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">F</span><span class="o">[(</span><span class="kt">Unit</span>, <span class="kt">A</span><span class="o">)]</span>, <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">unit</span><span class="o">,</span> <span class="n">fa</span><span class="o">)</span> <span class="o">~=</span> <span class="n">fa</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">xmonoidalRightIdentity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">],</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">Unit</span><span class="o">)]</span>, <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">F</span><span class="o">.</span><span class="n">unit</span><span class="o">)</span> <span class="o">~=</span> <span class="n">fa</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="n">xmonoidalAssociativity</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span>, <span class="kt">C</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">],</span> <span class="n">fc</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">C</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">],</span> <span class="n">iso</span><span class="k">:</span> <span class="kt">Iso</span><span class="o">[</span><span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="o">(</span><span class="kt">B</span>, <span class="kt">C</span><span class="o">))]</span>, <span class="kt">F</span><span class="o">[((</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)</span>, <span class="kt">C</span><span class="o">)]])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span>
-</span><span class='line'>  <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fb</span><span class="o">,</span> <span class="n">fc</span><span class="o">))</span> <span class="o">~=</span> <span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">F</span><span class="o">.</span><span class="n">zip</span><span class="o">(</span><span class="n">fa</span><span class="o">,</span> <span class="n">fb</span><span class="o">),</span> <span class="n">fc</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">def xmonoidalLeftIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonoidal[F], iso: Iso[F[(Unit, A)], F[A]]): Boolean =
+  F.zip(F.unit, fa) ~= fa
 
+def xmonoidalRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonoidal[F], iso: Iso[F[(A, Unit)], F[A]]): Boolean =
+  F.zip(fa, F.unit) ~= fa
 
-<h3>Deriving an <code>InvariantMonoidal</code> from an <code>InvariantMonad</code></h3>
+def xmonoidalAssociativity[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])(implicit F: InvariantMonoidal[F], iso: Iso[F[(A, (B, C))], F[((A, B), C)]]): Boolean =
+  F.zip(fa, F.zip(fb, fc)) ~= F.zip(F.zip(fa, fb), fc)
+</code></pre>
+
+<h3 id="deriving-an-invariantmonoidal-from-an-invariantmonad">Deriving an <code>InvariantMonoidal</code> from an <code>InvariantMonad</code></h3>
 
 <p>In the same way that a monad yields two monoidal functors (or two applicative functors) &ndash; one that evaluates <code>F[A]</code> first and <code>F[B]</code> second, and another which evaluates in the reverse order &ndash; an invariant monad gives rise to two invariant monoidal functors. For example, the following implementation evaluates the <code>F[A]</code> first and the <code>F[B]</code> second:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">implicit</span> <span class="k">def</span> <span class="n">xmonadToXmonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]](</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">InvariantMonad</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">unit</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pure</span><span class="o">(())</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">zip</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span> <span class="k">=</span>
-</span><span class='line'>    <span class="n">F</span><span class="o">.</span><span class="n">xflatMap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="n">F</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="n">fb</span><span class="o">)(</span><span class="n">b</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">))(</span><span class="n">ab</span> <span class="k">=&gt;</span> <span class="n">ab</span><span class="o">.</span><span class="n">_2</span><span class="o">))(</span><span class="n">ab</span> <span class="k">=&gt;</span> <span class="n">ab</span><span class="o">.</span><span class="n">_1</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">xmap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="n">g</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">xmap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">f</span><span class="o">)(</span><span class="n">g</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">implicit def xmonadToXmonoidal[F[_]](implicit F: InvariantMonad[F]): InvariantMonoidal[F] = new InvariantMonoidal[F] {
+  def unit: F[Unit] = F.pure(())
+  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)] =
+    F.xflatMap(fa)(a =&gt; F.xmap(fb)(b =&gt; (a, b))(ab =&gt; ab._2))(ab =&gt; ab._1)
+  def xmap[A, B](fa: F[A])(f: A =&gt; B)(g: B =&gt; A): F[B] = F.xmap(fa)(f)(g)
+}
+</code></pre>
 
-
-<h3>Sharing unit/zip</h3>
+<h3 id="sharing-unit-zip">Sharing unit/zip</h3>
 
 <p>Because the invariant monoidal differs from the covariant monoidal only in the defintion of <code>xmap</code>/<code>map</code>, we could extract a type class that captures the signature of <code>unit</code> and <code>zip</code> and the laws that govern their interaction.</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">MonoidalBase</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">unit</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Unit</span><span class="o">]</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">zip</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">fb</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[(</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">)]</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'><span class="k">trait</span> <span class="nc">Monoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">MonoidalBase</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="k">with</span> <span class="nc">Functor</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span>
-</span><span class='line'><span class="k">trait</span> <span class="nc">InvariantMonoidal</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">MonoidalBase</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span> <span class="k">with</span> <span class="nc">InvariantFunctor</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
+<pre><code class="language-scala">trait MonoidalBase[F[_]] {
+  def unit: F[Unit]
+  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)]
+}
+trait Monoidal[F[_]] extends MonoidalBase[F] with Functor[F]
+trait InvariantMonoidal[F[_]] extends MonoidalBase[F] with InvariantFunctor[F]
+</code></pre>
 
-
-<h2>Applicability to Codec</h2>
+<h2 id="applicability-to-codec">Applicability to Codec</h2>
 
 <p>In the last article, we saw that <code>Codec</code> supported both <code>flatZip</code> and <code>consume</code>, and how those methods exist due to the invariant monad structure of <code>Codec</code>. In fact, those methods both existed <em>before</em> the invariant monad structure was extracted. Is the same true for <code>unit</code> and <code>zip</code>? That is, do those methods exist under some other name, their existence justified by their usefulness in binary codec creation, rather than satisfying a type class definition?</p>
 
 <p>It turns out that both of these operations do exist already. The <code>unit</code> operation is provided by <code>scodec.codecs.ignore(0L)</code>, which returns a <code>Codec[Unit]</code> that encodes an empty bit vector. The <code>zip</code> operation is provided by the <code>pairedWith</code> method on codec &ndash; which has the operator alias <code>~</code>.</p>
 
 <p>We did not provide an invariant shadow of applicative functors, though that is worth exploring, perhaps in a future article.</p>
-</div>
 
-
-<div class="meta">
-	<div class="date">
-
-
-
-
-Jun 22nd, 2015</div>
-	<div class="tags">
-
-
-	<a class='category' href='/blog/categories/scodec-scala/'>scodec,scala</a>
-
-
-</div>
-	
-</div>
-</article>
-
-	<div class="share">
-	<div class="addthis_toolbox addthis_default_style ">
-		
-		
-		<a class="addthis_button_tweet"></a>
-		
-		
-		
+            </div>
+        </div>
 	</div>
-	
+    <div class="pure-u-1-24 pure-u-md-1-6"></div>
+</div>
+
+<div class="footer pure-g">
+    <div class="pure-u-1-24 pure-u-md-5-24"></div>
+    <div class="pure-u-11-12 pure-u-md-5-8">
+        <div class="footer-content">
+		  <div class="pure-menu pure-menu-horizontal">
+              <ul>
+			      
+                  <li class="pure-menu-heading" id="foot-name">Michael Pilquist:</li>
+                  
+				  
+                  
+          
+                  
+                  <li class="pure-menu-item">
+                      <a href="https://github.com/mpilquist" class="pure-menu-link">GitHub</a>
+                  </li>
+                  
+          
+                  
+          
+                  
+          
+                  
+                  <li class="pure-menu-item">
+                      <a href="https://twitter.com/mpilquist" class="pure-menu-link">Twitter</a>
+                  </li>
+                  
+          
+              </ul>
+              <a href="#" class="pure-menu-heading pull-right" id="gototop-btn">↑↑</a>
+          </div>
+		  
+		  <p id="foot-copyright">Copyright (c) 2012 - 2017 Michael Pilquist</p>
+		  
+		</div>
+	  </div>
+      <div class="pure-u-1-24 pure-u-md-1-6"></div>
 </div>
 
 
-
-<section id="comment">
-    <h2 class="title">Comments</h2>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-</section>
-</div>
-	<footer id="footer" class="inner">Copyright &copy; 2016
-
-    Michael Pilquist
-
-</footer>
-	<script src="/javascripts/slash.js"></script>
-<script src="/javascripts/jquery.fancybox.pack.js"></script>
+<script src="https://mpilquist.github.io/js/jquery.min.js" type="text/javascript"></script>
+<script src="https://mpilquist.github.io/js/jquery.timeago.js" type="text/javascript"></script>
 <script type="text/javascript">
-(function($){
-	$('.fancybox').fancybox();
-})(jQuery);
-</script> <!-- Delete or comment this line to disable Fancybox -->
-
-
-<script type="text/javascript">
-      var disqus_shortname = 'liftM';
-      
-        
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/';
-        var disqus_url = 'http://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/';
-        var disqus_script = 'embed.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//go.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
+  $(function(){
+    $("time.timeago").timeago();
+  })
+  $("#toggle-btn").click(function(){
+    $("#toggle-content").toggle();
+    if($(this).html() === "☰") {
+        $(this).html("X")
+    } else {
+        $(this).html("☰")
+    }
+  });
+  $(window).resize(function(){
+    if(window.innerWidth > 768) {
+      $(".desktop").removeAttr("style");
+    }
+  });
 </script>
 
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-41236326-1']);
-		_gaq.push(['_trackPageview']);
-
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-	</script>
-
-
+  ga('create', 'UA-41236326-1', 'auto');
+  ga('send', 'pageview');
+</script>
 
 </body>
 </html>
+

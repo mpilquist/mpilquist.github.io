@@ -7,8 +7,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Sun, 13 Nov 2016 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 11 Mar 2017 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://mpilquist.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>About</title>
+      <link>https://mpilquist.github.io/about/</link>
+      <pubDate>Sat, 11 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/about/</guid>
+      <description>&lt;div style=&#34;float: left; padding-right: 1em;&#34;&gt;&lt;img src=&#34;https://mpilquist.github.io/portrait-small.png&#34; alt=&#34;Portrait&#34; /&gt;&lt;/div&gt;
+
+&lt;p&gt;My name is Michael Pilquist. I&amp;rsquo;m a software architect residing in the greater Philadelphia area. I frequently speak at conferences and user groups about functional programming and the Scala programming language.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;m also an active open source contributor. Notable projects include &lt;a href=&#34;http://scodec.org&#34;&gt;scodec&lt;/a&gt;, &lt;a href=&#34;https://github.com/mpilquist/simulacrum&#34;&gt;simulacrum&lt;/a&gt;, and &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;fs2&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;This site includes articles about functional programming in Scala and links to my conference talks and screencasts. Reach me on &lt;a href=&#34;https://twitter.com/mpilquist&#34;&gt;Twitter&lt;/a&gt; or &lt;a href=&#34;https://github.com/mpilquist&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Compositional Streaming with FS2</title>
@@ -1235,20 +1251,6 @@ object DecodingContext {
 &lt;p&gt;
 &lt;div class=&#34;video-container&#34;&gt;
 &lt;iframe src=&#34;http://player.vimeo.com/video/65474054?title=0&amp;amp;byline=0&amp;amp;portrait=0&#34; width=&#34;500&#34; height=&#34;281&#34; frameborder=&#34;0&#34; webkitAllowFullScreen mozallowfullscreen allowFullScreen&gt;&lt;/iframe&gt; &lt;p&gt;&lt;a href=&#34;http://vimeo.com/65474054&#34;&gt;The Future of the JVM&lt;/a&gt; from &lt;a href=&#34;http://vimeo.com/chariotsolutions&#34;&gt;Chariot Solutions&lt;/a&gt; on &lt;a href=&#34;http://vimeo.com&#34;&gt;Vimeo&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Scalaz State Monad</title>
-      <link>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</link>
-      <pubDate>Tue, 28 Aug 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</guid>
-      <description>&lt;p&gt;Introduction to the State Monad in Scalaz 7. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scalaz-state-monad&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;http://www.youtube.com/embed/Jg3Uv_YWJqI&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
 &lt;/div&gt;&lt;/p&gt;</description>
     </item>
     

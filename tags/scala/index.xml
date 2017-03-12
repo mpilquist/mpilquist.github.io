@@ -10,6 +10,267 @@
     <atom:link href="https://mpilquist.github.io/tags/scala/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Stackless Function Composition</title>
+      <link>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</link>
+      <pubDate>Sat, 11 Mar 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</guid>
+      <description>&lt;p&gt;Last fall I spent a lot of time optimizing the internals of &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt;. The &lt;code&gt;Free&lt;/code&gt; monad is used extensively in FS2 for modeling various algebras &amp;ndash; most notably, an algebra supporting &lt;code&gt;Stream&lt;/code&gt; and an algebra supporting &lt;code&gt;Pull&lt;/code&gt;. Almost any operation a user performs on a &lt;code&gt;Stream&lt;/code&gt; or &lt;code&gt;Pull&lt;/code&gt; results in one or more bounces on the trampoline inside &lt;code&gt;Free&lt;/code&gt;. As such, any optimization in &lt;code&gt;Free&lt;/code&gt; pays off big time. In this article, we&amp;rsquo;ll look at one of these optimizations &amp;ndash; &lt;em&gt;map fusion&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;p&gt;Operator fusion is the act of condensing successive invocations of an operation in to a single invocation. Hence, map fusion is the act of condensing successive &lt;code&gt;map&lt;/code&gt; invocations in to a single &lt;code&gt;map&lt;/code&gt;. In the context of &lt;code&gt;Free&lt;/code&gt;, map fusion means that for all &lt;code&gt;fa: Free[F, A]&lt;/code&gt;, &lt;code&gt;f: A =&amp;gt; B&lt;/code&gt;, &lt;code&gt;g: B =&amp;gt; C&lt;/code&gt;, &lt;code&gt;fa.map(f).map(g)&lt;/code&gt; should result in the &lt;em&gt;same internal structure&lt;/em&gt; as &lt;code&gt;fa.map(f andThen g)&lt;/code&gt;. This should result in a significant performance improvement for free programs with lots of successive map operations, especially if &lt;code&gt;map&lt;/code&gt; is implemented in terms of &lt;code&gt;flatMap&lt;/code&gt; and &lt;code&gt;pure&lt;/code&gt;, as we can condense multiple bounces on the trampoline in to a single bounce.&lt;/p&gt;
+
+&lt;h2 id=&#34;coyoneda&#34;&gt;Coyoneda&lt;/h2&gt;
+
+&lt;p&gt;There&amp;rsquo;s already a data structure that provides map fusion for an arbitrary type constructor &amp;ndash; &lt;code&gt;Coyoneda&lt;/code&gt;. Here&amp;rsquo;s a simplified implementation of &lt;code&gt;Coyoneda&lt;/code&gt; based off the one defined in &lt;a href=&#34;https://github.com/typelevel/cats&#34;&gt;Cats&lt;/a&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;sealed abstract class Coyoneda[F[_], A] { self =&amp;gt;
+  type Pivot
+  val pivot: F[Pivot]
+  val transform: Pivot =&amp;gt; A
+
+  def map[B](f: A =&amp;gt; B): Coyoneda[F, B] = new Coyoneda[F, B] {
+    type Pivot = self.Pivot
+    val pivot = self.pivot
+    val transform = f compose self.transform
+  }
+
+  def run(implicit F: Functor[F]): F[A] =
+    F.map(pivot)(transform)
+}
+
+object Coyoneda {
+  def apply[F[_], A, B](fa: F[A], f: A =&amp;gt; B): Coyoneda[F, B] { type Pivot = A } =
+    new Coyoneda[F, B] {
+      type Pivot = A
+      val pivot: F[Pivot] = fa
+      val transform: Pivot =&amp;gt; B = f
+    }
+
+  def lift[F[_], A](fa: F[A]): Coyondea[F, A] =
+    apply[F, A, A](fa, identity)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;Coyoneda[F, A]&lt;/code&gt; stores a value of &lt;code&gt;F[X]&lt;/code&gt; for some &lt;code&gt;X&lt;/code&gt; along with a function from &lt;code&gt;X =&amp;gt; A&lt;/code&gt;. It forms a &lt;code&gt;Functor[Coyoneda[F, ?]]&lt;/code&gt; where mapping results in extending the transformation function by the function passed to &lt;code&gt;map&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;In some sense, &lt;strong&gt;&lt;code&gt;Coyoneda&lt;/code&gt; encodes map fusion directly&lt;/strong&gt; &amp;ndash; it hides away an &lt;code&gt;F[X]&lt;/code&gt; for some &lt;code&gt;X&lt;/code&gt; and then incrementally builds a transformation function by composing the functions passed to &lt;code&gt;map&lt;/code&gt;. When composition is complete, the &lt;code&gt;Coyoneda&lt;/code&gt; is &amp;ldquo;unwrapped&amp;rdquo; by mapping the composed transformation over the pivot (&lt;code&gt;F[X]&lt;/code&gt;) via a single invocation of &lt;code&gt;map&lt;/code&gt;. We won&amp;rsquo;t go in to detail on the theoretical underpinnings of &lt;code&gt;Coyoneda&lt;/code&gt;, but if you&amp;rsquo;re interested, a great starting point is &lt;a href=&#34;http://blog.higher-order.com/blog/2013/11/01/free-and-yoneda/&#34;&gt;Free Monads and the Yoneda Lemma&lt;/a&gt; by Rúnar Bjarnason.&lt;/p&gt;
+
+&lt;p&gt;This is pretty powerful &amp;ndash; we can get map fusion for any &lt;code&gt;Functor&lt;/code&gt; by lifting a value to &lt;code&gt;Coyoneda&lt;/code&gt;, passing the coyoneda to functions that operate on a &lt;code&gt;Functor&lt;/code&gt;, and then unwrapping via &lt;code&gt;run&lt;/code&gt;!&lt;/p&gt;
+
+&lt;h2 id=&#34;embedding-coyoneda-in-free&#34;&gt;Embedding Coyoneda in Free&lt;/h2&gt;
+
+&lt;p&gt;We want to go a bit further with &lt;code&gt;Free&lt;/code&gt; and embed map fusion inside the &lt;code&gt;map&lt;/code&gt; method. To do this, we can embed a &lt;code&gt;Coyoneda&lt;/code&gt; inside &lt;code&gt;Free&lt;/code&gt;. This is a very mechanical embedding &amp;ndash; the general idea is to add another constructor to &lt;code&gt;Free&lt;/code&gt; representing &lt;code&gt;Map&lt;/code&gt; (in addition to the standard constructors like &lt;code&gt;Pure&lt;/code&gt;, &lt;code&gt;Suspend&lt;/code&gt;, and &lt;code&gt;Bind&lt;/code&gt;). The &lt;code&gt;Map&lt;/code&gt; constructor wraps a &lt;code&gt;Coyoneda&lt;/code&gt;. We can then implement the &lt;code&gt;map&lt;/code&gt; operation on &lt;code&gt;Free&lt;/code&gt; such that it either extends the coyoneda transformation (if &lt;code&gt;map&lt;/code&gt; was called on a &lt;code&gt;Map&lt;/code&gt; instance) or constructs a new coyoneda (if &lt;code&gt;map&lt;/code&gt; was called on any other constructor). So something like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Free[F, A] {
+  def map[B](f: A =&amp;gt; B): Free[F, B] = this match {
+    case Map(coyoneda) =&amp;gt; Map(coyoneda.map(f))
+    case other =&amp;gt; Map(Coyondea[Free[F, ?], A, B](other, f))
+  }
+}
+object Free {
+  case class Map(coyoneda: Coyoneda[F, A]) extends Free[F, A]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What do we lose by doing this? With our current definition of &lt;code&gt;Coyoneda&lt;/code&gt;, we lose stack safety. We normally get stack safety from the monad in which we interpret the &lt;code&gt;Free&lt;/code&gt;, with &lt;code&gt;Free&lt;/code&gt; re-associating left-nested &lt;code&gt;flatMap&lt;/code&gt;s. If &lt;code&gt;map&lt;/code&gt; is implemented in terms of &lt;code&gt;flatMap&lt;/code&gt; and &lt;code&gt;pure&lt;/code&gt;, this works fine. But in the &lt;code&gt;Coyoneda&lt;/code&gt; backed version, we&amp;rsquo;ve lost stack safety due to the dependence on Scala&amp;rsquo;s function composition in &lt;code&gt;Coyoneda#map&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Consider:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val z: Coyoneda[Function0, Int] = Coyoneda(() =&amp;gt; 0, identity[Int])
+
+(0 to 10).foldLeft(z)((acc, i) =&amp;gt; acc.map(_ + i)).run.apply
+// 55
+
+(0 to 10000).foldLeft(z)((acc, i) =&amp;gt; acc.map(_ + i)).run.apply
+// 50005000
+
+(0 to 100000).foldLeft(z)((acc, i) =&amp;gt; acc.map(_ + i)).run.apply
+// java.lang.StackOverflowError
+//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is caused by the implementation of &lt;code&gt;compose&lt;/code&gt; in &lt;code&gt;scala.Function1&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Function1[-T1, +R] {
+  def apply(v1: T1): R
+  def compose[A](g: A =&amp;gt; T1): A =&amp;gt; R = { x =&amp;gt; apply(g(x)) }
+  def andThen[A](g: R =&amp;gt; A): T1 =&amp;gt; A = { x =&amp;gt; g(apply(x)) }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Each call to &lt;code&gt;compose&lt;/code&gt; (or &lt;code&gt;andThen&lt;/code&gt;) returns a new function that calls &lt;code&gt;apply&lt;/code&gt; on the previous function, resulting in a stack frame for each composition.&lt;/p&gt;
+
+&lt;h2 id=&#34;stack-safe-function-composition&#34;&gt;Stack Safe Function Composition&lt;/h2&gt;
+
+&lt;p&gt;Our map fusion optimization hinges on function composition. How can we compose functions in a stack safe way? We can use a &lt;em&gt;type aligned sequence&lt;/em&gt; &amp;ndash; a sequence of functions such that the output type of each function in the sequence is compatible with the input type of the next function in the sequence. We do not need fancy typelevel functions or dependent types to implement this! Rather, we can use a simple cons list.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;final class ListF1[-A, +B] private (private val fs: List[(Any =&amp;gt; Any)]) extends (A =&amp;gt; B) {
+
+  override def apply(a: A): B =
+    fs.foldLeft(a: Any)((x, f) =&amp;gt; f(x)).asInstanceOf[B]
+
+  override def compose[C](g: C =&amp;gt; A): ListF1[C, B] =
+    new ListF1(g.asInstanceOf[Any =&amp;gt; Any] :: fs)
+}
+
+object ListF1 {
+  def apply[A, B](f: A =&amp;gt; B): ListF1[A, B] = f match {
+    case f: ListF1[A, B] =&amp;gt; f
+    case _ =&amp;gt; new ListF1(f.asInstanceOf[Any =&amp;gt; Any] :: Nil)
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We represent the type level sequence with a &lt;code&gt;List[(Any =&amp;gt; Any)]&lt;/code&gt; and we enforce the &amp;ldquo;type alignment&amp;rdquo; property via the type signature of &lt;code&gt;compose&lt;/code&gt;. The list always has at least one element thanks to &lt;code&gt;apply&lt;/code&gt;. Each call to &lt;code&gt;compose&lt;/code&gt; results in cons-ing a function on to the type aligned sequence. Finally, we implement &lt;code&gt;ListF1#apply&lt;/code&gt; by applying each function in turn, using the output of the previous function as the input to the next.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;// Normal function composition is not stack safe
+(0 until 1000000).foldLeft(identity[Int] _)((acc, i) =&amp;gt; acc.compose(_ + 1))(0)
+// java.lang.StackOverflowError
+//   at scala.runtime.java8.JFunction1$mcII$sp.apply(JFunction1$mcII$sp.java:12)
+//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+
+// ListF1 composition is stack safe
+(0 until 1000000).foldLeft(ListF1(identity[Int]))((acc, i) =&amp;gt; acc.compose(_ + 1))(0)
+// 1000000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This definition is sufficient to restore stack safety to &lt;code&gt;Coyoneda&lt;/code&gt; and &lt;code&gt;Free&lt;/code&gt;! We just need to wrap each &lt;code&gt;Function1&lt;/code&gt; in a &lt;code&gt;ListF1&lt;/code&gt; inside the definition of &lt;code&gt;Coyoneda#map&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;generalized-stack-safe-function-composition&#34;&gt;Generalized Stack Safe Function Composition&lt;/h2&gt;
+
+&lt;p&gt;While &lt;code&gt;ListF1&lt;/code&gt; provides a stack safe &lt;code&gt;compose&lt;/code&gt;, it inherits the default &lt;code&gt;andThen&lt;/code&gt; from &lt;code&gt;Function1&lt;/code&gt;. This is very dangerous if we hope to provide a general purpose stack safe function wrapper. Extending &lt;code&gt;ListF1&lt;/code&gt; to support both stack safe &lt;code&gt;compose&lt;/code&gt; and &lt;code&gt;andThen&lt;/code&gt; (and arbitrary interleavings) requires us to store the type aligned sequence in a data structure that has constant time cons and snoc operations. The only standard library collection that supports this is &lt;code&gt;Vector&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;final class VectorF1[-A, +B] private (private val fs: Vector[(Any =&amp;gt; Any)]) extends (A =&amp;gt; B) {
+
+  override def apply(a: A): B =
+    fs.foldLeft(a: Any)((x, f) =&amp;gt; f(x)).asInstanceOf[B]
+
+  override def compose[C](g: C =&amp;gt; A): VectorF1[C, B] =
+    new VectorF1(g.asInstanceOf[Any =&amp;gt; Any] +: fs)
+
+  override def andThen[C](g: B =&amp;gt; C): VectorF1[A, C] =
+    new VectorF1(fs :+ g.asInstanceOf[Any =&amp;gt; Any])
+}
+
+object VectorF1 {
+  def apply[A, B](f: A =&amp;gt; B): VectorF1[A, B] = f match {
+    case f: VectorF1[A, B] =&amp;gt; f
+    case _ =&amp;gt; new VectorF1(Vector(f.asInstanceOf[Any =&amp;gt; Any]))
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;VectorF1&lt;/code&gt; seems perfect. It has stack safe &lt;code&gt;compose&lt;/code&gt; and &lt;code&gt;andThen&lt;/code&gt;. Unfortunately, it is terribly slow. Most composed functions are going to be made up of a small number of compositions &amp;ndash; 2, 3, or 4 functions. It&amp;rsquo;s uncommon to compose 1,000,000 functions. &lt;code&gt;Vector&lt;/code&gt; has effectively constant time cons and snoc, but there are large constant factors. For example, a single element vector will allocate an 32-element array internally. These constant factors end up dominating the performance results, so this solution won&amp;rsquo;t work.&lt;/p&gt;
+
+&lt;p&gt;Fortunately, FS2 has a data structure that performs better &amp;ndash; &lt;a href=&#34;https://oss.sonatype.org/service/local/repositories/releases/archive/co/fs2/fs2-core_2.12/0.9.4/fs2-core_2.12-0.9.4-javadoc.jar/!/fs2/util/Catenable.html&#34;&gt;&lt;code&gt;fs2.util.Catenable&lt;/code&gt;&lt;/a&gt;. It has O(1) cons, snoc, and concat, amortized O(1) uncons, O(n) traversal, and negligible constant factors for small collections.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;import fs2.util.Catenable
+
+final class CatenableF1[-A, +B] private (private val fs: Catenable[(Any =&amp;gt; Any)]) extends (A =&amp;gt; B) {
+
+  override def apply(a: A): B =
+    fs.foldLeft(a: Any)((x, f) =&amp;gt; f(x)).asInstanceOf[B]
+
+  override def compose[C](g: C =&amp;gt; A): CatenableF1[C, B] =
+    new CatenableF1(g.asInstanceOf[Any =&amp;gt; Any] +: fs)
+
+  override def andThen[C](g: B =&amp;gt; C): CatenableF1[A, C] =
+    new CatenableF1(fs :+ g.asInstanceOf[Any =&amp;gt; Any])
+}
+
+object CatenableF1 {
+  def apply[A, B](f: A =&amp;gt; B): CatenableF1[A, B] = f match {
+    case f: CatenableF1[A, B] =&amp;gt; f
+    case _ =&amp;gt; new CatenableF1(Catenable.single(f.asInstanceOf[Any =&amp;gt; Any]))
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;stack-safe-function-benchmarks&#34;&gt;Stack Safe Function Benchmarks&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s confirm our performance assumptions with a JMH benchmark:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;@State(Scope.Thread)
+class FunctionBenchmark {
+
+  val f = identity[Int] _
+
+  @Benchmark def unitary_Function1 = f(0)
+  @Benchmark def unitary_ListF1 = ListF1(f)(0)
+  @Benchmark def unitary_VectorF1 = VectorF1(f)(0)
+  @Benchmark def unitary_CatenableF1 = CatenableF1(f)(0)
+
+  @Benchmark def compose2_Function1 = (f compose f)(0)
+  @Benchmark def compose2_ListF1 = (ListF1(f) compose f)(0)
+  @Benchmark def compose2_VectorF1 = (VectorF1(f) compose f)(0)
+  @Benchmark def compose2_CatenableF1 = (CatenableF1(f) compose f)(0)
+
+  @Benchmark def andThen2_Function1 = (f andThen f)(0)
+  @Benchmark def andThen2_ListF1 = (ListF1(f) andThen f)(0)
+  @Benchmark def andThen2_VectorF1 = (VectorF1(f) andThen f)(0)
+  @Benchmark def andThen2_CatenableF1 = (CatenableF1(f) andThen f)(0)
+
+  @Benchmark def compose1k_Function1 = (0 until 1000).foldLeft(f)((acc, _) =&amp;gt; acc compose f)(0)
+  @Benchmark def compose1k_ListF1 = (0 until 1000).foldLeft(ListF1(f))((acc, _) =&amp;gt; acc compose f)(0)
+  @Benchmark def compose1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, _) =&amp;gt; acc compose f)(0)
+  @Benchmark def compose1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, _) =&amp;gt; acc compose f)(0)
+
+  @Benchmark def andThen1k_Function1 = (0 until 1000).foldLeft(f)((acc, _) =&amp;gt; acc andThen f)(0)
+  @Benchmark def andThen1k_ListF1 = (0 until 1000).foldLeft(ListF1(f): Int =&amp;gt; Int)((acc, _) =&amp;gt; acc andThen f)(0)
+  @Benchmark def andThen1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, _) =&amp;gt; acc andThen f)(0)
+  @Benchmark def andThen1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, _) =&amp;gt; acc andThen f)(0)
+
+  @Benchmark def interleaved5k_Function1 = (0 until 5000).foldLeft(f)((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
+  @Benchmark def interleaved5k_ListF1 = (0 until 5000).foldLeft(ListF1(f): Int =&amp;gt; Int)((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
+  @Benchmark def interleaved5k_VectorF1 = (0 until 5000).foldLeft(VectorF1(f))((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
+  @Benchmark def interleaved5k_CatenableF1 = (0 until 5000).foldLeft(CatenableF1(f))((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Running these tests via &lt;code&gt;jmh:run -i 10 -wi 5 -f1 -t4&lt;/code&gt; results in:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[info] Benchmark                                 Mode  Cnt          Score          Error  Units
+[info] FunctionBenchmark.andThen1k_CatenableF1      thrpt   10      52645.292 ±     1103.646  ops/s
+[info] FunctionBenchmark.andThen1k_Function1        thrpt   10     150172.986 ±    17942.467  ops/s
+[info] FunctionBenchmark.andThen1k_ListF1           thrpt   10     146660.259 ±    16294.933  ops/s
+[info] FunctionBenchmark.andThen1k_VectorF1         thrpt   10      44720.571 ±     5828.594  ops/s
+[info] FunctionBenchmark.andThen2_CatenableF1       thrpt   10   35588572.940 ±  3092474.118  ops/s
+[info] FunctionBenchmark.andThen2_Function1         thrpt   10  818744688.563 ± 19275569.749  ops/s
+[info] FunctionBenchmark.andThen2_ListF1            thrpt   10  171929071.672 ±  3233542.315  ops/s
+[info] FunctionBenchmark.andThen2_VectorF1          thrpt   10   14420360.573 ±   978766.979  ops/s
+[info] FunctionBenchmark.compose1k_CatenableF1      thrpt   10      74923.610 ±     2010.544  ops/s
+[info] FunctionBenchmark.compose1k_Function1        thrpt   10     212811.294 ±     2892.191  ops/s
+[info] FunctionBenchmark.compose1k_ListF1           thrpt   10      77221.242 ±     1649.900  ops/s
+[info] FunctionBenchmark.compose1k_VectorF1         thrpt   10      50692.537 ±      901.164  ops/s
+[info] FunctionBenchmark.compose2_CatenableF1       thrpt   10   38767734.133 ±   912509.779  ops/s
+[info] FunctionBenchmark.compose2_Function1         thrpt   10  814582136.712 ± 12637630.910  ops/s
+[info] FunctionBenchmark.compose2_ListF1            thrpt   10   97332398.974 ±  7628692.141  ops/s
+[info] FunctionBenchmark.compose2_VectorF1          thrpt   10   11022710.915 ±  2701253.720  ops/s
+[info] FunctionBenchmark.interleaved1k_CatenableF1  thrpt   10      48609.388 ±     1223.259  ops/s
+[info] FunctionBenchmark.interleaved1k_Function1    thrpt   10     136023.668 ±     9655.060  ops/s
+[info] FunctionBenchmark.interleaved1k_ListF1       thrpt   10     163702.682 ±     1764.030  ops/s
+[info] FunctionBenchmark.interleaved1k_VectorF1     thrpt   10      25646.788 ±     7765.635  ops/s
+[info] FunctionBenchmark.unitary_CatenableF1        thrpt   10   54484868.696 ± 17801651.822  ops/s
+[info] FunctionBenchmark.unitary_Function1          thrpt   10  760764365.837 ± 27670122.968  ops/s
+[info] FunctionBenchmark.unitary_ListF1             thrpt   10  160625316.286 ± 12419083.383  ops/s
+[info] FunctionBenchmark.unitary_VectorF1           thrpt   10   17808062.407 ±  2016163.644  ops/s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Based on these tests, &lt;code&gt;CatenableF1&lt;/code&gt; is about 3x faster than &lt;code&gt;VectorF1&lt;/code&gt; for small compositions and about 1.5x - 2x &lt;code&gt;VectorF1&lt;/code&gt; for large collections. &lt;code&gt;CatenableF1&lt;/code&gt; is about 3x slower than &lt;code&gt;ListF1&lt;/code&gt; and about 14x slower than &lt;code&gt;Function1&lt;/code&gt; for small compositions and about equal to &lt;code&gt;ListF1&lt;/code&gt; and 3x slower than &lt;code&gt;Function1&lt;/code&gt; for large compositions.&lt;/p&gt;
+
+&lt;p&gt;Not bad but stack safety comes at a runtime performance cost. One area for investigation is a dynamic algorithm that switches from &lt;code&gt;Function1&lt;/code&gt; to &lt;code&gt;CatenableF1&lt;/code&gt; when the composition stack reaches a certain depth.&lt;/p&gt;
+
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;If you check the FS2 source, you might notice that &lt;code&gt;Free&lt;/code&gt; does not do map fusion. We ended up not merging map fusion in to FS2 because we were able to get comparable performance gains with a simpler optimization that covers more use cases. We now eagerly evaluate &lt;code&gt;Bind(Pure(a), f)&lt;/code&gt; structures when stepping a &lt;code&gt;Free&lt;/code&gt;, which gives us the same performance boost as map fusion but covers more use cases and avoids the (minor) constant factor performance hit of &lt;code&gt;CatenableF1&lt;/code&gt;.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
       <title>Compositional Streaming with FS2</title>
       <link>https://mpilquist.github.io/blog/2016/11/13/fs2/</link>
       <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
@@ -1235,18 +1496,6 @@ object DecodingContext {
 &lt;div class=&#34;video-container&#34;&gt;
   &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;http://www.youtube.com/embed/Jg3Uv_YWJqI&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
 &lt;/div&gt;&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Intro to Scalaz 7</title>
-      <link>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</link>
-      <pubDate>Thu, 24 May 2012 00:00:00 +0000</pubDate>
-      
-      <guid>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</guid>
-      <description>&lt;p&gt;Introduction to Scalaz 7. Slides available on &lt;a href=&#34;http://www.slideshare.net/mpilquist/scalaz-13068563&#34;&gt;Slideshare&lt;/a&gt; and &lt;a href=&#34;https://speakerdeck.com/mpilquist/intro-to-scalaz&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;script async class=&#34;speakerdeck-embed&#34; data-id=&#34;2056222046ee0130dacf12313d03008e&#34; data-ratio=&#34;1.33333333333333&#34; src=&#34;//speakerdeck.com/assets/embed.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;</description>
     </item>
     
   </channel>

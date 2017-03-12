@@ -7,6 +7,11 @@
   </url>
   
   <url>
+    <loc>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</loc>
+    <lastmod>2017-03-11T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://mpilquist.github.io/blog/2016/11/13/fs2/</loc>
     <lastmod>2016-11-13T00:00:00+00:00</lastmod>
   </url>
@@ -88,7 +93,7 @@
   
   <url>
     <loc>https://mpilquist.github.io/categories/articles/</loc>
-    <lastmod>2015-06-22T00:00:00+00:00</lastmod>
+    <lastmod>2017-03-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -99,19 +104,19 @@
   
   <url>
     <loc>https://mpilquist.github.io/tags/fp/</loc>
-    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <lastmod>2017-03-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://mpilquist.github.io/post/</loc>
-    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <lastmod>2017-03-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://mpilquist.github.io/tags/scala/</loc>
-    <lastmod>2016-11-13T00:00:00+00:00</lastmod>
+    <lastmod>2017-03-11T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   

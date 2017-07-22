@@ -2,13 +2,24 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on mpilquist</title>
-    <link>https://mpilquist.github.io/post/index.xml</link>
+    <link>https://mpilquist.github.io/post/</link>
     <description>Recent content in Posts on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Sat, 11 Mar 2017 00:00:00 +0000</lastBuildDate>
-    <atom:link href="https://mpilquist.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 22 Jul 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://mpilquist.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Building a Planck Keyboard</title>
+      <link>https://mpilquist.github.io/blog/2017/07/22/building-a-planck-keyboard/</link>
+      <pubDate>Sat, 22 Jul 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2017/07/22/building-a-planck-keyboard/</guid>
+      <description>I started programming on an 8MHz 80286 IBM AT (mostly BASICA/GW-BASIC). The AT was a beast of a machine, weighing 43 pounds, with a keyboard to match &amp;ndash; the Model F, a buckling spring style &amp;ldquo;clicky&amp;rdquo; keyboard. Given this start, it is unsurprising that I am still fond of a solidly built mechanical keyboard. I have tried a few throughout the years, settling on a HHKB Pro 2 for a while.</description>
+    </item>
     
     <item>
       <title>Stackless Function Composition</title>
@@ -18,269 +29,7 @@
       <guid>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</guid>
       <description>&lt;p&gt;Last fall I spent a lot of time optimizing the internals of &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt;. The &lt;code&gt;Free&lt;/code&gt; monad is used extensively in FS2 for modeling various algebras &amp;ndash; most notably, an algebra supporting &lt;code&gt;Stream&lt;/code&gt; and an algebra supporting &lt;code&gt;Pull&lt;/code&gt;. Almost any operation a user performs on a &lt;code&gt;Stream&lt;/code&gt; or &lt;code&gt;Pull&lt;/code&gt; results in one or more bounces on the trampoline inside &lt;code&gt;Free&lt;/code&gt;. As such, any optimization in &lt;code&gt;Free&lt;/code&gt; pays off big time. In this article, we&amp;rsquo;ll look at one of these optimizations &amp;ndash; &lt;em&gt;map fusion&lt;/em&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;Operator fusion is the act of condensing successive invocations of an operation in to a single invocation. Hence, map fusion is the act of condensing successive &lt;code&gt;map&lt;/code&gt; invocations in to a single &lt;code&gt;map&lt;/code&gt;. In the context of &lt;code&gt;Free&lt;/code&gt;, map fusion means that for all &lt;code&gt;fa: Free[F, A]&lt;/code&gt;, &lt;code&gt;f: A =&amp;gt; B&lt;/code&gt;, &lt;code&gt;g: B =&amp;gt; C&lt;/code&gt;, &lt;code&gt;fa.map(f).map(g)&lt;/code&gt; should result in the &lt;em&gt;same internal structure&lt;/em&gt; as &lt;code&gt;fa.map(f andThen g)&lt;/code&gt;. This should result in a significant performance improvement for free programs with lots of successive map operations, especially if &lt;code&gt;map&lt;/code&gt; is implemented in terms of &lt;code&gt;flatMap&lt;/code&gt; and &lt;code&gt;pure&lt;/code&gt;, as we can condense multiple bounces on the trampoline in to a single bounce.&lt;/p&gt;
-
-&lt;h2 id=&#34;coyoneda&#34;&gt;Coyoneda&lt;/h2&gt;
-
-&lt;p&gt;There&amp;rsquo;s already a data structure that provides map fusion for an arbitrary type constructor &amp;ndash; &lt;code&gt;Coyoneda&lt;/code&gt;. Here&amp;rsquo;s a simplified implementation of &lt;code&gt;Coyoneda&lt;/code&gt; based off the one defined in &lt;a href=&#34;https://github.com/typelevel/cats&#34;&gt;Cats&lt;/a&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;sealed abstract class Coyoneda[F[_], A] { self =&amp;gt;
-  type Pivot
-  val pivot: F[Pivot]
-  val transform: Pivot =&amp;gt; A
-
-  def map[B](f: A =&amp;gt; B): Coyoneda[F, B] = new Coyoneda[F, B] {
-    type Pivot = self.Pivot
-    val pivot = self.pivot
-    val transform = f compose self.transform
-  }
-
-  def run(implicit F: Functor[F]): F[A] =
-    F.map(pivot)(transform)
-}
-
-object Coyoneda {
-  def apply[F[_], A, B](fa: F[A], f: A =&amp;gt; B): Coyoneda[F, B] { type Pivot = A } =
-    new Coyoneda[F, B] {
-      type Pivot = A
-      val pivot: F[Pivot] = fa
-      val transform: Pivot =&amp;gt; B = f
-    }
-
-  def lift[F[_], A](fa: F[A]): Coyondea[F, A] =
-    apply[F, A, A](fa, identity)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;Coyoneda[F, A]&lt;/code&gt; stores a value of &lt;code&gt;F[X]&lt;/code&gt; for some &lt;code&gt;X&lt;/code&gt; along with a function from &lt;code&gt;X =&amp;gt; A&lt;/code&gt;. It forms a &lt;code&gt;Functor[Coyoneda[F, ?]]&lt;/code&gt; where mapping results in extending the transformation function by the function passed to &lt;code&gt;map&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;In some sense, &lt;strong&gt;&lt;code&gt;Coyoneda&lt;/code&gt; encodes map fusion directly&lt;/strong&gt; &amp;ndash; it hides away an &lt;code&gt;F[X]&lt;/code&gt; for some &lt;code&gt;X&lt;/code&gt; and then incrementally builds a transformation function by composing the functions passed to &lt;code&gt;map&lt;/code&gt;. When composition is complete, the &lt;code&gt;Coyoneda&lt;/code&gt; is &amp;ldquo;unwrapped&amp;rdquo; by mapping the composed transformation over the pivot (&lt;code&gt;F[X]&lt;/code&gt;) via a single invocation of &lt;code&gt;map&lt;/code&gt;. We won&amp;rsquo;t go in to detail on the theoretical underpinnings of &lt;code&gt;Coyoneda&lt;/code&gt;, but if you&amp;rsquo;re interested, a great starting point is &lt;a href=&#34;http://blog.higher-order.com/blog/2013/11/01/free-and-yoneda/&#34;&gt;Free Monads and the Yoneda Lemma&lt;/a&gt; by Rúnar Bjarnason.&lt;/p&gt;
-
-&lt;p&gt;This is pretty powerful &amp;ndash; we can get map fusion for any &lt;code&gt;Functor&lt;/code&gt; by lifting a value to &lt;code&gt;Coyoneda&lt;/code&gt;, passing the coyoneda to functions that operate on a &lt;code&gt;Functor&lt;/code&gt;, and then unwrapping via &lt;code&gt;run&lt;/code&gt;!&lt;/p&gt;
-
-&lt;h2 id=&#34;embedding-coyoneda-in-free&#34;&gt;Embedding Coyoneda in Free&lt;/h2&gt;
-
-&lt;p&gt;We want to go a bit further with &lt;code&gt;Free&lt;/code&gt; and embed map fusion inside the &lt;code&gt;map&lt;/code&gt; method. To do this, we can embed a &lt;code&gt;Coyoneda&lt;/code&gt; inside &lt;code&gt;Free&lt;/code&gt;. This is a very mechanical embedding &amp;ndash; the general idea is to add another constructor to &lt;code&gt;Free&lt;/code&gt; representing &lt;code&gt;Map&lt;/code&gt; (in addition to the standard constructors like &lt;code&gt;Pure&lt;/code&gt;, &lt;code&gt;Suspend&lt;/code&gt;, and &lt;code&gt;Bind&lt;/code&gt;). The &lt;code&gt;Map&lt;/code&gt; constructor wraps a &lt;code&gt;Coyoneda&lt;/code&gt;. We can then implement the &lt;code&gt;map&lt;/code&gt; operation on &lt;code&gt;Free&lt;/code&gt; such that it either extends the coyoneda transformation (if &lt;code&gt;map&lt;/code&gt; was called on a &lt;code&gt;Map&lt;/code&gt; instance) or constructs a new coyoneda (if &lt;code&gt;map&lt;/code&gt; was called on any other constructor). So something like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Free[F, A] {
-  def map[B](f: A =&amp;gt; B): Free[F, B] = this match {
-    case Map(coyoneda) =&amp;gt; Map(coyoneda.map(f))
-    case other =&amp;gt; Map(Coyondea[Free[F, ?], A, B](other, f))
-  }
-}
-object Free {
-  case class Map(coyoneda: Coyoneda[F, A]) extends Free[F, A]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;What do we lose by doing this? With our current definition of &lt;code&gt;Coyoneda&lt;/code&gt;, we lose stack safety. We normally get stack safety from the monad in which we interpret the &lt;code&gt;Free&lt;/code&gt;, with &lt;code&gt;Free&lt;/code&gt; re-associating left-nested &lt;code&gt;flatMap&lt;/code&gt;s. If &lt;code&gt;map&lt;/code&gt; is implemented in terms of &lt;code&gt;flatMap&lt;/code&gt; and &lt;code&gt;pure&lt;/code&gt;, this works fine. But in the &lt;code&gt;Coyoneda&lt;/code&gt; backed version, we&amp;rsquo;ve lost stack safety due to the dependence on Scala&amp;rsquo;s function composition in &lt;code&gt;Coyoneda#map&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Consider:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val z: Coyoneda[Function0, Int] = Coyoneda(() =&amp;gt; 0, identity[Int])
-
-(0 to 10).foldLeft(z)((acc, i) =&amp;gt; acc.map(_ + i)).run.apply
-// 55
-
-(0 to 10000).foldLeft(z)((acc, i) =&amp;gt; acc.map(_ + i)).run.apply
-// 50005000
-
-(0 to 100000).foldLeft(z)((acc, i) =&amp;gt; acc.map(_ + i)).run.apply
-// java.lang.StackOverflowError
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This is caused by the implementation of &lt;code&gt;compose&lt;/code&gt; in &lt;code&gt;scala.Function1&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Function1[-T1, +R] {
-  def apply(v1: T1): R
-  def compose[A](g: A =&amp;gt; T1): A =&amp;gt; R = { x =&amp;gt; apply(g(x)) }
-  def andThen[A](g: R =&amp;gt; A): T1 =&amp;gt; A = { x =&amp;gt; g(apply(x)) }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Each call to &lt;code&gt;compose&lt;/code&gt; (or &lt;code&gt;andThen&lt;/code&gt;) returns a new function that calls &lt;code&gt;apply&lt;/code&gt; on the previous function, resulting in a stack frame for each composition.&lt;/p&gt;
-
-&lt;h2 id=&#34;stack-safe-function-composition&#34;&gt;Stack Safe Function Composition&lt;/h2&gt;
-
-&lt;p&gt;Our map fusion optimization hinges on function composition. How can we compose functions in a stack safe way? We can use a &lt;em&gt;type aligned sequence&lt;/em&gt; &amp;ndash; a sequence of functions such that the output type of each function in the sequence is compatible with the input type of the next function in the sequence. We do not need fancy typelevel functions or dependent types to implement this! Rather, we can use a simple cons list.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;final class ListF1[-A, +B] private (private val fs: List[(Any =&amp;gt; Any)]) extends (A =&amp;gt; B) {
-
-  override def apply(a: A): B =
-    fs.foldLeft(a: Any)((x, f) =&amp;gt; f(x)).asInstanceOf[B]
-
-  override def compose[C](g: C =&amp;gt; A): ListF1[C, B] =
-    new ListF1(g.asInstanceOf[Any =&amp;gt; Any] :: fs)
-}
-
-object ListF1 {
-  def apply[A, B](f: A =&amp;gt; B): ListF1[A, B] = f match {
-    case f: ListF1[A, B] =&amp;gt; f
-    case _ =&amp;gt; new ListF1(f.asInstanceOf[Any =&amp;gt; Any] :: Nil)
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We represent the type level sequence with a &lt;code&gt;List[(Any =&amp;gt; Any)]&lt;/code&gt; and we enforce the &amp;ldquo;type alignment&amp;rdquo; property via the type signature of &lt;code&gt;compose&lt;/code&gt;. The list always has at least one element thanks to &lt;code&gt;apply&lt;/code&gt;. Each call to &lt;code&gt;compose&lt;/code&gt; results in cons-ing a function on to the type aligned sequence. Finally, we implement &lt;code&gt;ListF1#apply&lt;/code&gt; by applying each function in turn, using the output of the previous function as the input to the next.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;// Normal function composition is not stack safe
-(0 until 1000000).foldLeft(identity[Int] _)((acc, i) =&amp;gt; acc.compose(_ + 1))(0)
-// java.lang.StackOverflowError
-//   at scala.runtime.java8.JFunction1$mcII$sp.apply(JFunction1$mcII$sp.java:12)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-
-// ListF1 composition is stack safe
-(0 until 1000000).foldLeft(ListF1(identity[Int]))((acc, i) =&amp;gt; acc.compose(_ + 1))(0)
-// 1000000
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This definition is sufficient to restore stack safety to &lt;code&gt;Coyoneda&lt;/code&gt; and &lt;code&gt;Free&lt;/code&gt;! We just need to wrap each &lt;code&gt;Function1&lt;/code&gt; in a &lt;code&gt;ListF1&lt;/code&gt; inside the definition of &lt;code&gt;Coyoneda#map&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h2 id=&#34;generalized-stack-safe-function-composition&#34;&gt;Generalized Stack Safe Function Composition&lt;/h2&gt;
-
-&lt;p&gt;While &lt;code&gt;ListF1&lt;/code&gt; provides a stack safe &lt;code&gt;compose&lt;/code&gt;, it inherits the default &lt;code&gt;andThen&lt;/code&gt; from &lt;code&gt;Function1&lt;/code&gt;. This is very dangerous if we hope to provide a general purpose stack safe function wrapper. Extending &lt;code&gt;ListF1&lt;/code&gt; to support both stack safe &lt;code&gt;compose&lt;/code&gt; and &lt;code&gt;andThen&lt;/code&gt; (and arbitrary interleavings) requires us to store the type aligned sequence in a data structure that has constant time cons and snoc operations. The only standard library collection that supports this is &lt;code&gt;Vector&lt;/code&gt; (correction: &lt;a href=&#34;https://twitter.com/nickstanch/status/840886207064203264&#34;&gt;@nickstanch pointed out that &lt;code&gt;scala.collection.immutable.Queue&lt;/code&gt; has O(1) cons and snoc and O(n) traversal&lt;/a&gt; &amp;ndash; benchmarks below have been updated to include a &lt;code&gt;Queue&lt;/code&gt; based implementation).&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;final class VectorF1[-A, +B] private (private val fs: Vector[(Any =&amp;gt; Any)]) extends (A =&amp;gt; B) {
-
-  override def apply(a: A): B =
-    fs.foldLeft(a: Any)((x, f) =&amp;gt; f(x)).asInstanceOf[B]
-
-  override def compose[C](g: C =&amp;gt; A): VectorF1[C, B] =
-    new VectorF1(g.asInstanceOf[Any =&amp;gt; Any] +: fs)
-
-  override def andThen[C](g: B =&amp;gt; C): VectorF1[A, C] =
-    new VectorF1(fs :+ g.asInstanceOf[Any =&amp;gt; Any])
-}
-
-object VectorF1 {
-  def apply[A, B](f: A =&amp;gt; B): VectorF1[A, B] = f match {
-    case f: VectorF1[A, B] =&amp;gt; f
-    case _ =&amp;gt; new VectorF1(Vector(f.asInstanceOf[Any =&amp;gt; Any]))
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;VectorF1&lt;/code&gt; seems perfect. It has stack safe &lt;code&gt;compose&lt;/code&gt; and &lt;code&gt;andThen&lt;/code&gt;. Unfortunately, it is terribly slow. Most composed functions are going to be made up of a small number of compositions &amp;ndash; 2, 3, or 4 functions. It&amp;rsquo;s uncommon to compose 1,000,000 functions. &lt;code&gt;Vector&lt;/code&gt; has effectively constant time cons and snoc, but there are large constant factors. For example, a single element vector will allocate an 32-element array internally. These constant factors end up dominating the performance results, so this solution won&amp;rsquo;t work.&lt;/p&gt;
-
-&lt;p&gt;Fortunately, FS2 has a data structure that performs better &amp;ndash; &lt;a href=&#34;https://oss.sonatype.org/service/local/repositories/releases/archive/co/fs2/fs2-core_2.12/0.9.4/fs2-core_2.12-0.9.4-javadoc.jar/!/fs2/util/Catenable.html&#34;&gt;&lt;code&gt;fs2.util.Catenable&lt;/code&gt;&lt;/a&gt;. It has O(1) cons, snoc, and concat, amortized O(1) uncons, O(n) traversal, and negligible constant factors for small collections.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;import fs2.util.Catenable
-
-final class CatenableF1[-A, +B] private (private val fs: Catenable[(Any =&amp;gt; Any)]) extends (A =&amp;gt; B) {
-
-  override def apply(a: A): B =
-    fs.foldLeft(a: Any)((x, f) =&amp;gt; f(x)).asInstanceOf[B]
-
-  override def compose[C](g: C =&amp;gt; A): CatenableF1[C, B] =
-    new CatenableF1(g.asInstanceOf[Any =&amp;gt; Any] +: fs)
-
-  override def andThen[C](g: B =&amp;gt; C): CatenableF1[A, C] =
-    new CatenableF1(fs :+ g.asInstanceOf[Any =&amp;gt; Any])
-}
-
-object CatenableF1 {
-  def apply[A, B](f: A =&amp;gt; B): CatenableF1[A, B] = f match {
-    case f: CatenableF1[A, B] =&amp;gt; f
-    case _ =&amp;gt; new CatenableF1(Catenable.single(f.asInstanceOf[Any =&amp;gt; Any]))
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;stack-safe-function-benchmarks&#34;&gt;Stack Safe Function Benchmarks&lt;/h3&gt;
-
-&lt;p&gt;Let&amp;rsquo;s confirm our performance assumptions with a JMH benchmark:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;@State(Scope.Thread)
-class FunctionBenchmark {
-
-  val f = identity[Int] _
-
-  @Benchmark def unitary_Function1 = f(0)
-  @Benchmark def unitary_ListF1 = ListF1(f)(0)
-  @Benchmark def unitary_VectorF1 = VectorF1(f)(0)
-  @Benchmark def unitary_CatenableF1 = CatenableF1(f)(0)
-  @Benchmark def unitary_QueueF1 = QueueF1(f)(0)
-
-  @Benchmark def compose2_Function1 = (f compose f)(0)
-  @Benchmark def compose2_ListF1 = (ListF1(f) compose f)(0)
-  @Benchmark def compose2_VectorF1 = (VectorF1(f) compose f)(0)
-  @Benchmark def compose2_CatenableF1 = (CatenableF1(f) compose f)(0)
-  @Benchmark def compose2_QueueF1 = (QueueF1(f) compose f)(0)
-
-  @Benchmark def andThen2_Function1 = (f andThen f)(0)
-  @Benchmark def andThen2_ListF1 = (ListF1(f) andThen f)(0)
-  @Benchmark def andThen2_VectorF1 = (VectorF1(f) andThen f)(0)
-  @Benchmark def andThen2_CatenableF1 = (CatenableF1(f) andThen f)(0)
-  @Benchmark def andThen2_QueueF1 = (QueueF1(f) andThen f)(0)
-
-  @Benchmark def compose1k_Function1 = (0 until 1000).foldLeft(f)((acc, _) =&amp;gt; acc compose f)(0)
-  @Benchmark def compose1k_ListF1 = (0 until 1000).foldLeft(ListF1(f))((acc, _) =&amp;gt; acc compose f)(0)
-  @Benchmark def compose1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, _) =&amp;gt; acc compose f)(0)
-  @Benchmark def compose1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, _) =&amp;gt; acc compose f)(0)
-  @Benchmark def compose1k_QueueF1 = (0 until 1000).foldLeft(QueueF1(f))((acc, _) =&amp;gt; acc compose f)(0)
-
-  @Benchmark def andThen1k_Function1 = (0 until 1000).foldLeft(f)((acc, _) =&amp;gt; acc andThen f)(0)
-  @Benchmark def andThen1k_ListF1 = (0 until 1000).foldLeft(ListF1(f): Int =&amp;gt; Int)((acc, _) =&amp;gt; acc andThen f)(0)
-  @Benchmark def andThen1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, _) =&amp;gt; acc andThen f)(0)
-  @Benchmark def andThen1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, _) =&amp;gt; acc andThen f)(0)
-  @Benchmark def andThen1k_QueueF1 = (0 until 1000).foldLeft(QueueF1(f))((acc, _) =&amp;gt; acc andThen f)(0)
-
-  @Benchmark def interleaved1k_Function1 = (0 until 1000).foldLeft(f)((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_ListF1 = (0 until 1000).foldLeft(ListF1(f): Int =&amp;gt; Int)((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_QueueF1 = (0 until 1000).foldLeft(QueueF1(f))((acc, i) =&amp;gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Running these tests via &lt;code&gt;jmh:run -i 20 -wi 10 -f1 -t2&lt;/code&gt; results in:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;[info] Benchmark                                     Mode  Cnt          Score          Error  Units
-[info] FunctionBenchmark.andThen1k_CatenableF1      thrpt   20      45571.159 ±     2335.498  ops/s
-[info] FunctionBenchmark.andThen1k_Function1        thrpt   20     126595.146 ±     9753.267  ops/s
-[info] FunctionBenchmark.andThen1k_ListF1           thrpt   20     122326.955 ±    10781.655  ops/s
-[info] FunctionBenchmark.andThen1k_QueueF1          thrpt   20      37697.152 ±     3168.007  ops/s
-[info] FunctionBenchmark.andThen1k_VectorF1         thrpt   20      45148.023 ±      442.307  ops/s
-[info] FunctionBenchmark.andThen2_CatenableF1       thrpt   20   32498316.581 ±   785428.217  ops/s
-[info] FunctionBenchmark.andThen2_Function1         thrpt   20  797337943.963 ± 21834869.821  ops/s
-[info] FunctionBenchmark.andThen2_ListF1            thrpt   20  155599638.602 ±  4425324.044  ops/s
-[info] FunctionBenchmark.andThen2_QueueF1           thrpt   20   14540756.592 ±   123320.145  ops/s
-[info] FunctionBenchmark.andThen2_VectorF1          thrpt   20   14688247.077 ±   131961.840  ops/s
-[info] FunctionBenchmark.compose1k_CatenableF1      thrpt   20      69420.052 ±     1235.404  ops/s
-[info] FunctionBenchmark.compose1k_Function1        thrpt   20     152949.881 ±     1692.388  ops/s
-[info] FunctionBenchmark.compose1k_ListF1           thrpt   20      71636.332 ±     1137.961  ops/s
-[info] FunctionBenchmark.compose1k_QueueF1          thrpt   20      51920.074 ±      428.416  ops/s
-[info] FunctionBenchmark.compose1k_VectorF1         thrpt   20      40058.457 ±     4437.660  ops/s
-[info] FunctionBenchmark.compose2_CatenableF1       thrpt   20   27988815.099 ±  2636173.720  ops/s
-[info] FunctionBenchmark.compose2_Function1         thrpt   20  789010032.967 ± 28815277.968  ops/s
-[info] FunctionBenchmark.compose2_ListF1            thrpt   20   95572290.279 ±  1972247.968  ops/s
-[info] FunctionBenchmark.compose2_QueueF1           thrpt   20   20448278.219 ±   224039.432  ops/s
-[info] FunctionBenchmark.compose2_VectorF1          thrpt   20   12204863.300 ±   155372.662  ops/s
-[info] FunctionBenchmark.interleaved1k_CatenableF1  thrpt   20      47635.076 ±      556.602  ops/s
-[info] FunctionBenchmark.interleaved1k_Function1    thrpt   20     129433.210 ±     1434.155  ops/s
-[info] FunctionBenchmark.interleaved1k_ListF1       thrpt   20     134112.681 ±     2443.776  ops/s
-[info] FunctionBenchmark.interleaved1k_QueueF1      thrpt   20      43697.844 ±     1693.528  ops/s
-[info] FunctionBenchmark.interleaved1k_VectorF1     thrpt   20      30688.994 ±      512.420  ops/s
-[info] FunctionBenchmark.unitary_CatenableF1        thrpt   20   48579687.093 ±  1281930.212  ops/s
-[info] FunctionBenchmark.unitary_Function1          thrpt   20  809718632.059 ±  6557132.444  ops/s
-[info] FunctionBenchmark.unitary_ListF1             thrpt   20  172189813.428 ±  3269454.794  ops/s
-[info] FunctionBenchmark.unitary_QueueF1            thrpt   20   22289854.985 ±   500526.148  ops/s
-[info] FunctionBenchmark.unitary_VectorF1           thrpt   20   18913195.601 ±   502848.724  ops/s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Based on these tests, &lt;code&gt;CatenableF1&lt;/code&gt; is about 3x faster than &lt;code&gt;VectorF1&lt;/code&gt; for small compositions and about 1.5x - 2x &lt;code&gt;VectorF1&lt;/code&gt; for large collections. &lt;code&gt;CatenableF1&lt;/code&gt; is about 3x slower than &lt;code&gt;ListF1&lt;/code&gt; and about 14x slower than &lt;code&gt;Function1&lt;/code&gt; for small compositions and about equal to &lt;code&gt;ListF1&lt;/code&gt; and 3x slower than &lt;code&gt;Function1&lt;/code&gt; for large compositions. &lt;code&gt;CatenableF1&lt;/code&gt; beats &lt;code&gt;QueueF1&lt;/code&gt; which beats &lt;code&gt;VectorF1&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Not bad but stack safety comes at a runtime performance cost. One area for investigation is a dynamic algorithm that switches from &lt;code&gt;Function1&lt;/code&gt; to &lt;code&gt;CatenableF1&lt;/code&gt; when the composition stack reaches a certain depth.&lt;/p&gt;
-
-&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;If you check the FS2 source, you might notice that &lt;code&gt;Free&lt;/code&gt; does not do map fusion. We ended up not merging map fusion in to FS2 because we were able to get comparable performance gains with a simpler optimization that covers more use cases. We now eagerly evaluate &lt;code&gt;Bind(Pure(a), f)&lt;/code&gt; structures when stepping a &lt;code&gt;Free&lt;/code&gt;, which gives us the same performance boost as map fusion but covers more use cases and avoids the (minor) constant factor performance hit of &lt;code&gt;CatenableF1&lt;/code&gt;.&lt;/p&gt;</description>
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -289,12 +38,7 @@ class FunctionBenchmark {
       <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2016/11/13/fs2/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scalae By The Bay 2016&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/oFk8-a1FSP0&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scalae By The Bay 2016&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -303,12 +47,7 @@ class FunctionBenchmark {
       <pubDate>Fri, 20 May 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2016/05/20/fs2/</guid>
-      <description>&lt;p&gt;Informal talk series that introduces Functional Streams for Scala (FS2).&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/cahvyadYfX8?list=PLFrwDVdSrYE6PVD_p6YQLAbNaEHagx9bW&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Informal talk series that introduces Functional Streams for Scala (FS2).&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -317,12 +56,7 @@ class FunctionBenchmark {
       <pubDate>Wed, 02 Mar 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</guid>
-      <description>&lt;p&gt;Talk given at the &lt;a href=&#34;http://typelevel.org/event/2016-03-summit-philadelphia/&#34;&gt;Typelevel Summit Philadelphia&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/Crc2RHWrcLI&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at the &lt;a href=&#34;http://typelevel.org/event/2016-03-summit-philadelphia/&#34;&gt;Typelevel Summit Philadelphia&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -331,12 +65,7 @@ class FunctionBenchmark {
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.world&#34;&gt;Scala World&lt;/a&gt; in Penrith, UK. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/practical-binary-with-scodec-and-shapeless&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/jM21a-t4JnQ&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.world&#34;&gt;Scala World&lt;/a&gt; in Penrith, UK. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/practical-binary-with-scodec-and-shapeless&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -345,12 +74,7 @@ class FunctionBenchmark {
       <pubDate>Fri, 14 Aug 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/08/14/sbtb/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scala By The Bay 2015&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/a-tour-of-functional-structures-via-scodec-and-simulacrum&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/CtyzSZ3Z5_w&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scala By The Bay 2015&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/a-tour-of-functional-structures-via-scodec-and-simulacrum&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -359,211 +83,8 @@ class FunctionBenchmark {
       <pubDate>Mon, 22 Jun 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</guid>
-      <description>
-
-&lt;p&gt;In the &lt;a href=&#34;https://mpilquist.github.io/blog/2015/06/18/invariant-shadows/&#34;&gt;last post&lt;/a&gt;, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant &lt;code&gt;FlatMap&lt;/code&gt; and &lt;code&gt;Monad&lt;/code&gt;. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.&lt;/p&gt;
-
-&lt;p&gt;Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.&lt;/p&gt;
-
-&lt;p&gt;First, let&amp;rsquo;s review the definition of an applicative functor, using a type class hierachy similar to the one used in &lt;a href=&#34;https://github.com/non/cats&#34;&gt;Cats&lt;/a&gt;. (These examples are simplified versions of the definitions in the Cats codebase.)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Apply[F[_]] extends Functor[F] {
-  def ap[A, B](fa: F[A])(ff: F[A =&amp;gt; B]): F[B]
-}
-
-trait Applicative[F[_]] extends Apply[F] {
-  def pure[A](a: A): F[A]
-  def map[A, B](fa: F[A])(f: A =&amp;gt; B): F[B] = ap(fa)(pure(f))
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Along with laws:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def applyComposition[F[_], A, B, C](fa: F[A], fab: F[A =&amp;gt; B], fbc: F[B =&amp;gt; C])(implicit F: Apply[F]): Boolean = {
-  val compose: (B =&amp;gt; C) =&amp;gt; (A =&amp;gt; B) =&amp;gt; (A =&amp;gt; C) = _.compose
-  F.ap(F.ap(fa)(fab))(fbc) == F.ap(fa)(F.ap(fab)(F.map(fbc)(compose)))
-}
-
-def applicativeIdentity[F[_], A](fa: F[A])(implicit F: Applicative[F]): Boolean =
-  F.ap(fa)(F.pure((a: A) =&amp;gt; a)) == fa
-
-def applicativeHomomorphism[F[_], A, B](a: A, f: A =&amp;gt; B)(implicit F: Applicative[F]): Boolean =
-  F.ap(F.pure(a))(F.pure(f)) == F.pure(f(a))
-
-def applicativeInterchange[F[_], A, B](a: A, ff: F[A =&amp;gt; B])(implicit F: Applicative[F]): Boolean =
-  F.ap(F.pure(a))(ff) == F.ap(ff)(F.pure((f: A =&amp;gt; B) =&amp;gt; f(a)))
-
-def applicativeMap[F[_], A, B](fa: F[A], f: A =&amp;gt; B)(implicit F: Applicative[F]): Boolean =
-  F.map(fa)(f) == F.ap(fa)(F.pure(f))
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;applicative-codec&#34;&gt;Applicative[Codec]&lt;/h3&gt;
-
-&lt;p&gt;Can we define an &lt;code&gt;Applicative[Codec]&lt;/code&gt; instance?  We&amp;rsquo;ve previously seen how &lt;code&gt;Codec&lt;/code&gt; has an invariant functor instance but not a covariant functor instance. As such, we can rule out an &lt;code&gt;Applicative[Codec]&lt;/code&gt;, for if we could define such an instance, it would give rise to a &lt;code&gt;Functor[Codec]&lt;/code&gt;. Regardless, let&amp;rsquo;s try to implement such an instance, as it is illustrative.&lt;/p&gt;
-
-&lt;p&gt;In the last article, it was implied that we can implement pure for &lt;code&gt;Codec&lt;/code&gt;. Here&amp;rsquo;s an implementation:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def pure[A](a: A): Codec[A] = new Codec[A] {
-  def sizeBound = SizeBound.exact(0)
-  def encode(a: A) = Attempt.successful(BitVector.empty)
-  def decode(b: BitVector) = Attempt.successful(DecodeResult(a, b))
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The encode operation always returns an empty vector, while the decode operation always returns the full input as the remainder and returns the pure value as the decoded value.&lt;/p&gt;
-
-&lt;p&gt;How about &lt;code&gt;ap&lt;/code&gt;?&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def ap[A, B](ca: Codec[A])(cf: Codec[A =&amp;gt; B]): Codec[B] = new Codec[B] {
-  def sizeBound = SizeBound.unknown
-  def decode(b: BitVector) = (for {
-    decA &amp;lt;- DecodingContext(ca)
-    defF &amp;lt;- DecodingContext(cb)
-  } yield decF(decA)).decode(b)
-  def encode(b: B) = {
-    ???
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The decode case is easy enough to define using the &lt;code&gt;DecodingContext&lt;/code&gt; type from scodec, which is equivalent to a &lt;code&gt;StateT[Attempt, BitVector, ?]&lt;/code&gt; monad transformer stack, threading the remainder of each decode as the state value. We encounter an impasse in &lt;code&gt;encode&lt;/code&gt; though. We could try to add a &lt;code&gt;B =&amp;gt; A&lt;/code&gt; function, though it is not obvious as to how that would help. Instead, we can use an alternative form of applicative functors known as monoidal functors.&lt;/p&gt;
-
-&lt;h2 id=&#34;monoidal-functors&#34;&gt;Monoidal Functors&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://wiki.haskell.org/Typeclassopedia#Alternative_formulation&#34;&gt;(Lax) monoidal functors&lt;/a&gt; are an alternative form of applicative functors &amp;ndash; similar to how monads can be represented with either &lt;code&gt;pure&lt;/code&gt; and &lt;code&gt;flatMap&lt;/code&gt; or &lt;code&gt;unit&lt;/code&gt;, &lt;code&gt;flatten&lt;/code&gt; (aka &lt;code&gt;join&lt;/code&gt;), and &lt;code&gt;map&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Monoidal[F[_]] extends Functor[F] {
-  def unit: F[Unit]
-  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Instead of defining &lt;code&gt;pure&lt;/code&gt; and &lt;code&gt;ap&lt;/code&gt;, monoidal functors are defined in terms of &lt;code&gt;unit&lt;/code&gt;, &lt;code&gt;zip&lt;/code&gt;, and &lt;code&gt;map&lt;/code&gt;. Note that in the standard/typical definition, &lt;code&gt;map&lt;/code&gt; is derived from &lt;code&gt;pure&lt;/code&gt; and &lt;code&gt;ap&lt;/code&gt; but in the monoidal definition, &lt;code&gt;map&lt;/code&gt; is left abstract.&lt;/p&gt;
-
-&lt;p&gt;The laws for monoidal functors are the following:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Iso[A, B] { def apply(a: A): B }
-
-implicit class IsoOps[A](val a: A) {
-  def ~=[B](b: B)(implicit iso: Iso[A, B]): Boolean = iso(a) == b
-}
-
-def monoidalLeftIdentity[F[_], A](fa: F[A])(implicit F: Monoidal[F], iso: Iso[F[(Unit, A)], F[A]]): Boolean =
-  F.zip(F.unit, fa) ~= fa
-
-def monoidalRightIdentity[F[_], A](fa: F[A])(implicit F: Monoidal[F], iso: Iso[F[(A, Unit)], F[A]]): Boolean =
-  F.zip(fa, F.unit) ~= fa
-
-def monoidalAssociativity[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])(implicit F: Monoidal[F], iso: Iso[F[(A, (B, C))], F[((A, B), C)]]): Boolean =
-  F.zip(fa, F.zip(fb, fc)) ~= F.zip(F.zip(fa, fb), fc)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The identity laws state that zipping a value with the unit value yields the original value, ignoring the tuple structure. The associativity law requires &lt;code&gt;zip&lt;/code&gt; to be associative, again ignoring the tuple structure. Here, like in the Typeclassopedia definition, we defer the equality checking to an isomorphism that ignores the unwanted structure.&lt;/p&gt;
-
-&lt;p&gt;We could further generalize this type class by removing the requirement for the &lt;code&gt;unit&lt;/code&gt; and &lt;code&gt;map&lt;/code&gt; operations, leaving simply &lt;code&gt;zip&lt;/code&gt; along with the associativity law &amp;ndash; this is exactly what Scalaz has done with the &lt;code&gt;scalaz.Zip&lt;/code&gt; type class.&lt;/p&gt;
-
-&lt;h3 id=&#34;converting-applicative-forms&#34;&gt;Converting applicative forms&lt;/h3&gt;
-
-&lt;p&gt;We can convert any applicative functor to a monoidal functor and vice-versa:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;implicit def applicativeToMonoidal[F[_]](implicit F: Applicative[F]): Monoidal[F] = new Monoidal[F] {
-  def unit: F[Unit] = F.pure(())
-  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)] = F.ap(fb)(F.map(fa)(a =&amp;gt; (b: B) =&amp;gt; (a, b)))
-  def map[A, B](fa: F[A])(f: A =&amp;gt; B): F[B] = F.map(fa)(f)
-}
-
-implicit def monoidalToApplicative[F[_]](implicit F: Monoidal[F]): Applicative[F] = new Applicative[F] {
-  def pure[A](a: A): F[A] = F.map(F.unit)(_ =&amp;gt; a)
-  def ap[A, B](fa: F[A])(ff: F[A =&amp;gt; B]): F[B] = F.map(F.zip(fa, ff)) { case (a, f) =&amp;gt; f(a) }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;monoidal-codec&#34;&gt;Monoidal[Codec]&lt;/h2&gt;
-
-&lt;p&gt;Let&amp;rsquo;s try to implement a &lt;code&gt;Monoidal&lt;/code&gt; instance for &lt;code&gt;Codec&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The definition of &lt;code&gt;unit&lt;/code&gt; looks very similar to the definition of &lt;code&gt;pure&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def unit: Codec[Unit] = new Codec[Unit] {
-  def sizeBound = SizeBound.exact(0)
-  def encode(a: A) = Attempt.successful(BitVector.empty)
-  def decode(b: BitVector) = Attempt.successful(DecodeResult((), b))
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now let&amp;rsquo;s try to implement &lt;code&gt;zip&lt;/code&gt; &amp;ndash; note that we should not be able to, as we know &lt;code&gt;Codec&lt;/code&gt; doesn&amp;rsquo;t have a covariant functor.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def zip[A, B](ca: Codec[A], cb: Codec[B]): Codec[(A, B)] = new Codec[(A, B)] {
-  def sizeBound = ca.sizeBound + cb.sizeBound
-  def decode(b: BitVector) = (for {
-    a &amp;lt;- DecodingContext(ca)
-    b &amp;lt;- DecodingContext(cb)
-  } yield (a, b)).decode(b)
-  def encode(ab: (A, B)) = for {
-    encA &amp;lt;- ca.encode(ab._1)
-    encB &amp;lt;- cb.encode(ab._2)
-  } yield encA ++ encB
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Wait, so what are we missing? We have an implementation of &lt;code&gt;unit&lt;/code&gt; and &lt;code&gt;zip&lt;/code&gt; and yet we know we can&amp;rsquo;t have a lawful &lt;code&gt;Monoidal[Codec]&lt;/code&gt; instance due to the fact that there&amp;rsquo;s no covariant functor for &lt;code&gt;Codec&lt;/code&gt;. Monoidal functors have &lt;em&gt;three&lt;/em&gt; abstract operations though, not two (like &lt;code&gt;Applicative&lt;/code&gt;) &amp;ndash; &lt;code&gt;unit&lt;/code&gt;, &lt;code&gt;zip&lt;/code&gt;, and &lt;code&gt;map&lt;/code&gt;. So in order to have a monoidal functor for &lt;code&gt;Codec&lt;/code&gt;, we need to define &lt;code&gt;map&lt;/code&gt;, which we know we can&amp;rsquo;t do!&lt;/p&gt;
-
-&lt;p&gt;However, we do have &lt;code&gt;xmap&lt;/code&gt;. What happens if we pair &lt;code&gt;xmap&lt;/code&gt; with &lt;code&gt;unit&lt;/code&gt; and &lt;code&gt;zip&lt;/code&gt;?&lt;/p&gt;
-
-&lt;h2 id=&#34;invariant-monoidal-functors&#34;&gt;Invariant monoidal functors&lt;/h2&gt;
-
-&lt;p&gt;Let&amp;rsquo;s define a new invariant shadow of &lt;code&gt;Monoidal&lt;/code&gt; that extends &lt;code&gt;InvariantFunctor&lt;/code&gt; instead of &lt;code&gt;Functor&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait InvariantMonoidal[F[_]] extends InvariantFunctor[F] {
-  def unit: F[Unit]
-  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can also port the laws from lax monoidal functors, which are identical except for requiring an &lt;code&gt;InvariantMonoidal&lt;/code&gt; instance instead of a &lt;code&gt;Monoidal&lt;/code&gt; instance:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def xmonoidalLeftIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonoidal[F], iso: Iso[F[(Unit, A)], F[A]]): Boolean =
-  F.zip(F.unit, fa) ~= fa
-
-def xmonoidalRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonoidal[F], iso: Iso[F[(A, Unit)], F[A]]): Boolean =
-  F.zip(fa, F.unit) ~= fa
-
-def xmonoidalAssociativity[F[_], A, B, C](fa: F[A], fb: F[B], fc: F[C])(implicit F: InvariantMonoidal[F], iso: Iso[F[(A, (B, C))], F[((A, B), C)]]): Boolean =
-  F.zip(fa, F.zip(fb, fc)) ~= F.zip(F.zip(fa, fb), fc)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;deriving-an-invariantmonoidal-from-an-invariantmonad&#34;&gt;Deriving an &lt;code&gt;InvariantMonoidal&lt;/code&gt; from an &lt;code&gt;InvariantMonad&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;In the same way that a monad yields two monoidal functors (or two applicative functors) &amp;ndash; one that evaluates &lt;code&gt;F[A]&lt;/code&gt; first and &lt;code&gt;F[B]&lt;/code&gt; second, and another which evaluates in the reverse order &amp;ndash; an invariant monad gives rise to two invariant monoidal functors. For example, the following implementation evaluates the &lt;code&gt;F[A]&lt;/code&gt; first and the &lt;code&gt;F[B]&lt;/code&gt; second:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;implicit def xmonadToXmonoidal[F[_]](implicit F: InvariantMonad[F]): InvariantMonoidal[F] = new InvariantMonoidal[F] {
-  def unit: F[Unit] = F.pure(())
-  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)] =
-    F.xflatMap(fa)(a =&amp;gt; F.xmap(fb)(b =&amp;gt; (a, b))(ab =&amp;gt; ab._2))(ab =&amp;gt; ab._1)
-  def xmap[A, B](fa: F[A])(f: A =&amp;gt; B)(g: B =&amp;gt; A): F[B] = F.xmap(fa)(f)(g)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;sharing-unit-zip&#34;&gt;Sharing unit/zip&lt;/h3&gt;
-
-&lt;p&gt;Because the invariant monoidal differs from the covariant monoidal only in the defintion of &lt;code&gt;xmap&lt;/code&gt;/&lt;code&gt;map&lt;/code&gt;, we could extract a type class that captures the signature of &lt;code&gt;unit&lt;/code&gt; and &lt;code&gt;zip&lt;/code&gt; and the laws that govern their interaction.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait MonoidalBase[F[_]] {
-  def unit: F[Unit]
-  def zip[A, B](fa: F[A], fb: F[B]): F[(A, B)]
-}
-trait Monoidal[F[_]] extends MonoidalBase[F] with Functor[F]
-trait InvariantMonoidal[F[_]] extends MonoidalBase[F] with InvariantFunctor[F]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;applicability-to-codec&#34;&gt;Applicability to Codec&lt;/h2&gt;
-
-&lt;p&gt;In the last article, we saw that &lt;code&gt;Codec&lt;/code&gt; supported both &lt;code&gt;flatZip&lt;/code&gt; and &lt;code&gt;consume&lt;/code&gt;, and how those methods exist due to the invariant monad structure of &lt;code&gt;Codec&lt;/code&gt;. In fact, those methods both existed &lt;em&gt;before&lt;/em&gt; the invariant monad structure was extracted. Is the same true for &lt;code&gt;unit&lt;/code&gt; and &lt;code&gt;zip&lt;/code&gt;? That is, do those methods exist under some other name, their existence justified by their usefulness in binary codec creation, rather than satisfying a type class definition?&lt;/p&gt;
-
-&lt;p&gt;It turns out that both of these operations do exist already. The &lt;code&gt;unit&lt;/code&gt; operation is provided by &lt;code&gt;scodec.codecs.ignore(0L)&lt;/code&gt;, which returns a &lt;code&gt;Codec[Unit]&lt;/code&gt; that encodes an empty bit vector. The &lt;code&gt;zip&lt;/code&gt; operation is provided by the &lt;code&gt;pairedWith&lt;/code&gt; method on codec &amp;ndash; which has the operator alias &lt;code&gt;~&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;We did not provide an invariant shadow of applicative functors, though that is worth exploring, perhaps in a future article.&lt;/p&gt;
-</description>
+      <description>In the last post, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant FlatMap and Monad. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.
+Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</description>
     </item>
     
     <item>
@@ -572,179 +93,7 @@ trait InvariantMonoidal[F[_]] extends MonoidalBase[F] with InvariantFunctor[F]
       <pubDate>Thu, 18 Jun 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/06/18/invariant-shadows/</guid>
-      <description>
-
-&lt;p&gt;A common use case when working with binary protocols is decoding a value and then using the decoded value to determine how to decode the remaining bits. For example, consider a simple framing structure, made up of a 2-byte big endian unsigned integer field followed by &lt;code&gt;n&lt;/code&gt; bytes, where &lt;code&gt;n&lt;/code&gt; is the value in the first field. In order to decode this structure, we need to first decode the 2-byte size field, then use the decoded size to take that number of bytes from the remainder.&lt;/p&gt;
-
-&lt;p&gt;This can be represented with &lt;a href=&#34;http://scodec.org&#34;&gt;scodec&lt;/a&gt; like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;import scodec._
-import scodec.bits._
-import scodec.codecs._
-
-val decoder: Decoder[ByteVector] = uint16 flatMap { size =&amp;gt; bytes(size * 8L) }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here, we used &lt;code&gt;flatMap&lt;/code&gt; to express the dependency between &lt;code&gt;uint16: Codec[Int]&lt;/code&gt; and the bytes decoder. However, &lt;code&gt;flatMap&lt;/code&gt; on &lt;code&gt;Codec&lt;/code&gt; returns
-a &lt;code&gt;Decoder[B]&lt;/code&gt;, not a &lt;code&gt;Codec[B]&lt;/code&gt;, so by using &lt;code&gt;flatMap&lt;/code&gt;, we lose the ability to encode.&lt;/p&gt;
-
-&lt;p&gt;It turns out that it is impossible to define &lt;code&gt;flatMap&lt;/code&gt; for &lt;code&gt;Codec&lt;/code&gt; with the expected signature. Consider this attempt:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Codec[A] extends Encoder[A] with Decoder[A] { self =&amp;gt;
-
-  def flatMap[B](f: A =&amp;gt; Codec[B]): Codec[B] = new Codec[B] {
-    def sizeBound = self.sizeBound.atLeast
-    def decode(b: BitVector): Attempt[DecodeResult[B]] =
-      self.decode(b).flatMap { res =&amp;gt; f(res.value).decode(res.remainder) }
-    def encode(b: B): Attempt[BitVector] =
-      ???
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The implementation of &lt;code&gt;decode&lt;/code&gt; is straightforward, but we arrive at an impasse when trying to implement &lt;code&gt;encode&lt;/code&gt;. We have a &lt;code&gt;Codec[A]&lt;/code&gt;, a function &lt;code&gt;A =&amp;gt; Codec[B]&lt;/code&gt; and a value of type &lt;code&gt;B&lt;/code&gt;. We cannot use the &lt;code&gt;Codec[A]&lt;/code&gt; to encode unless we have an &lt;code&gt;A&lt;/code&gt;, and we cannot get access to a &lt;code&gt;Codec[B]&lt;/code&gt; unless we have an &lt;code&gt;A&lt;/code&gt; to apply to the function. Hence, we cannot implement &lt;code&gt;flatMap&lt;/code&gt; on &lt;code&gt;Codec&lt;/code&gt; &amp;ndash; meaning that there is no monad for &lt;code&gt;Codec&lt;/code&gt;!&lt;/p&gt;
-
-&lt;p&gt;So how were we able to call &lt;code&gt;flatMap&lt;/code&gt; on &lt;code&gt;Codec&lt;/code&gt; in our first example? That worked because &lt;code&gt;Decoder&lt;/code&gt; defines a &lt;code&gt;flatMap&lt;/code&gt; method like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Decoder[+A] { self =&amp;gt;
-
-  def flatMap[B](f: A =&amp;gt; Decoder[B]): Decoder[B] = new Decoder[B] {
-    def decode(b: BitVector): Attempt[DecodeResult[B]] =
-      self.decode(b).flatMap { res =&amp;gt; f(res.value).decode(res.remainder) }
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Because &lt;code&gt;Codec&lt;/code&gt; extends from &lt;code&gt;Decoder&lt;/code&gt;, it inherits this definition of &lt;code&gt;flatMap&lt;/code&gt;, which is why flat mapping a &lt;code&gt;Codec&lt;/code&gt; results in a &lt;code&gt;Decoder&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Nonetheless, we can change the signature of &lt;code&gt;flatMap&lt;/code&gt; slightly in order to get much of the utility of &lt;code&gt;flatMap&lt;/code&gt; without running in to our impasse when encoding. In our ill-fated attempt at implementing &lt;code&gt;flatMap&lt;/code&gt;, we were short a value of &lt;code&gt;A&lt;/code&gt;. Hence, we can ask the caller to provide the &lt;code&gt;A&lt;/code&gt; value. A particularly useful way of doing so is changing the return type from &lt;code&gt;Codec[B]&lt;/code&gt; to &lt;code&gt;Codec[(A, B)]&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;This has implications on both decoding and encoding &amp;ndash; when decoding, we need to return the decoded &lt;code&gt;A&lt;/code&gt; in the overall result instead of using it solely to generate the &lt;code&gt;Codec[B]&lt;/code&gt;, whereas in encoding, we need to encode the input &lt;code&gt;A&lt;/code&gt;, apply the function with the same &lt;code&gt;A&lt;/code&gt; to create a &lt;code&gt;Codec[B]&lt;/code&gt;, encode the input &lt;code&gt;B&lt;/code&gt;, and finally concatenate the encoded forms of &lt;code&gt;A&lt;/code&gt; and &lt;code&gt;B&lt;/code&gt;. The signature is the same as &lt;code&gt;flatMap&lt;/code&gt; except the result type is &lt;code&gt;Codec[(A, B)]&lt;/code&gt; instead of &lt;code&gt;Codec[B]&lt;/code&gt; &amp;ndash; so for now, let&amp;rsquo;s call this &lt;code&gt;flatZip&lt;/code&gt; since it zips &lt;code&gt;A&lt;/code&gt; and &lt;code&gt;B&lt;/code&gt; in to a tuple.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Codec[A] extends Encoder[A] with Decoder[A] { self =&amp;gt;
-
-  def flatZip[B](f: A =&amp;gt; Codec[B]): Codec[(A, B)] = new Codec[(A, B)] {
-    def sizeBound = self.sizeBound.atLeast
-    def decode(b: BitVector): Attempt[DecodeResult[(A, B)]] =
-      self.decode(b).flatMap { res =&amp;gt;
-        val a = res.value
-        val bres = f(a).decode(res.remainder)
-        bres.map { _.map { b =&amp;gt; (a, b) } }
-      }
-    def encode(ab: (A, B)): Attempt[BitVector] = for {
-      encA &amp;lt;- self.encode(ab._1)
-      codecB = f(ab._1)
-      encB &amp;lt;- codecB.encode(ab._2)
-    } yield encA ++ encB
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Another solution to the &lt;code&gt;flatMap&lt;/code&gt; dilemma is keeping the return type as &lt;code&gt;Codec[B]&lt;/code&gt; but adding another parameter to the method that lets us materialize an &lt;code&gt;A&lt;/code&gt; from what we have &amp;ndash; namely, a &lt;code&gt;B&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Codec[A] extends Encoder[A] with Decoder[A] { self =&amp;gt;
-
-  def consume[B](f: A =&amp;gt; Codec[B])(g: B =&amp;gt; A): Codec[B] = new Codec[B] {
-    def sizeBound = self.sizeBound.atLeast
-    def decode(b: BitVector): Attempt[DecodeResult[B]] =
-      self.decode(b).flatMap { res =&amp;gt; f(res.value).decode(res.remainder) }
-    def encode(b: B): Attempt[BitVector] = {
-      val a = g(b)
-      for {
-        encA &amp;lt;- self.encode(a)
-        codecB = f(a)
-        encB &amp;lt;- codecB.encode(b)
-      } yield encA ++ encB
-    }
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;One interesting use case for &lt;code&gt;consume&lt;/code&gt; is handling header fields whose values are derived from the body. For instance, see &lt;a href=&#34;https://github.com/scodec/scodec/blob/2d790190617b8025ce22c7c9f041f1a7a52a8d84/shared/src/test/scala/scodec/examples/ProductsExample.scala#L86-L103&#34;&gt;this example from scodec&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;An interesting property of these methods is that they can be implemented in terms of one another, as long as we have the &lt;code&gt;xmap&lt;/code&gt; operation.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;consume(f)(g) == flatZip(f).xmap[B](ab =&amp;gt; ab._2)(b =&amp;gt; (g(b), b))&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;flatZip(f) == consume(a =&amp;gt; f(a).xmap[(A, B)](b =&amp;gt; (a, b))(ab =&amp;gt; ab._2))(ab =&amp;gt; ab._1)&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The scodec library provides both of these methods, as they are useful in different scenarios. However, these identities show that they are just different formulations of the same concept.&lt;/p&gt;
-
-&lt;h3 id=&#34;a-note-on-naming&#34;&gt;A note on naming&lt;/h3&gt;
-
-&lt;p&gt;The &lt;code&gt;flatZip&lt;/code&gt; name leaves a lot to be desired. We selected it based on an appeal to how the method is &lt;code&gt;flatMap&lt;/code&gt;-like in signature but returns a tuple &amp;ndash; zipping the &lt;code&gt;A&lt;/code&gt; and &lt;code&gt;B&lt;/code&gt;. &lt;code&gt;flatMapAndZip&lt;/code&gt; is way too long and a bit deceiving, as it implies that the operation is the result of composing zipping with &lt;code&gt;flatMap&lt;/code&gt;. Additionally, we are only really zipping on the decoder side &amp;ndash; when encoding, the user is passing the tuple to us. Zip describes the action that builds the tuple, but it would be clearer to describe the tuple itself. Using &lt;code&gt;product&lt;/code&gt; to refer to the product type &lt;code&gt;(A, B)&lt;/code&gt;, we could call this operation &lt;code&gt;flatMapProduct&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The &lt;code&gt;consume&lt;/code&gt; name could also be improved upon. For starters, it is evocative. Worse, the rationale for its name applies equally well when using &lt;code&gt;consume&lt;/code&gt; as an alias for &lt;code&gt;flatMap&lt;/code&gt;. Re-examining the signature shows us that &lt;code&gt;consume&lt;/code&gt; is like &lt;code&gt;flatMap&lt;/code&gt; but takes an extra parameter, &lt;code&gt;B =&amp;gt; A&lt;/code&gt;. There doesn&amp;rsquo;t seem to be much help in naming there. Instead, let&amp;rsquo;s use our identity to help name the operation. We&amp;rsquo;ve shown that &lt;code&gt;consume&lt;/code&gt; can be written in terms of &lt;code&gt;flatMapProduct&lt;/code&gt; and &lt;code&gt;xmap&lt;/code&gt;. Hence, &lt;code&gt;consume&lt;/code&gt; is like an invariant version of the (covariant) &lt;code&gt;flatMap&lt;/code&gt;. Informed by the fact that we use &lt;code&gt;xmap&lt;/code&gt; as the invariant form of the (covariant) &lt;code&gt;map&lt;/code&gt; method, we&amp;rsquo;ll call this operation &lt;code&gt;xflatMap&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Knowing that &lt;code&gt;flatMapProduct&lt;/code&gt; depends on &lt;code&gt;xmap&lt;/code&gt;, let&amp;rsquo;s use the same convention there as well and call it &lt;code&gt;xflatMapProduct&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Naming is hard.&lt;/p&gt;
-
-&lt;h2 id=&#34;generalizing&#34;&gt;Generalizing&lt;/h2&gt;
-
-&lt;p&gt;Let&amp;rsquo;s extract a type class for this operation. Here, we&amp;rsquo;ll pick &lt;code&gt;xflatMap&lt;/code&gt; as the primary operation and define &lt;code&gt;xflatMapProduct&lt;/code&gt; in terms of &lt;code&gt;xflatMap&lt;/code&gt;, but the inverse would be equally useful. Let&amp;rsquo;s also assume we have an invariant functor type class available:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait InvariantFunctor[F[_]] {
-  def xmap[A, B](fa: F[A])(f: A =&amp;gt; B)(g: B =&amp;gt; A): F[B]
-}
-
-trait InvariantFlatMap[F[_]] extends InvariantFunctor[F] {
-
-  def xflatMap[A, B](fa: F[A])(f: A =&amp;gt; F[B])(g: B =&amp;gt; A): F[B]
-
-  def xflatMapProduct[A, B](fa: F[A])(f: A =&amp;gt; F[B]): F[(A, B)] =
-    xflatMap[A, (A, B)](fa)(a =&amp;gt; xmap[B, (A, B)](f(a))(b =&amp;gt; (a, b))(ab =&amp;gt; ab._2))(ab =&amp;gt; ab._1)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;What laws can we write that govern the behavior of &lt;code&gt;xflatMap&lt;/code&gt;? We could use the same laws as the normal &lt;code&gt;FlatMap&lt;/code&gt; type class adjusted for the extra &lt;code&gt;g&lt;/code&gt; parameter &amp;ndash; namely, that &lt;code&gt;xflatMap&lt;/code&gt; is associative.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def xflatMapAssociativity[F[_], A, B, C](
-  fa: F[A], f: A =&amp;gt; F[B], fi: B =&amp;gt; A, g: B =&amp;gt; F[C], gi: C =&amp;gt; B
-)(implicit F: InvariantFlatMap[F]): Boolean =
-  F.xflatMap(F.xflatMap(fa)(f)(fi))(g)(gi) ==
-    F.xflatMap(fa)(a =&amp;gt; F.xflatMap(f(a))(g)(gi))(gi andThen fi)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;parallels-with-flatmap&#34;&gt;Parallels with &lt;code&gt;FlatMap&lt;/code&gt;&lt;/h3&gt;
-
-&lt;p&gt;The (covariant) &lt;code&gt;FlatMap&lt;/code&gt; type class corresponds to &lt;code&gt;InvariantFlatMap&lt;/code&gt; in the same way that (covariant) &lt;code&gt;Functor&lt;/code&gt; corresponds to &lt;code&gt;InvariantFunctor&lt;/code&gt;. For example, any &lt;code&gt;FlatMap&lt;/code&gt; instance gives rise to an &lt;code&gt;InvariantFlatMap&lt;/code&gt; instance which simply ignores the &lt;code&gt;g&lt;/code&gt; parameter.&lt;/p&gt;
-
-&lt;p&gt;What about &lt;code&gt;xflatMapProduct&lt;/code&gt; though? There&amp;rsquo;s nothing to remove or ignore in its signature, so how can there be a correspondence to a covariant equivalent? The covariant equivalent of &lt;code&gt;xflatMapProduct&lt;/code&gt; differs not in signature, but in implementation &amp;ndash; specifically, it uses the covariant &lt;code&gt;map&lt;/code&gt; instead of the invariant &lt;code&gt;xmap&lt;/code&gt;. In fact, the covariant equivalent of &lt;code&gt;xflatMapProduct&lt;/code&gt; is known as &lt;code&gt;mproduct&lt;/code&gt; in Haskell &amp;ndash; short for &amp;ldquo;monad product&amp;rdquo;, which is interesting because it does not rely on a full monad struture, but rather, only the structure of &lt;code&gt;FlatMap&lt;/code&gt;/&lt;code&gt;Bind&lt;/code&gt;. Naming is hard. (To be fair, &lt;code&gt;mproduct&lt;/code&gt; exists in the Haskell standard library, which does not include the &lt;code&gt;Bind&lt;/code&gt; type class.)&lt;/p&gt;
-
-&lt;h2 id=&#34;further-generalization-with-fast-and-loose-reasoning&#34;&gt;Further Generalization with Fast and Loose Reasoning&lt;/h2&gt;
-
-&lt;p&gt;Building off these correspondences, can we create an &lt;code&gt;InvariantMonad&lt;/code&gt; type class by adding a &lt;code&gt;pure&lt;/code&gt; method to an &lt;code&gt;InvariantFunctor&lt;/code&gt;?&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait InvariantMonad[F[_]] extends InvariantFlatMap[F] {
-  def pure[A](a: A): F[A]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With the associativity law inherited from &lt;code&gt;InvariantFlatMap&lt;/code&gt; along with a left and right identity law:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def invariantMonadLeftIdentity[F[_], A, B](a: A, f: A =&amp;gt; F[B], fi: B =&amp;gt; A)(implicit F: InvariantMonad[F]): Boolean =
-  F.xflatMap(F.pure(a))(f)(fi) == f(a)
-
-def invariantMonadRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonad[F]): Boolean =
-  F.xflatMap(fa)(a =&amp;gt; F.pure(a))(identity) == fa
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can now port arbitrary functions that work with monads to work with invariant monads &amp;ndash; compensating for the extra inverse function as appropriate.&lt;/p&gt;
-
-&lt;h2 id=&#34;parting-thoughts&#34;&gt;Parting Thoughts&lt;/h2&gt;
-
-&lt;p&gt;Starting with a concrete example from scodec, we allowed the type system to guide us in the development of &lt;code&gt;flatZip&lt;/code&gt; and &lt;code&gt;consume&lt;/code&gt;. By generalizing the resulting operations, we were able to focus on the structure, with no implied meaning from binary serialization. Once we realized that we had build an invariant form of &lt;code&gt;FlatMap&lt;/code&gt;, we were able to use loose reasoning based on correspondences with familiar type classes to develop an invariant form of &lt;code&gt;Monad&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Continuously shifting between working with concrete types and working with minimally expressive type classes, allowing the findings from each style to inform the work in the opposite style, is a powerful technique in API development.&lt;/p&gt;
-
-&lt;p&gt;Further work will focus on development of an &lt;code&gt;InvariantApplicative&lt;/code&gt; type class, along with finding more applications of these invariant type classes in scodec.&lt;/p&gt;
-
-&lt;h2 id=&#34;acknowledgements&#34;&gt;Acknowledgements&lt;/h2&gt;
-
-&lt;p&gt;Special thanks to Paul Chiusano for some thoughtful discussion of these topics.&lt;/p&gt;
-</description>
+      <description>A common use case when working with binary protocols is decoding a value and then using the decoded value to determine how to decode the remaining bits. For example, consider a simple framing structure, made up of a 2-byte big endian unsigned integer field followed by n bytes, where n is the value in the first field. In order to decode this structure, we need to first decode the 2-byte size field, then use the decoded size to take that number of bytes from the remainder.</description>
     </item>
     
     <item>
@@ -757,12 +106,7 @@ def invariantMonadRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonad[F]
 
 &lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/&#34;&gt;http://www.manning.com/bjarnason/&lt;/a&gt;).&lt;/p&gt;
 
-&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/Dsd4pc99FSY?list=PLFrwDVdSrYE6dy14XCmUtRAJuhCxuzJp0&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -771,12 +115,7 @@ def invariantMonadRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonad[F]
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://www.meetup.com/scala-phase/&#34;&gt;PHASE&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/eNJ6ZbbrP2A&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://www.meetup.com/scala-phase/&#34;&gt;PHASE&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -798,12 +137,7 @@ def invariantMonadRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonad[F]
 
 &lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/VZWLRepyNvo&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -814,315 +148,7 @@ def invariantMonadRightIdentity[F[_], A](fa: F[A])(implicit F: InvariantMonad[F]
       <guid>https://mpilquist.github.io/blog/2013/06/09/scodec-part-3/</guid>
       <description>&lt;p&gt;This is part 3 of a series of posts about &lt;a href=&#34;http://github.com/mpilquist/scodec/&#34;&gt;scodec&lt;/a&gt;. In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/&#34;&gt;Part 2&lt;/a&gt;, we saw how to create a &lt;code&gt;Codec[A]&lt;/code&gt; and xmap it in to a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll show how to use &lt;a href=&#34;http://github.com/milessabin/shapeless/&#34;&gt;Shapeless&lt;/a&gt; to perform automatic xmapping to case classes.&lt;/p&gt;
 
-&lt;p&gt;&lt;/p&gt;
-
-&lt;h1 id=&#34;shapeless-hlists&#34;&gt;Shapeless HLists&lt;/h1&gt;
-
-&lt;p&gt;Shapeless is a generic programming library by Miles Sabin. One of the primary abstractions in Shapeless is the HList, or heterogeneous list. An HList represents a list of values of arbitrary types where the type of each element is preserved during compilation. For example:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val foo = 1 :: true :: &amp;quot;yes&amp;quot; :: Nil
-val bar = 1 :: true :: &amp;quot;yes&amp;quot; :: HNil
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The type of &lt;code&gt;foo&lt;/code&gt; is &lt;code&gt;List[Any]&lt;/code&gt; because &lt;code&gt;Any&lt;/code&gt; is the least upper bound of &lt;code&gt;Int&lt;/code&gt;, &lt;code&gt;Boolean&lt;/code&gt;, and &lt;code&gt;String&lt;/code&gt;. The type of &lt;code&gt;bar&lt;/code&gt; is &lt;code&gt;Int :: Boolean :: String :: HNil&lt;/code&gt;. The number of list elements and the type of each element is preserved.&lt;/p&gt;
-
-&lt;p&gt;For a fantastic introduction to HLists, see Miles&amp;rsquo;s &lt;a href=&#34;http://2013.flatmap.no/sabin.html&#34;&gt;recent talk at flatMap(Oslo)&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Shapeless supports converting an HList of the proper type to a case class instance and vice-versa. For example:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;case class Point3D(x: Int, y: Int, z: Int)
-
-val pointIso: Iso[Point3D, Int :: Int :: Int :: HNil] =
-  Iso.hlist(Point3D.apply _, Point3D.unapply _)
-
-val components = 1 :: 2 :: 3 :: HNil
-val point = pointIso.from(components) // Point(1, 2, 3)
-val backToComponents = pointIso.to(point) // 1 :: 2 :: 3 :: HNil
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The key abstraction here is &lt;code&gt;Iso&lt;/code&gt;, which represents an isomorphism between two types. &lt;code&gt;Iso&lt;/code&gt; is defined in Shapeless source like this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Iso[T, U] { self =&amp;gt;
-  def to(t : T) : U
-  def from(u : U) : T
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The &lt;code&gt;Iso&lt;/code&gt; companion object defines the &lt;code&gt;hlist&lt;/code&gt; method, which returns an isomorphism between a case class and an HList of the appropriate shape given the case class&amp;rsquo;s &lt;code&gt;apply&lt;/code&gt; and &lt;code&gt;unapply&lt;/code&gt; methods. Typically, the iso is defined as an implicit val in the companion object of the case class to allow other modules implicit access to it. Additionally, it&amp;rsquo;s type is typically inferred. So we&amp;rsquo;d actually write this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;case class Point3D(x: Int, y: Int, z: Int)
-
-object Point3D {
-  implicit val hlistIso = Iso.hlist(Point3D.apply _, Point3D.unapply _)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;(Note: the &lt;a href=&#34;https://github.com/milessabin/shapeless/tree/topic/macro-paradise&#34;&gt;macro-paradise&lt;/a&gt; branch of Shapeless removes the need for this boilerplate. Instead, an equivalent isomorphism can be summoned when needed via &lt;code&gt;Iso[Point3D, Int :: Int :: Int :: HNil]&lt;/code&gt;. The macro-paradise branch uses new macro features from &lt;a href=&#34;http://docs.scala-lang.org/overviews/macros/paradise.html&#34;&gt;Eugene Burmako&amp;rsquo;s branch of Scala&lt;/a&gt;. For more information, see &lt;a href=&#34;http://marakana.com/s/post/1421/shapeless_meets_implicit_macros&#34;&gt;Miles&amp;rsquo;s talk at NEScala 2013&lt;/a&gt;. For a discussion on new macro features, see &lt;a href=&#34;https://groups.google.com/d/msg/scala-internals/91W0-PxMQ9Q/bTounkiouB8J&#34;&gt;scala-internals&lt;/a&gt;.)&lt;/p&gt;
-
-&lt;h1 id=&#34;hlist-codecs&#34;&gt;HList Codecs&lt;/h1&gt;
-
-&lt;p&gt;Given a codec for an HList and an iso between the HList type and a case class, we can use &lt;code&gt;xmap&lt;/code&gt; to convert the codec:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val comps: Codec[Int :: Int :: Int :: HNil] = ???
-val points: Codec[Points3D] = comps.xmap(Point3D.hlistIso.from, Point3D.hlistIso.to)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This is an extremely common operation, so we let&amp;rsquo;s add direct support for it. We can add a method to &lt;code&gt;Codec&lt;/code&gt; that takes an &lt;code&gt;Iso&lt;/code&gt; and delegates to &lt;code&gt;xmap&lt;/code&gt;. Further, we can make the iso parameter implicit, allowing the compiler to find the right iso automatically:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Codec[A] {
-  def encode(a: A): Error \/ BitVector
-  def decode(bits: BitVector): Error \/ (BitVector, A)
-  ...
-  final def as[B](implicit iso: Iso[B, A]): Codec[B] = Codec.xmap(this)(iso.from, iso.to)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This allows our point example to be rewritten as:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val comps: Codec[Int :: Int :: Int :: HNil] = ???
-val points: Codec[Points3D] = comps.as[Points3D]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&#34;constructing-hlist-codecs&#34;&gt;Constructing HList Codecs&lt;/h1&gt;
-
-&lt;p&gt;So once we have a codec for an HList, we can easily convert it to a codec for a case class, but how can we create an HList codec? There&amp;rsquo;s always the option to extend &lt;code&gt;Codec&lt;/code&gt; directly but we&amp;rsquo;d prefer something more compositional in nature &amp;ndash; some way to create the codec from smaller codecs.&lt;/p&gt;
-
-&lt;h2 id=&#34;hlist-of-codecs&#34;&gt;HList of Codecs&lt;/h2&gt;
-
-&lt;p&gt;One way of accomplishing this is to create an HList of codecs:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val int: Codec[Int] = ...
-val threeInts = int :: int :: int :: HNil
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The type of &lt;code&gt;threeInts&lt;/code&gt; is &lt;code&gt;Codec[Int] :: Codec[Int] :: Codec[Int] :: HNil&lt;/code&gt; but we want a &lt;code&gt;Codec[Int :: Int :: Int :: HNil]&lt;/code&gt;. It looks like an &lt;a href=&#34;http://stackoverflow.com/questions/16127360/sequencing-an-hlist&#34;&gt;applicative sequence operation on the HList&lt;/a&gt; would do the trick but there&amp;rsquo;s no &lt;code&gt;Applicative&lt;/code&gt; instance for &lt;code&gt;Codec&lt;/code&gt; (remember in part 2, we showed that &lt;code&gt;Codec&lt;/code&gt; does not have a covariant functor instance, therefore, there cannot be an &lt;code&gt;Applicative&lt;/code&gt; instance). Instead, we can implement this conversion directly by folding right over the elements of the HList. Our starting value is simply a &lt;code&gt;Codec[HNil]&lt;/code&gt; and the fold operation prepends a specific codec on to the accumulated HList codec.&lt;/p&gt;
-
-&lt;p&gt;Let&amp;rsquo;s start by implementing the empty case and the fold operation:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-
-  val hnilCodec: Codec[HNil] = new Codec[HNil] {
-    def encode(hn: HNil) = \/-(BitVector.empty)
-    def decode(buffer: BitVector) = \/-((buffer, HNil))
-  }
-
-  def prepend[A, L &amp;lt;: HList](a: Codec[A], l: Codec[L]): Codec[A :: L] =
-    new Codec[A :: L] {
-      override def encode(xs: A :: L) = Codec.encodeBoth(a, l)(xs.head, xs.tail)
-      override def decode(buffer: BitVector) = (for {
-        decA &amp;lt;- Codec.DecodingContext(a.decode)
-        decL &amp;lt;- Codec.DecodingContext(l.decode)
-      } yield decA :: decL).run(buffer)
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The &lt;code&gt;prepend&lt;/code&gt; method&amp;rsquo;s type signature is interesting. Every specific HList (e.g., &lt;code&gt;Int :: Int :: Int :: HNil&lt;/code&gt;) is a subtype of the HList type. The signature of &lt;code&gt;prepend&lt;/code&gt; takes advantage of that in order to take a &lt;code&gt;Codec[L]&lt;/code&gt; where &lt;code&gt;L&lt;/code&gt; is any HList type. Further, it uses &lt;code&gt;L&lt;/code&gt; in its return type, along with the cons (&lt;code&gt;::&lt;/code&gt;) type operator, to declare that a &lt;code&gt;Codec[A :: L]&lt;/code&gt; is returned. As a result, &lt;code&gt;encode&lt;/code&gt; can split its argument in to an &lt;code&gt;A&lt;/code&gt; and an &lt;code&gt;L&lt;/code&gt; via &lt;code&gt;head&lt;/code&gt; and &lt;code&gt;tail&lt;/code&gt; respectively, and use the &lt;code&gt;encodeBoth&lt;/code&gt; function we implemented in part 1. Similarly, &lt;code&gt;decode&lt;/code&gt; can decode an &lt;code&gt;A&lt;/code&gt; and an &lt;code&gt;L&lt;/code&gt; and then put them together with the cons value operator.&lt;/p&gt;
-
-&lt;p&gt;Now let&amp;rsquo;s use these with &lt;code&gt;foldRight&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  ...
-  def apply[L &amp;lt;: HList](l: L) =
-    l.foldRight(hnilCodec)(prepend)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;There are two issues with this implementation though. The first is that &lt;code&gt;foldRight&lt;/code&gt; on HList takes a &lt;code&gt;Poly2&lt;/code&gt; as its second argument, not a regular monomorhpic function. Second, our type signature claims to work with all HLists, regardless of their contents, but we only want to accept &lt;code&gt;HLists&lt;/code&gt; where each element is a &lt;code&gt;Codec&lt;/code&gt; of an arbitrary type.&lt;/p&gt;
-
-&lt;p&gt;Let&amp;rsquo;s lift &lt;code&gt;prepend&lt;/code&gt; in to a &lt;code&gt;Poly2&lt;/code&gt; instance:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  ...
-  object Prepend extends Poly2 {
-    implicit def caseCodecAndCodecHList[A, L &amp;lt;: HList] =
-      at[Codec[A], Codec[L]](prepend)
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now we need to limit the type of &lt;code&gt;HLists&lt;/code&gt; that can be passed to apply. We can do this by asking (the compiler) for evidence that each member of &lt;code&gt;L&lt;/code&gt; is a &lt;code&gt;Codec&lt;/code&gt; of an arbitrary type. Shapeless supports this via &lt;code&gt;UnaryTCConstraint&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  ...
-  import UnaryTCConstraint._
-  def apply[L &amp;lt;: HList : *-&amp;gt;*[Codec]#λ](l: L) =
-    l.foldRight(hnilCodec)(Prepend)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Compiling this shows that we aren&amp;rsquo;t quite done:
-&lt;code&gt;could not find implicit value for parameter folder: shapeless.RightFolder[L,scodec.Codec[shapeless.HNil],scodec.HListCodec.Prepend.type]&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;This is due to the &lt;code&gt;foldRight&lt;/code&gt; operation requiring an implicit &lt;code&gt;RightFolder&lt;/code&gt; parameter. In general, when can solve these types of errors by adding implicit parameters to our function signature. In this case, by requiring an implicit &lt;code&gt;RightFolder&lt;/code&gt; of the specified type:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  ...
-  import UnaryTCConstraint._
-  def apply[L &amp;lt;: HList : *-&amp;gt;*[Codec]#λ](l: L)(
-    implicit folder: RightFolder[L, Codec[HNil], Prepend.type]
-  ) = l.foldRight(hnilCodec)(Prepend)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can stop at this point if we want - the implementation is now fully functional. If we want to be explicit about the return type of &lt;code&gt;apply&lt;/code&gt;, we have one more step. Namely, we need to indicate that &lt;code&gt;apply&lt;/code&gt; returns a &lt;code&gt;Codec[M]&lt;/code&gt; where &lt;code&gt;M&lt;/code&gt; is an HList. Further, we need to describe the relationship between &lt;code&gt;L&lt;/code&gt; and &lt;code&gt;M&lt;/code&gt;, which is provided by &lt;code&gt;RightFolderAux&lt;/code&gt; - an alternative to &lt;code&gt;RightFolder&lt;/code&gt; that lets us use the result type:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  ...
-  import UnaryTCConstraint._
-  def apply[L &amp;lt;: HList : *-&amp;gt;*[Codec]#λ, M &amp;lt;: HList](l: L)(
-    implicit folder: RightFolderAux[L, Codec[HNil], Prepend.type, Codec[M]]
-  ): Codec[M] = l.foldRight(hnilCodec)(Prepend)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;prepending-a-codec-on-to-an-hlist-codec&#34;&gt;Prepending a codec on to an HList codec&lt;/h2&gt;
-
-&lt;p&gt;Now that we have a way to construct HList codecs, let&amp;rsquo;s consider other operations on them. For starters, consider combining a &lt;code&gt;Codec[A]&lt;/code&gt; with a &lt;code&gt;Codec[L]&lt;/code&gt; where &lt;code&gt;L&lt;/code&gt; is an HList. We built this combinator earlier &amp;ndash; the &lt;code&gt;prepend&lt;/code&gt; method used in the call to &lt;code&gt;foldRight&lt;/code&gt; when constructing an HList codec. We can add an operator to HList codecs that aliases &lt;code&gt;prepend&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;implicit class EnrichedHListCodec[L &amp;lt;: HList](l: Codec[L]) {
-  def ::[A](a: Codec[A]): Codec[A :: L] = HListCodec.prepend(a, l)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now we can cons codecs on the the front of an HList codec with &lt;code&gt;::&lt;/code&gt;. For example:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val comps = int :: int :: int :: HListCodec.hnilCodec
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can further simplify this by defining the &lt;code&gt;::&lt;/code&gt; operator on a non-HList codec as well. Calling &lt;code&gt;::&lt;/code&gt; on a non-HList codec should prepend the left codec on to the result of the right codec prepended to &lt;code&gt;Codec[HNil]&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;implicit class EnrichedCodec[A](codecA: Codec[A]) {
-  def ::[B](codecB: Codec[B]): Codec[B :: A :: HNil] =
-    HListCodec.prepend(codecB, HListCodec.prepend(codecA, HListCodec.hnilCodec))
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This lets us write the &lt;code&gt;Points3D&lt;/code&gt; codec as:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val points = (int :: int :: int).as[Points3D]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;appending-a-codec-on-to-an-hlist-codec&#34;&gt;Appending a codec on to an HList codec&lt;/h2&gt;
-
-&lt;p&gt;Similarly, we can imagine the need to append a &lt;code&gt;Codec[A]&lt;/code&gt; on to the end of a &lt;code&gt;Codec[L]&lt;/code&gt;. We don&amp;rsquo;t have a convenient type operator to represent the result of appending &lt;code&gt;A&lt;/code&gt; to &lt;code&gt;L&lt;/code&gt; so we&amp;rsquo;ll just define a new type parameter &lt;code&gt;LA&lt;/code&gt; and require implicit evidence that ensures &lt;code&gt;LA&lt;/code&gt; represents the list with &lt;code&gt;A&lt;/code&gt; appended to the end of &lt;code&gt;L&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  def append[L &amp;lt;: HList, A, LA &amp;lt;: HList](
-    l: Codec[L], a: Codec[A]
-  )(implicit ???
-  ): Codec[LA] = new Codec[LA] {
-    override def encode(xs: LA) = ???
-    override def decode(buffer: BitVector) = ???
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Let&amp;rsquo;s start with the implementation of decode. We can decode with &lt;code&gt;l&lt;/code&gt; and then with &lt;code&gt;a&lt;/code&gt; and then append the result from &lt;code&gt;a&lt;/code&gt; on to the end of the result from &lt;code&gt;l&lt;/code&gt;. For the implementation of encode, we need to take everything but the last element out of the provided value of type &lt;code&gt;LA&lt;/code&gt; and encode it with &lt;code&gt;l&lt;/code&gt;. Then we need to take the last element from the value of type &lt;code&gt;LA&lt;/code&gt; and encode it with &lt;code&gt;a&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  def append[L &amp;lt;: HList, A, LA &amp;lt;: HList](
-    l: Codec[L], a: Codec[A]
-  )(implicit ???
-  ): Codec[LA] = new Codec[LA] {
-    override def encode(xs: LA) = Codec.encodeBoth(l, a)(xs.init, xs.last)
-    override def decode(buffer: BitVector) = (for {
-      decL &amp;lt;- Codec.DecodingContext(l.decode)
-      decA &amp;lt;- Codec.DecodingContext(a.decode)
-    } yield decL :+ decA).run(buffer)
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Compiling this and inspecting the implicits that Shapeless needs causes us to add an implicit for the call to &lt;code&gt;init&lt;/code&gt;, and implicit for the call to &lt;code&gt;last&lt;/code&gt;, and an implicit for the call to &lt;code&gt;:+&lt;/code&gt;. For the implicits supporting &lt;code&gt;init&lt;/code&gt; and &lt;code&gt;last&lt;/code&gt;, we need to further refine the return type of each by specifying the output type:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object HListCodec {
-  def append[L &amp;lt;: HList, A, LA &amp;lt;: HList](l: Codec[L], a: Codec[A])(implicit
-    prepend: PrependAux[L, A :: HNil, LA],
-    init: Init[LA] { type Out = L },
-    last: Last[LA] { type Out = A }
-  ): Codec[LA] = new Codec[LA] {
-    override def encode(xs: LA) = Codec.encodeBoth(l, a)(xs.init, xs.last)
-    override def decode(buffer: BitVector) = (for {
-      decL &amp;lt;- Codec.DecodingContext(l.decode)
-      decA &amp;lt;- Codec.DecodingContext(a.decode)
-    } yield decL :+ decA).run(buffer)
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And we can provide syntax support for this as well:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;implicit class EnrichedHListCodec[L &amp;lt;: HList](l: Codec[L]) {
-  ...
-  def :+[A, LA &amp;lt;: HList](a: Codec[A])(implicit
-    prepend: PrependAux[L, A :: HNil, LA],
-    init: Init[LA] { type Out = L },
-    last: Last[LA] { type Out = A }
-  ): Codec[LA] = append(l, a)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;concatenating-hlist-codecs&#34;&gt;Concatenating HList codecs&lt;/h2&gt;
-
-&lt;p&gt;Finally, we can concatenate two HList codecs. We can concatenate a &lt;code&gt;Codec[K]&lt;/code&gt; with a &lt;code&gt;Codec[L]&lt;/code&gt; in to a &lt;code&gt;Codec[KL]&lt;/code&gt;. In the same way we did with the &lt;code&gt;append&lt;/code&gt; method, we&amp;rsquo;ll just invent the type parameter &lt;code&gt;KL&lt;/code&gt; and then require evidence that it has the structure of &lt;code&gt;K&lt;/code&gt; concatenated with &lt;code&gt;L&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def concat[K &amp;lt;: HList, L &amp;lt;: HList, KL &amp;lt;: HList](ck: Codec[K], cl: Codec[L])(
-  implicit ???
-): Codec[KL] = new Codec[KL] {
-  override def encode(xs: KL) = ???
-  override def decode(buffer: BitVector) = ???
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;As usual, we&amp;rsquo;ll start with the implementation of decode. We can use the same basic template as we used in &lt;code&gt;append&lt;/code&gt; but instead of appending a single element, we&amp;rsquo;ll just concatenate the result of each decode operation. The compiler informs us that we need a &lt;code&gt;Prepend&lt;/code&gt; implicit in scope. This time, we want to bind the result of concatenation to the &lt;code&gt;KL&lt;/code&gt; type parameter so we&amp;rsquo;ll use &lt;code&gt;PrependAux&lt;/code&gt; instead:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def concat[K &amp;lt;: HList, L &amp;lt;: HList, KL &amp;lt;: HList, KLen &amp;lt;: Nat](ck: Codec[K], cl: Codec[L])(implicit
-  prepend: PrependAux[K, L, KL]
-): Codec[KL] = new Codec[KL] {
-  override def encode(xs: KL) = ???
-  override def decode(buffer: BitVector) = (for {
-    decK &amp;lt;- Codec.DecodingContext(ck.decode)
-    decL &amp;lt;- Codec.DecodingContext(cl.decode)
-  } yield decK ::: decL).run(buffer)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;To encode, we need to split the provided HList of type &lt;code&gt;KL&lt;/code&gt; in to two HLists &amp;ndash; one of &lt;code&gt;K&lt;/code&gt; and one of &lt;code&gt;L&lt;/code&gt;. A feature of HLists is that they encode their length in to their static type. Hence, we can get the length of &lt;code&gt;K&lt;/code&gt; and split the provided &lt;code&gt;KL&lt;/code&gt; at that position, yielding two HLists &amp;ndash; one of type &lt;code&gt;K&lt;/code&gt; and another of type &lt;code&gt;L&lt;/code&gt;. Because we are splitting &lt;code&gt;KL&lt;/code&gt; with a statically known length, the &lt;code&gt;split&lt;/code&gt; method needs a type encoding of the length. Hence, we need to add another type parameter to the method that represents the length of list &lt;code&gt;K&lt;/code&gt; - called &amp;lsquo;KLen&amp;rsquo;. We then need to bind the length of &lt;code&gt;K&lt;/code&gt; to that parameter. Finally, we need an implicit &lt;code&gt;Split&lt;/code&gt; parameter for splitting &lt;code&gt;KL&lt;/code&gt; at position &lt;code&gt;KLen&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def concat[K &amp;lt;: HList, L &amp;lt;: HList, KL &amp;lt;: HList, KLen &amp;lt;: Nat](
-  ck: Codec[K], cl: Codec[L]
-)(implicit
-  prepend: PrependAux[K, L, KL],
-  lengthK: Length[K] { type Out = KLen },
-  split: Split[KL, KLen] { type P = K; type S = L }
-): Codec[KL] = new Codec[KL] {
-  override def encode(xs: KL) = {
-    val (k, l) = xs.split[KLen]
-    Codec.encodeBoth(ck, cl)(k, l)
-  }
-  override def decode(buffer: BitVector) = (for {
-    decK &amp;lt;- Codec.DecodingContext(ck.decode)
-    decL &amp;lt;- Codec.DecodingContext(cl.decode)
-  } yield decK ::: decL).run(buffer)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Syntax support follow the same pattern as before:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;implicit class EnrichedHListCodec[L &amp;lt;: HList](l: Codec[L]) {
-  def :::[K &amp;lt;: HList, KL &amp;lt;: HList, KLen &amp;lt;: Nat](k: Codec[K])(implicit
-    prepend: PrependAux[K, L, KL],
-    lengthK: Length[K] { type Out = KLen },
-    split: Split[KL, KLen] { type P = K; type S = L }
-  ): Codec[KL] = concat(k, l)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&#34;wrap-up&#34;&gt;Wrap Up&lt;/h1&gt;
-
-&lt;p&gt;In this post we looked at how scodec uses Shapeless to provide type-safe binding of binary structures to case classes. In the process, we&amp;rsquo;ve explored some type-level generic programming.&lt;/p&gt;</description>
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -1133,138 +159,7 @@ val threeInts = int :: int :: int :: HNil
       <guid>https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/</guid>
       <description>&lt;p&gt;In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/05/27/scodec-intro/&#34;&gt;Part 1&lt;/a&gt;, we looked at the codec trait and a way to create a &lt;code&gt;Codec[(A, B)]&lt;/code&gt; out of a &lt;code&gt;Codec[A]&lt;/code&gt; and a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll look at converting a &lt;code&gt;Codec[A]&lt;/code&gt; to a &lt;code&gt;Codec[B]&lt;/code&gt; using a type driven approach and we&amp;rsquo;ll get our feet wet with some category theory.&lt;/p&gt;
 
-&lt;p&gt;&lt;/p&gt;
-
-&lt;p&gt;Consider this:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;case class Point2D(x: Int, y: Int)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we have a codec for an integer, we can create a &lt;code&gt;Codec[(Int, Int)]&lt;/code&gt; easily using the &lt;code&gt;TupleCodec&lt;/code&gt; from Part 1:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val int: Codec[Int] = ...
-val tuple: Codec[(Int, Int)] = new TupleCodec(int, int)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Working directly with tuples isn&amp;rsquo;t pleasant, so we&amp;rsquo;d like to be able to create a &lt;code&gt;Codec[Point2D]&lt;/code&gt; from a &lt;code&gt;Codec[(Int, Int)]&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val point: Codec[Point2D] = ???
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Hence, we need a function that can convert a &lt;code&gt;Codec[A]&lt;/code&gt; to a &lt;code&gt;Codec[B]&lt;/code&gt;. This looks like functor map, so let&amp;rsquo;s try it:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def map[A, B](ca: Codec[A])(f: A =&amp;gt; B): Codec[B] = new Codec[B] {
-  def encode(b: B): String \/ BitVector = ???
-  def decode(buf: BitVector): String \/ (BitVector, B) = ???
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Let&amp;rsquo;s start with the implementation of &lt;code&gt;decode&lt;/code&gt;. We have:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;buf&lt;/code&gt;, a value of &lt;code&gt;BitVector&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;f&lt;/code&gt;, a function &lt;code&gt;A =&amp;gt; B&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;ca&lt;/code&gt;, a &lt;code&gt;Codec[A]&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Using those values, we need to produce a &lt;code&gt;String \/ (BitVector, B)&lt;/code&gt;. We can use the values as jigsaw puzzle pieces and find a way to put all the proper shapes together. In this case, we can call &lt;code&gt;decode&lt;/code&gt; on &lt;code&gt;ca&lt;/code&gt; to get back a value of &lt;code&gt;String \/ (BitVector, A)&lt;/code&gt;. Then we can map &lt;code&gt;f&lt;/code&gt; over the inner &lt;code&gt;A&lt;/code&gt; to get a &lt;code&gt;String \/ (BitVector, B)&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def map[A, B](ca: Codec[A])(f: A =&amp;gt; B): Codec[B] = new Codec[B] {
-  def encode(b: B): String \/ BitVector = ???
-  def decode(buf: BitVector): String \/ (BitVector, B) =
-    ca.decode(buf) map { case (rest, a) =&amp;gt; (rest, f(a)) }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;So far so good. Let&amp;rsquo;s try the same type driven approach with the implementation of &lt;code&gt;encode&lt;/code&gt;. We have:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;b&lt;/code&gt;, a value of &lt;code&gt;B&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;f&lt;/code&gt;, a function &lt;code&gt;A =&amp;gt; B&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;ca&lt;/code&gt;, a &lt;code&gt;Codec[A]&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;It seems we are at an impasse &amp;ndash; no matter which value we start with, there&amp;rsquo;s no way to combine it with the other values. Intuitively, we know that encode should use &lt;code&gt;ca.encode&lt;/code&gt; in its implementation, so let&amp;rsquo;s try that:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def map[A, B](ca: Codec[A])(f: A =&amp;gt; B): Codec[B] = new Codec[B] {
-  def encode(b: B): String \/ BitVector =
-    ca.encode(???)
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In order to call encode, we need a value of &lt;code&gt;A&lt;/code&gt; but we only have a value of &lt;code&gt;B&lt;/code&gt;. Again, relying on intuition, we know we should use &lt;code&gt;b&lt;/code&gt; to generate a value of type &lt;code&gt;A&lt;/code&gt;. To do so, we can just &lt;em&gt;materialize&lt;/em&gt; a function &lt;code&gt;B =&amp;gt; A&lt;/code&gt; by asking for it in the signature of &lt;code&gt;map&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def map[A, B](ca: Codec[A])(f: A =&amp;gt; B, g: B =&amp;gt; A): Codec[B] = new Codec[B] {
-  def encode(b: B): String \/ BitVector =
-    ca.encode(g(b))
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;detour-in-to-category-theory&#34;&gt;Detour in to category theory&lt;/h3&gt;
-
-&lt;p&gt;We now have a working way to convert a &lt;code&gt;Codec[A]&lt;/code&gt; to a &lt;code&gt;Codec[B]&lt;/code&gt; but naming the function &lt;code&gt;map&lt;/code&gt; is awkward. We started with the name map because the problem felt like a functor map. But by the time we finished, we ended up needing two functions, &lt;code&gt;f: A =&amp;gt; B&lt;/code&gt; and &lt;code&gt;g: B =&amp;gt; A&lt;/code&gt;. Let&amp;rsquo;s rename this function to &lt;code&gt;sortOfMap&lt;/code&gt; for now and consider a typeclass for types that support the general signature:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait NotQuiteFunctor[F[_]] {
-  def sortOfMap[A, B](fa: F[A])(f: A =&amp;gt; B, g: B =&amp;gt; A): F[B]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://www.haskell.org/hoogle/?hoogle=%28a+-%3E+b%29-%3E%28b-%3Ea%29-%3E%28f+a%29-%3E%28f+b%29&#34;&gt;Searching Hoogle&lt;/a&gt; for this type signature doesn&amp;rsquo;t find any exact matches. Lars Hupel pointed out to me that this typeclass is actually an &lt;em&gt;invariant functor&lt;/em&gt; or &lt;em&gt;exponential functor&lt;/em&gt;. The &lt;code&gt;sortOfMap&lt;/code&gt; operation is typically called &lt;code&gt;invmap&lt;/code&gt; or &lt;code&gt;xmap&lt;/code&gt;. Edward Kmett has a &lt;a href=&#34;http://comonad.com/reader/2008/rotten-bananas/&#34;&gt;fascinating blog post exploring exponential functors&lt;/a&gt; (note: currently offline, see &lt;a href=&#34;http://webcache.googleusercontent.com/search?q=cache%3Acomonad.com%2Freader%2F2008%2Frotten-bananas%2F&amp;amp;oq=cache%3Acomonad.com%2Freader%2F2008%2Frotten-bananas%2F&amp;amp;aqs=chrome.0.57j58.3499j0&amp;amp;sourceid=chrome&amp;amp;ie=UTF-8&#34;&gt;cached version&lt;/a&gt;). Additionally, &lt;a href=&#34;http://tmorris.net/posts/functors-and-things-using-scala/index.html&#34;&gt;Tony Morris&amp;rsquo;s index of functor types&lt;/a&gt; lists the invariant/exponential functor as well.&lt;/p&gt;
-
-&lt;p&gt;Now that we know the name for the typeclass we abstracted, let&amp;rsquo;s examine the laws for it. An invariant functor has two laws:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;identity - &lt;code&gt;xmap(ma)(identity, identity) == ma&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;composite - &lt;code&gt;xmap(xmap(ma)(f1, g1))(f2, g2) == xmap(ma)(f2 compose f1, g1 compose g2)&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The identity law states that xmapping with identity does not modify the input. The composite law states that function composition distributes over the xmap operation.&lt;/p&gt;
-
-&lt;p&gt;Note that every &lt;em&gt;covariant functor&lt;/em&gt; (the kind of functor that us Scala developers are most familiar with) gives rise to an &lt;em&gt;invariant functor&lt;/em&gt; that ignores the &lt;code&gt;g&lt;/code&gt; function. Similarly, every &lt;em&gt;contravariant functor&lt;/em&gt; (which defines &lt;code&gt;def contramap[A, B](f: B =&amp;gt; A): F[B]&lt;/code&gt;) gives rise to an &lt;em&gt;invariant functor&lt;/em&gt; that ignores the &lt;code&gt;f&lt;/code&gt; function.&lt;/p&gt;
-
-&lt;p&gt;Unfortunately, Scalaz 7 does not provide an &lt;code&gt;InvariantFunctor&lt;/code&gt; typeclass. It was present in Scalaz 6 though, and as far as I can tell, it wasn&amp;rsquo;t removed deliberately. Hence, we can &lt;a href=&#34;https://github.com/scalaz/scalaz/pull/351&#34;&gt;integrate it in to the Scalaz 7 typeclass hierarchy&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;integrating-xmap&#34;&gt;Integrating xmap&lt;/h3&gt;
-
-&lt;p&gt;Now that we have a handle on what this operation is, we can complete the implementation in scodec:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object Codec {
-  def xmap[A, B](codec: Codec[A])(f: A =&amp;gt; B, g: B =&amp;gt; A): Codec[B] = new Codec[B] {
-    def encode(b: B): String \/ BitVector =
-      codec.encode(g(b))
-    def decode(buffer: BitVector): String \/ (BitVector, B) =
-      codec.decode(buffer).map { case (rest, a) =&amp;gt; (rest, f(a)) }
-  }
-  ...
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can also add &lt;code&gt;xmap&lt;/code&gt; directly to the &lt;code&gt;Codec&lt;/code&gt; trait to allow OO style method usage:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Codec[A] {
-  def encode(a: A): String \/ BitVector
-  def decode(b: BitVector): String \/ (BitVector, A)
-  final def xmap[B](f: A =&amp;gt; B, g: B =&amp;gt; A): Codec[B] =
-    Codec.xmap(this)(f, g)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Returning to our original example, we can now easily convert a &lt;code&gt;Codec[(Int, Int)]&lt;/code&gt; in to a &lt;code&gt;Codec[Point2D]&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;val tuple: Codec[(Int, Int)] = new TupleCodec(int, int)
-val point: Codec[Point2D] = tuple.xmap(
-  { case (x, y) =&amp;gt; Point2D(x, y) },
-  { p =&amp;gt; (p.y, p.y) }
-)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;wrap-up&#34;&gt;Wrap Up&lt;/h3&gt;
-
-&lt;p&gt;In this post, we used a type driven approach plus some intuition to implement the xmap operation. By abstracting out a typeclass, we learned about invariant functors.&lt;/p&gt;
-
-&lt;p&gt;In the next post, we&amp;rsquo;ll look at using &lt;a href=&#34;https://github.com/milessabin/shapeless&#34;&gt;Shapeless&lt;/a&gt; to simplify codec definitions and xmapping.&lt;/p&gt;</description>
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -1293,208 +188,7 @@ Performance is considered but yields to the above design constraints.&lt;/p&gt;
 
 &lt;p&gt;This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of &lt;a href=&#34;http://github.com/milessabing/shapeless&#34;&gt;Shapeless&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;terminology&#34;&gt;Terminology&lt;/h2&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;em&gt;encoding&lt;/em&gt; - converting a value in to its binary representation&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;decoding&lt;/em&gt; - converting binary data in to a value&lt;/li&gt;
-&lt;li&gt;&lt;em&gt;codec&lt;/em&gt; - a value that can encode and decode values of a given Scala type&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;representing-binary&#34;&gt;Representing Binary&lt;/h2&gt;
-
-&lt;p&gt;Binary data is passed around a lot in scodec. As such, a representation of binary data is needed. The representation must satisfy a number of constraints:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Must be immutable&lt;/li&gt;
-&lt;li&gt;Must support bit operations such as &lt;code&gt;take(bitCount)&lt;/code&gt;, &lt;code&gt;drop(bitCount)&lt;/code&gt;, and typical bitwise operators (negation, and, or, xor, &amp;hellip;)&lt;/li&gt;
-&lt;li&gt;Must support fast concatenation in order to handle encoding a number of values in to a single binary structure&lt;/li&gt;
-&lt;li&gt;Must support fast &lt;code&gt;take(bitCount)&lt;/code&gt;/&lt;code&gt;drop(bitCount)&lt;/code&gt; operations in order to allow fast decoding&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Focusing on individual bits as the fundamental element instead of bytes is the most unique constraint. By focusing on bits instead of bytes or words, the combinator DSL is able to support a more natural description of bit fields.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;Array[Byte]&lt;/code&gt; is an unsuitable representation given that it meets none of the stated constraints. &lt;code&gt;java.nio.ByteBuffer&lt;/code&gt; does not provide a way to enforce immutable at the type level and fails on the other constraints. &lt;code&gt;Vector[Byte]&lt;/code&gt; satisfies all constraints except for providing bit operations.&lt;/p&gt;
-
-&lt;p&gt;To satisfy these constraints, scodec includes the &lt;code&gt;BitVector&lt;/code&gt; and &lt;code&gt;ByteVector&lt;/code&gt; data types and the &lt;code&gt;BitwiseOperation&lt;/code&gt; supporting trait. This approach allows the API provided to codec authors to be more focused than generic collections. Additionally, the backing implementation of &lt;code&gt;BitVector&lt;/code&gt; and &lt;code&gt;ByteVector&lt;/code&gt; can be changed for performance reasons without impacting users.&lt;/p&gt;
-
-&lt;h3 id=&#34;bitwiseoperations&#34;&gt;BitwiseOperations&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;BitwiseOperations&lt;/code&gt; is a supporting trait that&amp;rsquo;s extended by both &lt;code&gt;BitVector&lt;/code&gt; and &lt;code&gt;ByteVector&lt;/code&gt;. It provides bitwise shifting operators as well as bitwise negation, bitwise and, bitwise or, and bitwise xor.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait BitwiseOperations[Repr] {
-
-  final def &amp;lt;&amp;lt;(n: Int): Repr = leftShift(n)
-  def leftShift(n: Int): Repr
-
-  final def &amp;gt;&amp;gt;(n: Int): Repr = rightShift(n, true)
-  final def &amp;gt;&amp;gt;&amp;gt;(n: Int): Repr = rightShift(n, false)
-  def rightShift(n: Int, signExtension: Boolean): Repr
-
-  final def unary_~(): Repr = not
-  def not: Repr
-
-  final def &amp;amp;(other: Repr): Repr = and(other)
-  def and(other: Repr): Repr
-
-  final def |(other: Repr): Repr = or(other)
-  def or(other: Repr): Repr
-
-  final def ^(other: Repr): Repr = xor(other)
-  def xor(other: Repr): Repr
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;bitvector&#34;&gt;BitVector&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;BitVector&lt;/code&gt; represents an immutable sequence of bits. By extending the &lt;a href=&#34;http://www.scala-lang.org/api/current/index.html#scala.collection.IndexedSeqOptimized&#34;&gt;&lt;code&gt;IndexedSeqOptimized[Boolean, BitVector]&lt;/code&gt;&lt;/a&gt; trait from the Scala collection library, a bit vector can be used as a collection of booleans. As a bonus, most of the implementation is provided by &lt;code&gt;IndexedSeqOptimized&lt;/code&gt; - albeit, sometimes inefficiently.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait BitVector extends IndexedSeqOptimized[Boolean, BitVector] with BitwiseOperations[BitVector] {
-  ...
-  def toByteVector: ByteVector
-  def toByteArray: Array[Byte]
-  def toByteBuffer: ByteBuffer
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Constructing a bit vector can be done in a number of ways. The &lt;code&gt;apply&lt;/code&gt; method on the bit vector companion allows direct wrapping of a &lt;code&gt;ByteVector&lt;/code&gt;, &lt;code&gt;Array[Byte]&lt;/code&gt;, or &lt;code&gt;java.nio.ByteBuffer&lt;/code&gt;. To create a bit vector from literal bytes, the literal bytes can be passed directly to apply. For example, &lt;code&gt;BitVector(0x55, 0x2a)&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;When decoding, many codecs need to take a certain number of bits and convert them to a value. For example, a codec for a signed 32-bit integer might take 32 bits and return those bits converted to an &lt;code&gt;Int&lt;/code&gt; along with the remaining bits in the input vector (via &lt;code&gt;input.drop(32)&lt;/code&gt;). &lt;code&gt;BitVector#take&lt;/code&gt; is insufficient for this task because taking &lt;code&gt;n&lt;/code&gt; bits from a &lt;code&gt;m&lt;/code&gt; bit vector where &lt;code&gt;n &amp;gt; m&lt;/code&gt; results in &lt;code&gt;m&lt;/code&gt; bits being returned. As a result, every codec would need similar error handling for this case.&lt;/p&gt;
-
-&lt;p&gt;To simplify this case, &lt;code&gt;BitVector&lt;/code&gt; has an &lt;code&gt;acquire&lt;/code&gt; method, which gets a bit vector of exactly &lt;code&gt;n&lt;/code&gt; bits or returns an error.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def acquire(n: Int): String \/ BitVector = {
-  if (size &amp;lt; n) \/ left s&amp;quot;cannot acquire $n bits from a vector that contains $size bits&amp;quot;
-  else \/ right take(n)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note the use of Scalaz&amp;rsquo;s disjunction (i.e., &lt;code&gt;\/&lt;/code&gt;) data type, instead of &lt;code&gt;Option[BitVector]&lt;/code&gt; or throwing an exception. By providing a disjunction that has a descriptive error message, overall error reporting is improved. (In general, I think Scalaz&amp;rsquo;s disjunction is one of the most undervalued parts of Scalaz.)&lt;/p&gt;
-
-&lt;p&gt;The &lt;code&gt;acquire&lt;/code&gt; method only handles getting the necessary bits. Converting the acquired bits to a value may fail. Combining bit acquisition with failure checked type conversion can be refactored in to:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def consume[A](n: Int)(decode: BitVector =&amp;gt; String \/ A): String \/ (BitVector, A) = for {
-  toDecode &amp;lt;- acquire(n)
-  decoded &amp;lt;- decode(toDecode)
-} yield (drop(n), decoded)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;bytevector&#34;&gt;ByteVector&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;ByteVector&lt;/code&gt; represents an immutable sequence of bytes.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait ByteVector extends IndexedSeqOptimized[Byte, ByteVector] with BitwiseOperations[ByteVector] {
-  ...
-  def toArray: Array[Byte]
-  def toByteBuffer: ByteBuffer = ByteBuffer.wrap(toArray)
-  def toBitVector: BitVector = BitVector(this)
-  def toHexadecimal: String
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Unsurprisingly, &lt;code&gt;ByteVector&lt;/code&gt; is currently implemented by delegating to a &lt;code&gt;Vector[Byte]&lt;/code&gt;. There are a number of potential improvements, including:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;for vectors with length &amp;lt;= 8, use a special byte vector implementaiton backed by a single &lt;code&gt;Long&lt;/code&gt; value&lt;/li&gt;
-&lt;li&gt;delegate to Akka&amp;rsquo;s &lt;a href=&#34;https://github.com/akka/akka/blob/master/akka-actor/src/main/scala/akka/util/ByteString.scala&#34;&gt;&lt;code&gt;ByteString&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;write a custom vector-like structure that&amp;rsquo;s manually specialized for bytes&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Before any of these performance improvements are implemented, benchmarks will be developed in order to measure impacts.&lt;/p&gt;
-
-&lt;h2 id=&#34;codecs&#34;&gt;Codecs&lt;/h2&gt;
-
-&lt;p&gt;With the basic data types out of the way, we can concretize the definition of a codec.&lt;/p&gt;
-
-&lt;p&gt;Encoding is represented by a function &lt;code&gt;A =&amp;gt; String \/ BitVector&lt;/code&gt;. By modeling encoding this way, a failure to encode a value of type &lt;code&gt;A&lt;/code&gt; can be communicated without throwing an exception. For example, given a &lt;code&gt;Codec[Int]&lt;/code&gt; that encodes unsigned 24-bit integers, calling encode with a negative integer would return an error message on the left side of the disjunction.&lt;/p&gt;
-
-&lt;p&gt;Decoding is represented by a function &lt;code&gt;BitVector =&amp;gt; String \/ (BitVector, A)&lt;/code&gt;. Similar to the rationale for encoding, a failure
-to decode a value of type &lt;code&gt;A&lt;/code&gt; results in an error message on the left side of the disjunction. Successful decoding results in a tuple of the remaining (non-consumed) bits and the decoded value.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trait Codec[A] {
-  def encode(a: A): String \/ BitVector
-  def decode(b: BitVector): String \/ (BitVector, A)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;tuple-codec&#34;&gt;Tuple Codec&lt;/h3&gt;
-
-&lt;p&gt;Consider a codec for a tuple &lt;code&gt;(A, B)&lt;/code&gt;:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;class TupleCodec[A, B](codecA: Codec[A], codecB: Codec[B]) extends Codec[(A, B)] {
-
-  override def encode(t: (A, B)) =
-    Codec.encodeBoth(codecA, codecB)(t._1, t._2)
-
-  override def decode(buffer: BitVector) =
-    Codec.decodeBoth(codecA, codecB)(buffer)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Let&amp;rsquo;s implement &lt;code&gt;Codec.encodeBoth&lt;/code&gt; and &lt;code&gt;Codec.decodeBoth&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;First, encoding:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def encodeBoth[A, B](codecA: Codec[A], codecB: Codec[B])(a: A, b: B): String \/ BitVector =
-  ???
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Encoding is fairly straightforward. First, &lt;code&gt;a&lt;/code&gt; is encoded, then &lt;code&gt;b&lt;/code&gt; is encoded, and then the resulting vectors are concatenated. Any error results in the overall encoding failing. This is easily accomplished with a for-comprehension:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def encodeBoth[A, B](codecA: Codec[A], codecB: Codec[B])(a: A, b: B): String \/ BitVector =
-  for {
-    encA &amp;lt;- codecA.encode(a)
-    encB &amp;lt;- codecB.encode(b)
-  } yield encA ++ encB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Second, decoding:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def decodeBoth[A, B]
-  (codecA: Codec[A], codecB: Codec[B])
-  (buffer: BitVector): String \/ (BitVector, (A, B)) = ???
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Decoding is accomplished by first decoding with &lt;code&gt;codecA&lt;/code&gt;, then, assuming successful decoding, decoding the remaining bits with &lt;code&gt;codecB&lt;/code&gt;, and finally returning both decoded values in a tuple. Any error results in the overall decoding failing. This could be implemented directly:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def decodeBoth[A, B]
-  (codecA: Codec[A], codecB: Codec[B])
-  (buffer: BitVector): String \/ (BitVector, (A, B)) = {
-  val decA = codecA.decode(buffer)
-  decA flatMap { case (afterA, a) =&amp;gt;
-    val decB = codecB.decode(afterA)
-    decB map { case (afterB, b) =&amp;gt; (afterB, (a, B)) }
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can do better than this though. Note the type signature of &lt;code&gt;Codec#decode&lt;/code&gt;: &lt;code&gt;BitVector =&amp;gt; String \/ (BitVector, A)&lt;/code&gt;. The &lt;a href=&#34;https://github.com/scalaz/scalaz/blob/scalaz-seven/core/src/main/scala/scalaz/StateT.scala&#34;&gt;&lt;code&gt;scalaz.StateT&lt;/code&gt;&lt;/a&gt; monad transformer wraps functions of the form &lt;code&gt;S =&amp;gt; F[(S, A)]&lt;/code&gt; for a monad &lt;code&gt;F&lt;/code&gt;. We can set &lt;code&gt;F&lt;/code&gt; to &lt;code&gt;String \/ ?&lt;/code&gt; resulting in &lt;code&gt;StateT[({type λ[+α] = Error \/ α})#λ, BitVector, A]&lt;/code&gt;. This pattern occurs often enough when working with codecs to warrant special support:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;type DecodingContext[+A] = StateT[({type λ[+α] = Error \/ α})#λ, BitVector, A]
-
-object DecodingContext {
-  def apply[A](f: BitVector =&amp;gt; Error \/ (BitVector, A)): DecodingContext[A] =
-    StateT[({type λ[+α] = Error \/ α})#λ, BitVector, A](f)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Returning to &lt;code&gt;decodeBoth&lt;/code&gt;, we can use &lt;code&gt;DecodingContext&lt;/code&gt; to implement it simply:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def decodeBoth[A, B]
-  (codecA: Codec[A], codecB: Codec[B])
-  (buffer: BitVector): String \/ (BitVector, (A, B)) = {
-  for {
-    a &amp;lt;- DecodingContext(codecA.decode)
-    b &amp;lt;- DecodingContext(codecB.decode)
-  } yield (a, b)
-}.run(buffer)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;wrap-up&#34;&gt;Wrap up&lt;/h2&gt;
-
-&lt;p&gt;This article presented the basic data types used in scodec. In part 2, we&amp;rsquo;ll look at the &lt;code&gt;Codec&lt;/code&gt; trait in more detail and investigate how to convert a &lt;code&gt;Codec[A]&lt;/code&gt; in to a &lt;code&gt;Codec[B]&lt;/code&gt; given some relations between &lt;code&gt;A&lt;/code&gt; and &lt;code&gt;B&lt;/code&gt;.&lt;/p&gt;</description>
+&lt;p&gt;&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -1503,12 +197,25 @@ object DecodingContext {
       <pubDate>Wed, 03 Apr 2013 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel/</guid>
-      <description>&lt;p&gt;Panel discussion at &lt;a href=&#34;http://phillyemergingtech.com/2013&#34;&gt;Philly ETE 2013&lt;/a&gt; with Jamie Allen, Doug Lea, Cliff Click, Charlie Hunt, and myself.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-&lt;iframe src=&#34;http://player.vimeo.com/video/65474054?title=0&amp;amp;byline=0&amp;amp;portrait=0&#34; width=&#34;500&#34; height=&#34;281&#34; frameborder=&#34;0&#34; webkitAllowFullScreen mozallowfullscreen allowFullScreen&gt;&lt;/iframe&gt; &lt;p&gt;&lt;a href=&#34;http://vimeo.com/65474054&#34;&gt;The Future of the JVM&lt;/a&gt; from &lt;a href=&#34;http://vimeo.com/chariotsolutions&#34;&gt;Chariot Solutions&lt;/a&gt; on &lt;a href=&#34;http://vimeo.com&#34;&gt;Vimeo&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Panel discussion at &lt;a href=&#34;http://phillyemergingtech.com/2013&#34;&gt;Philly ETE 2013&lt;/a&gt; with Jamie Allen, Doug Lea, Cliff Click, Charlie Hunt, and myself.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Scalaz State Monad</title>
+      <link>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</link>
+      <pubDate>Tue, 28 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</guid>
+      <description>&lt;p&gt;Introduction to the State Monad in Scalaz 7. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scalaz-state-monad&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Intro to Scalaz 7</title>
+      <link>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</link>
+      <pubDate>Thu, 24 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</guid>
+      <description>&lt;p&gt;Introduction to Scalaz 7. Slides available on &lt;a href=&#34;http://www.slideshare.net/mpilquist/scalaz-13068563&#34;&gt;Slideshare&lt;/a&gt; and &lt;a href=&#34;https://speakerdeck.com/mpilquist/intro-to-scalaz&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
   </channel>

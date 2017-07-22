@@ -2,12 +2,15 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Screencasts on mpilquist</title>
-    <link>https://mpilquist.github.io/categories/screencasts/index.xml</link>
+    <link>https://mpilquist.github.io/categories/screencasts/</link>
     <description>Recent content in Screencasts on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <atom:link href="https://mpilquist.github.io/categories/screencasts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 20 May 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://mpilquist.github.io/categories/screencasts/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Intro to Functional Streams for Scala (FS2)</title>
@@ -15,12 +18,7 @@
       <pubDate>Fri, 20 May 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2016/05/20/fs2/</guid>
-      <description>&lt;p&gt;Informal talk series that introduces Functional Streams for Scala (FS2).&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/cahvyadYfX8?list=PLFrwDVdSrYE6PVD_p6YQLAbNaEHagx9bW&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Informal talk series that introduces Functional Streams for Scala (FS2).&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -33,12 +31,7 @@
 
 &lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/&#34;&gt;http://www.manning.com/bjarnason/&lt;/a&gt;).&lt;/p&gt;
 
-&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/Dsd4pc99FSY?list=PLFrwDVdSrYE6dy14XCmUtRAJuhCxuzJp0&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
     </item>
     
   </channel>

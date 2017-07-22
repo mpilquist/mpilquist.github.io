@@ -30,7 +30,7 @@
   <script src="https://mpilquist.github.io/highlight/highlight.pack.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
-  <meta name="generator" content="Hugo 0.19" />
+  <meta name="generator" content="Hugo 0.25.1" />
   
 </head>
 <body>
@@ -46,6 +46,10 @@
                 
                 <li class="pure-menu-item">
                     <a href="https://mpilquist.github.io/categories/articles" class="pure-menu-link">Articles</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/keyboards" class="pure-menu-link">Keyboards</a>
                 </li>
                 
                 <li class="pure-menu-item">
@@ -71,6 +75,10 @@
                 
                 <li class="pure-menu-item">
                     <a href="https://mpilquist.github.io/categories/articles" class="pure-menu-link">Articles</a>
+                </li>
+                
+                <li class="pure-menu-item">
+                    <a href="https://mpilquist.github.io/categories/keyboards" class="pure-menu-link">Keyboards</a>
                 </li>
                 
                 <li class="pure-menu-item">
@@ -267,7 +275,7 @@ object VectorF1 {
 }
 </code></pre>
 
-<p><code>VectorF1</code> seems perfect. It has stack safe <code>compose</code> and <code>andThen</code>. Unfortunately, it is terribly slow. Most composed functions are going to be made up of a small number of compositions &ndash; 2, 3, or 4 functions. It&rsquo;s uncommon to compose 1,000,000 functions. <code>Vector</code> has effectively constant time cons and snoc, but there are large constant factors. For example, a single element vector will allocate an 32-element array internally. These constant factors end up dominating the performance results, so this solution won&rsquo;t work.</p>
+<p><code>VectorF1</code> seems perfect. It has stack safe <code>compose</code> and <code>andThen</code>. Unfortunately, it is terribly slow. Most composed functions are going to be made up of a small number of compositions &ndash; 2, 3, or 4 functions. It&rsquo;s uncommon to compose 1,000,000 functions. <code>Vector</code> has effectively constant time cons and snoc, but there are large constant factors. For example, a single element vector will allocate a 32-element array internally. These constant factors end up dominating the performance results, so this solution won&rsquo;t work.</p>
 
 <p>Fortunately, FS2 has a data structure that performs better &ndash; <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/co/fs2/fs2-core_2.12/0.9.4/fs2-core_2.12-0.9.4-javadoc.jar/!/fs2/util/Catenable.html"><code>fs2.util.Catenable</code></a>. It has O(1) cons, snoc, and concat, amortized O(1) uncons, O(n) traversal, and negligible constant factors for small collections.</p>
 

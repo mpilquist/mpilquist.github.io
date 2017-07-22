@@ -2,12 +2,15 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Talks on mpilquist</title>
-    <link>https://mpilquist.github.io/categories/talks/index.xml</link>
+    <link>https://mpilquist.github.io/categories/talks/</link>
     <description>Recent content in Talks on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <atom:link href="https://mpilquist.github.io/categories/talks/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 13 Nov 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://mpilquist.github.io/categories/talks/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Compositional Streaming with FS2</title>
@@ -15,12 +18,7 @@
       <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2016/11/13/fs2/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scalae By The Bay 2016&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/oFk8-a1FSP0&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scalae By The Bay 2016&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -29,12 +27,7 @@
       <pubDate>Wed, 02 Mar 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</guid>
-      <description>&lt;p&gt;Talk given at the &lt;a href=&#34;http://typelevel.org/event/2016-03-summit-philadelphia/&#34;&gt;Typelevel Summit Philadelphia&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/Crc2RHWrcLI&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at the &lt;a href=&#34;http://typelevel.org/event/2016-03-summit-philadelphia/&#34;&gt;Typelevel Summit Philadelphia&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -43,12 +36,7 @@
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.world&#34;&gt;Scala World&lt;/a&gt; in Penrith, UK. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/practical-binary-with-scodec-and-shapeless&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/jM21a-t4JnQ&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.world&#34;&gt;Scala World&lt;/a&gt; in Penrith, UK. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/practical-binary-with-scodec-and-shapeless&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -57,12 +45,7 @@
       <pubDate>Fri, 14 Aug 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/08/14/sbtb/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scala By The Bay 2015&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/a-tour-of-functional-structures-via-scodec-and-simulacrum&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/CtyzSZ3Z5_w&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scala By The Bay 2015&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/a-tour-of-functional-structures-via-scodec-and-simulacrum&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -71,12 +54,7 @@
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</guid>
-      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://www.meetup.com/scala-phase/&#34;&gt;PHASE&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/eNJ6ZbbrP2A&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://www.meetup.com/scala-phase/&#34;&gt;PHASE&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -98,12 +76,7 @@
 
 &lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;https://www.youtube.com/embed/VZWLRepyNvo&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -112,12 +85,7 @@
       <pubDate>Wed, 03 Apr 2013 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel/</guid>
-      <description>&lt;p&gt;Panel discussion at &lt;a href=&#34;http://phillyemergingtech.com/2013&#34;&gt;Philly ETE 2013&lt;/a&gt; with Jamie Allen, Doug Lea, Cliff Click, Charlie Hunt, and myself.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-&lt;iframe src=&#34;http://player.vimeo.com/video/65474054?title=0&amp;amp;byline=0&amp;amp;portrait=0&#34; width=&#34;500&#34; height=&#34;281&#34; frameborder=&#34;0&#34; webkitAllowFullScreen mozallowfullscreen allowFullScreen&gt;&lt;/iframe&gt; &lt;p&gt;&lt;a href=&#34;http://vimeo.com/65474054&#34;&gt;The Future of the JVM&lt;/a&gt; from &lt;a href=&#34;http://vimeo.com/chariotsolutions&#34;&gt;Chariot Solutions&lt;/a&gt; on &lt;a href=&#34;http://vimeo.com&#34;&gt;Vimeo&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Panel discussion at &lt;a href=&#34;http://phillyemergingtech.com/2013&#34;&gt;Philly ETE 2013&lt;/a&gt; with Jamie Allen, Doug Lea, Cliff Click, Charlie Hunt, and myself.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -126,12 +94,7 @@
       <pubDate>Tue, 28 Aug 2012 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</guid>
-      <description>&lt;p&gt;Introduction to the State Monad in Scalaz 7. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scalaz-state-monad&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;div class=&#34;video-container&#34;&gt;
-  &lt;iframe width=&#34;560&#34; height=&#34;315&#34; src=&#34;http://www.youtube.com/embed/Jg3Uv_YWJqI&#34; frameborder=&#34;0&#34; allowfullscreen&gt;&lt;/iframe&gt;
-&lt;/div&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Introduction to the State Monad in Scalaz 7. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scalaz-state-monad&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -140,10 +103,7 @@
       <pubDate>Thu, 24 May 2012 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</guid>
-      <description>&lt;p&gt;Introduction to Scalaz 7. Slides available on &lt;a href=&#34;http://www.slideshare.net/mpilquist/scalaz-13068563&#34;&gt;Slideshare&lt;/a&gt; and &lt;a href=&#34;https://speakerdeck.com/mpilquist/intro-to-scalaz&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;
-&lt;script async class=&#34;speakerdeck-embed&#34; data-id=&#34;2056222046ee0130dacf12313d03008e&#34; data-ratio=&#34;1.33333333333333&#34; src=&#34;//speakerdeck.com/assets/embed.js&#34;&gt;&lt;/script&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Introduction to Scalaz 7. Slides available on &lt;a href=&#34;http://www.slideshare.net/mpilquist/scalaz-13068563&#34;&gt;Slideshare&lt;/a&gt; and &lt;a href=&#34;https://speakerdeck.com/mpilquist/intro-to-scalaz&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
   </channel>

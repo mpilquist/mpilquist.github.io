@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Sat, 22 Jul 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 04 Jul 2018 15:24:47 -0400</lastBuildDate>
     
 	<atom:link href="https://mpilquist.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Inference Driven Design</title>
+      <link>https://mpilquist.github.io/blog/2018/07/04/fs2/</link>
+      <pubDate>Wed, 04 Jul 2018 15:24:47 -0400</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2018/07/04/fs2/</guid>
+      <description>&lt;p&gt;Design is an exercise in balancing tradeoffs of various constraints. In this post, we&amp;rsquo;ll look at a library design issue faced in &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt; and how constraints like Scala&amp;rsquo;s type inference algorithm, minimization of explicit type annotations, and invariance under refactoring can be balanced.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Building a Planck Keyboard</title>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on mpilquist</title>
@@ -6,32 +6,28 @@
     <description>Recent content in Tags on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Wed, 04 Jul 2018 15:24:47 -0400</lastBuildDate>
-    
-	<atom:link href="https://mpilquist.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
+    <lastBuildDate>Sat, 09 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Fp</title>
+      <title>fp</title>
       <link>https://mpilquist.github.io/tags/fp/</link>
-      <pubDate>Wed, 04 Jul 2018 15:24:47 -0400</pubDate>
+      <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/tags/fp/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Scala</title>
+      <title>scala</title>
       <link>https://mpilquist.github.io/tags/scala/</link>
-      <pubDate>Wed, 04 Jul 2018 15:24:47 -0400</pubDate>
+      <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/tags/scala/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Scodec</title>
+      <title>scodec</title>
       <link>https://mpilquist.github.io/tags/scodec/</link>
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
       

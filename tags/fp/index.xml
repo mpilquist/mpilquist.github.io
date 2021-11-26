@@ -1,16 +1,58 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Fp on mpilquist</title>
+    <title>fp on mpilquist</title>
     <link>https://mpilquist.github.io/tags/fp/</link>
-    <description>Recent content in Fp on mpilquist</description>
+    <description>Recent content in fp on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Wed, 04 Jul 2018 15:24:47 -0400</lastBuildDate>
+    <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
+    <lastBuildDate>Sat, 09 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/tags/fp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Intro to Scala 3 via 8 Queens</title>
+      <link>https://mpilquist.github.io/blog/2021/01/09/intro-to-scala-3-via-8-queens/</link>
+      <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2021/01/09/intro-to-scala-3-via-8-queens/</guid>
+      <description>Published on GitHub here: https://github.com/mpilquist/8queens#readme</description>
+    </item>
     
-	<atom:link href="https://mpilquist.github.io/tags/fp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Small Data Science with Typelevel Libraries</title>
+      <link>https://mpilquist.github.io/blog/2021/01/03/small-data-science-with-typelevel-libraries/</link>
+      <pubDate>Sun, 03 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2021/01/03/small-data-science-with-typelevel-libraries/</guid>
+      <description>Published on GitHub here: https://github.com/mpilquist/strava-summary#readme</description>
+    </item>
     
+    <item>
+      <title>The Future of Typelevel Concurrency</title>
+      <link>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</link>
+      <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</guid>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Scodec for Scala 3</title>
+      <link>https://mpilquist.github.io/blog/2020/04/18/scodec/</link>
+      <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2020/04/18/scodec/</guid>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Inference Driven Design</title>
@@ -18,9 +60,7 @@
       <pubDate>Wed, 04 Jul 2018 15:24:47 -0400</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2018/07/04/fs2/</guid>
-      <description>&lt;p&gt;Design is an exercise in balancing tradeoffs of various constraints. In this post, we&amp;rsquo;ll look at a library design issue faced in &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt; and how constraints like Scala&amp;rsquo;s type inference algorithm, minimization of explicit type annotations, and invariance under refactoring can be balanced.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Design is an exercise in balancing tradeoffs of various constraints. In this post, we&amp;rsquo;ll look at a library design issue faced in &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt; and how constraints like Scala&amp;rsquo;s type inference algorithm, minimization of explicit type annotations, and invariance under refactoring can be balanced.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -29,9 +69,7 @@
       <pubDate>Sat, 11 Mar 2017 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</guid>
-      <description>&lt;p&gt;Last fall I spent a lot of time optimizing the internals of &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt;. The &lt;code&gt;Free&lt;/code&gt; monad is used extensively in FS2 for modeling various algebras &amp;ndash; most notably, an algebra supporting &lt;code&gt;Stream&lt;/code&gt; and an algebra supporting &lt;code&gt;Pull&lt;/code&gt;. Almost any operation a user performs on a &lt;code&gt;Stream&lt;/code&gt; or &lt;code&gt;Pull&lt;/code&gt; results in one or more bounces on the trampoline inside &lt;code&gt;Free&lt;/code&gt;. As such, any optimization in &lt;code&gt;Free&lt;/code&gt; pays off big time. In this article, we&amp;rsquo;ll look at one of these optimizations &amp;ndash; &lt;em&gt;map fusion&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;Last fall I spent a lot of time optimizing the internals of &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt;. The &lt;code&gt;Free&lt;/code&gt; monad is used extensively in FS2 for modeling various algebras &amp;ndash; most notably, an algebra supporting &lt;code&gt;Stream&lt;/code&gt; and an algebra supporting &lt;code&gt;Pull&lt;/code&gt;. Almost any operation a user performs on a &lt;code&gt;Stream&lt;/code&gt; or &lt;code&gt;Pull&lt;/code&gt; results in one or more bounces on the trampoline inside &lt;code&gt;Free&lt;/code&gt;. As such, any optimization in &lt;code&gt;Free&lt;/code&gt; pays off big time. In this article, we&amp;rsquo;ll look at one of these optimizations &amp;ndash; &lt;em&gt;map fusion&lt;/em&gt;.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -96,9 +134,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       
       <guid>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</guid>
       <description>&lt;p&gt;Informal talk series that presents the major functional programming type classes in Scala.&lt;/p&gt;
-
-&lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/&#34;&gt;http://www.manning.com/bjarnason/&lt;/a&gt;).&lt;/p&gt;
-
+&lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/)&#34;&gt;http://www.manning.com/bjarnason/)&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
     </item>
     

@@ -30,7 +30,7 @@
   <script src="https://mpilquist.github.io/highlight/highlight.pack.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
-  <meta name="generator" content="Hugo 0.30" />
+  <meta name="generator" content="Hugo 0.89.4" />
   
 </head>
 <body>
@@ -126,231 +126,187 @@
 
             <div class="post-content">
                 <p>Last fall I spent a lot of time optimizing the internals of <a href="https://github.com/functional-streams-for-scala/fs2">FS2</a>. The <code>Free</code> monad is used extensively in FS2 for modeling various algebras &ndash; most notably, an algebra supporting <code>Stream</code> and an algebra supporting <code>Pull</code>. Almost any operation a user performs on a <code>Stream</code> or <code>Pull</code> results in one or more bounces on the trampoline inside <code>Free</code>. As such, any optimization in <code>Free</code> pays off big time. In this article, we&rsquo;ll look at one of these optimizations &ndash; <em>map fusion</em>.</p>
-
-<p></p>
-
 <p>Operator fusion is the act of condensing successive invocations of an operation in to a single invocation. Hence, map fusion is the act of condensing successive <code>map</code> invocations in to a single <code>map</code>. In the context of <code>Free</code>, map fusion means that for all <code>fa: Free[F, A]</code>, <code>f: A =&gt; B</code>, <code>g: B =&gt; C</code>, <code>fa.map(f).map(g)</code> should result in the <em>same internal structure</em> as <code>fa.map(f andThen g)</code>. This should result in a significant performance improvement for free programs with lots of successive map operations, especially if <code>map</code> is implemented in terms of <code>flatMap</code> and <code>pure</code>, as we can condense multiple bounces on the trampoline in to a single bounce.</p>
-
 <h2 id="coyoneda">Coyoneda</h2>
-
 <p>There&rsquo;s already a data structure that provides map fusion for an arbitrary type constructor &ndash; <code>Coyoneda</code>. Here&rsquo;s a simplified implementation of <code>Coyoneda</code> based off the one defined in <a href="https://github.com/typelevel/cats">Cats</a>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">sealed</span> <span style="color:#66d9ef">abstract</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">_</span><span style="color:#f92672">]</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">]</span> <span style="color:#f92672">{</span> self <span style="color:#66d9ef">=&gt;</span>
+  <span style="color:#66d9ef">type</span> <span style="color:#66d9ef">Pivot</span>
+  <span style="color:#66d9ef">val</span> pivot<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Pivot</span><span style="color:#f92672">]</span>
+  <span style="color:#66d9ef">val</span> transform<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Pivot</span> <span style="color:#f92672">=&gt;</span> A
 
-<pre><code class="language-scala">sealed abstract class Coyoneda[F[_], A] { self =&gt;
-  type Pivot
-  val pivot: F[Pivot]
-  val transform: Pivot =&gt; A
+  <span style="color:#66d9ef">def</span> map<span style="color:#f92672">[</span><span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> B<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">type</span> <span style="color:#66d9ef">Pivot</span> <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span><span style="color:#a6e22e">Pivot</span>
+    <span style="color:#66d9ef">val</span> pivot <span style="color:#66d9ef">=</span> self<span style="color:#f92672">.</span>pivot
+    <span style="color:#66d9ef">val</span> transform <span style="color:#66d9ef">=</span> f compose self<span style="color:#f92672">.</span>transform
+  <span style="color:#f92672">}</span>
 
-  def map[B](f: A =&gt; B): Coyoneda[F, B] = new Coyoneda[F, B] {
-    type Pivot = self.Pivot
-    val pivot = self.pivot
-    val transform = f compose self.transform
-  }
+  <span style="color:#66d9ef">def</span> run<span style="color:#f92672">(</span><span style="color:#66d9ef">implicit</span> F<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Functor</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span><span style="color:#f92672">])</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    F<span style="color:#f92672">.</span>map<span style="color:#f92672">(</span>pivot<span style="color:#f92672">)(</span>transform<span style="color:#f92672">)</span>
+<span style="color:#f92672">}</span>
 
-  def run(implicit F: Functor[F]): F[A] =
-    F.map(pivot)(transform)
-}
+<span style="color:#66d9ef">object</span> <span style="color:#a6e22e">Coyoneda</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">[</span><span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">_</span><span style="color:#f92672">]</span>, <span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>fa<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span><span style="color:#f92672">],</span> f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> B<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#f92672">{</span> <span style="color:#66d9ef">type</span> <span style="color:#66d9ef">Pivot</span> <span style="color:#f92672">=</span> A <span style="color:#f92672">}</span> <span style="color:#66d9ef">=</span>
+    <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#f92672">{</span>
+      <span style="color:#66d9ef">type</span> <span style="color:#66d9ef">Pivot</span> <span style="color:#f92672">=</span> A
+      <span style="color:#66d9ef">val</span> pivot<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Pivot</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> fa
+      <span style="color:#66d9ef">val</span> transform<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Pivot</span> <span style="color:#f92672">=&gt;</span> B <span style="color:#66d9ef">=</span> f
+    <span style="color:#f92672">}</span>
 
-object Coyoneda {
-  def apply[F[_], A, B](fa: F[A], f: A =&gt; B): Coyoneda[F, B] { type Pivot = A } =
-    new Coyoneda[F, B] {
-      type Pivot = A
-      val pivot: F[Pivot] = fa
-      val transform: Pivot =&gt; B = f
-    }
-
-  def lift[F[_], A](fa: F[A]): Coyondea[F, A] =
-    apply[F, A, A](fa, identity)
-}
-</code></pre>
-
-<p><code>Coyoneda[F, A]</code> stores a value of <code>F[X]</code> for some <code>X</code> along with a function from <code>X =&gt; A</code>. It forms a <code>Functor[Coyoneda[F, ?]]</code> where mapping results in extending the transformation function by the function passed to <code>map</code>.</p>
-
+  <span style="color:#66d9ef">def</span> lift<span style="color:#f92672">[</span><span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">_</span><span style="color:#f92672">]</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">](</span>fa<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">F</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span><span style="color:#f92672">])</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Coyondea</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    apply<span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">](</span>fa<span style="color:#f92672">,</span> identity<span style="color:#f92672">)</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p><code>Coyoneda[F, A]</code> stores a value of <code>F[X]</code> for some <code>X</code> along with a function from <code>X =&gt; A</code>. It forms a <code>Functor[Coyoneda[F, ?]]</code> where mapping results in extending the transformation function by the function passed to <code>map</code>.</p>
 <p>In some sense, <strong><code>Coyoneda</code> encodes map fusion directly</strong> &ndash; it hides away an <code>F[X]</code> for some <code>X</code> and then incrementally builds a transformation function by composing the functions passed to <code>map</code>. When composition is complete, the <code>Coyoneda</code> is &ldquo;unwrapped&rdquo; by mapping the composed transformation over the pivot (<code>F[X]</code>) via a single invocation of <code>map</code>. We won&rsquo;t go in to detail on the theoretical underpinnings of <code>Coyoneda</code>, but if you&rsquo;re interested, a great starting point is <a href="http://blog.higher-order.com/blog/2013/11/01/free-and-yoneda/">Free Monads and the Yoneda Lemma</a> by Rúnar Bjarnason.</p>
-
 <p>This is pretty powerful &ndash; we can get map fusion for any <code>Functor</code> by lifting a value to <code>Coyoneda</code>, passing the coyoneda to functions that operate on a <code>Functor</code>, and then unwrapping via <code>run</code>!</p>
-
 <h2 id="embedding-coyoneda-in-free">Embedding Coyoneda in Free</h2>
-
 <p>We want to go a bit further with <code>Free</code> and embed map fusion inside the <code>map</code> method. To do this, we can embed a <code>Coyoneda</code> inside <code>Free</code>. This is a very mechanical embedding &ndash; the general idea is to add another constructor to <code>Free</code> representing <code>Map</code> (in addition to the standard constructors like <code>Pure</code>, <code>Suspend</code>, and <code>Bind</code>). The <code>Map</code> constructor wraps a <code>Coyoneda</code>. We can then implement the <code>map</code> operation on <code>Free</code> such that it either extends the coyoneda transformation (if <code>map</code> was called on a <code>Map</code> instance) or constructs a new coyoneda (if <code>map</code> was called on any other constructor). So something like this:</p>
-
-<pre><code class="language-scala">trait Free[F, A] {
-  def map[B](f: A =&gt; B): Free[F, B] = this match {
-    case Map(coyoneda) =&gt; Map(coyoneda.map(f))
-    case other =&gt; Map(Coyondea[Free[F, ?], A, B](other, f))
-  }
-}
-object Free {
-  case class Map(coyoneda: Coyoneda[F, A]) extends Free[F, A]
-}
-</code></pre>
-
-<p>What do we lose by doing this? With our current definition of <code>Coyoneda</code>, we lose stack safety. We normally get stack safety from the monad in which we interpret the <code>Free</code>, with <code>Free</code> re-associating left-nested <code>flatMap</code>s. If <code>map</code> is implemented in terms of <code>flatMap</code> and <code>pure</code>, this works fine. But in the <code>Coyoneda</code> backed version, we&rsquo;ve lost stack safety due to the dependence on Scala&rsquo;s function composition in <code>Coyoneda#map</code>.</p>
-
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">trait</span> <span style="color:#a6e22e">Free</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">]</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">def</span> map<span style="color:#f92672">[</span><span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> B<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Free</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> <span style="color:#66d9ef">this</span> <span style="color:#66d9ef">match</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">case</span> <span style="color:#a6e22e">Map</span><span style="color:#f92672">(</span>coyoneda<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#a6e22e">Map</span><span style="color:#f92672">(</span>coyoneda<span style="color:#f92672">.</span>map<span style="color:#f92672">(</span>f<span style="color:#f92672">))</span>
+    <span style="color:#66d9ef">case</span> other <span style="color:#66d9ef">=&gt;</span> <span style="color:#a6e22e">Map</span><span style="color:#f92672">(</span><span style="color:#a6e22e">Coyondea</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Free</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">?</span><span style="color:#f92672">]</span>, <span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>other<span style="color:#f92672">,</span> f<span style="color:#f92672">))</span>
+  <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+<span style="color:#66d9ef">object</span> <span style="color:#a6e22e">Free</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">case</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Map</span><span style="color:#f92672">(</span>coyoneda<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">])</span> <span style="color:#66d9ef">extends</span> <span style="color:#a6e22e">Free</span><span style="color:#f92672">[</span><span style="color:#66d9ef">F</span>, <span style="color:#66d9ef">A</span><span style="color:#f92672">]</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>What do we lose by doing this? With our current definition of <code>Coyoneda</code>, we lose stack safety. We normally get stack safety from the monad in which we interpret the <code>Free</code>, with <code>Free</code> re-associating left-nested <code>flatMap</code>s. If <code>map</code> is implemented in terms of <code>flatMap</code> and <code>pure</code>, this works fine. But in the <code>Coyoneda</code> backed version, we&rsquo;ve lost stack safety due to the dependence on Scala&rsquo;s function composition in <code>Coyoneda#map</code>.</p>
 <p>Consider:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">val</span> z<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Coyoneda</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Function0</span>, <span style="color:#66d9ef">Int</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">Coyoneda</span><span style="color:#f92672">(()</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">,</span> identity<span style="color:#f92672">[</span><span style="color:#66d9ef">Int</span><span style="color:#f92672">])</span>
 
-<pre><code class="language-scala">val z: Coyoneda[Function0, Int] = Coyoneda(() =&gt; 0, identity[Int])
-
-(0 to 10).foldLeft(z)((acc, i) =&gt; acc.map(_ + i)).run.apply
-// 55
-
-(0 to 10000).foldLeft(z)((acc, i) =&gt; acc.map(_ + i)).run.apply
-// 50005000
-
-(0 to 100000).foldLeft(z)((acc, i) =&gt; acc.map(_ + i)).run.apply
-// java.lang.StackOverflowError
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-</code></pre>
-
-<p>This is caused by the implementation of <code>compose</code> in <code>scala.Function1</code>:</p>
-
-<pre><code class="language-scala">trait Function1[-T1, +R] {
-  def apply(v1: T1): R
-  def compose[A](g: A =&gt; T1): A =&gt; R = { x =&gt; apply(g(x)) }
-  def andThen[A](g: R =&gt; A): T1 =&gt; A = { x =&gt; g(apply(x)) }
-}
-</code></pre>
-
-<p>Each call to <code>compose</code> (or <code>andThen</code>) returns a new function that calls <code>apply</code> on the previous function, resulting in a stack frame for each composition.</p>
-
+<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> to <span style="color:#ae81ff">10</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>z<span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc<span style="color:#f92672">.</span>map<span style="color:#f92672">(</span><span style="color:#66d9ef">_</span> <span style="color:#f92672">+</span> i<span style="color:#f92672">)).</span>run<span style="color:#f92672">.</span>apply
+<span style="color:#75715e">// 55
+</span><span style="color:#75715e"></span>
+<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> to <span style="color:#ae81ff">10000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>z<span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc<span style="color:#f92672">.</span>map<span style="color:#f92672">(</span><span style="color:#66d9ef">_</span> <span style="color:#f92672">+</span> i<span style="color:#f92672">)).</span>run<span style="color:#f92672">.</span>apply
+<span style="color:#75715e">// 50005000
+</span><span style="color:#75715e"></span>
+<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> to <span style="color:#ae81ff">100000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>z<span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc<span style="color:#f92672">.</span>map<span style="color:#f92672">(</span><span style="color:#66d9ef">_</span> <span style="color:#f92672">+</span> i<span style="color:#f92672">)).</span>run<span style="color:#f92672">.</span>apply
+<span style="color:#75715e">// java.lang.StackOverflowError
+</span><span style="color:#75715e">//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+</span><span style="color:#75715e">//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+</span><span style="color:#75715e">//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+</span></code></pre></div><p>This is caused by the implementation of <code>compose</code> in <code>scala.Function1</code>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">trait</span> <span style="color:#a6e22e">Function1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">-T1</span>, <span style="color:#66d9ef">+R</span><span style="color:#f92672">]</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">(</span>v1<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">T1</span><span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">R</span>
+  <span style="color:#66d9ef">def</span> compose<span style="color:#f92672">[</span><span style="color:#66d9ef">A</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> T1<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> R <span style="color:#66d9ef">=</span> <span style="color:#f92672">{</span> x <span style="color:#66d9ef">=&gt;</span> apply<span style="color:#f92672">(</span>g<span style="color:#f92672">(</span>x<span style="color:#f92672">))</span> <span style="color:#f92672">}</span>
+  <span style="color:#66d9ef">def</span> andThen<span style="color:#f92672">[</span><span style="color:#66d9ef">A</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">R</span> <span style="color:#f92672">=&gt;</span> A<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">T1</span> <span style="color:#f92672">=&gt;</span> A <span style="color:#66d9ef">=</span> <span style="color:#f92672">{</span> x <span style="color:#66d9ef">=&gt;</span> g<span style="color:#f92672">(</span>apply<span style="color:#f92672">(</span>x<span style="color:#f92672">))</span> <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>Each call to <code>compose</code> (or <code>andThen</code>) returns a new function that calls <code>apply</code> on the previous function, resulting in a stack frame for each composition.</p>
 <h2 id="stack-safe-function-composition">Stack Safe Function Composition</h2>
-
 <p>Our map fusion optimization hinges on function composition. How can we compose functions in a stack safe way? We can use a <em>type aligned sequence</em> &ndash; a sequence of functions such that the output type of each function in the sequence is compatible with the input type of the next function in the sequence. We do not need fancy typelevel functions or dependent types to implement this! Rather, we can use a simple cons list.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ListF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">-A</span>, <span style="color:#66d9ef">+B</span><span style="color:#f92672">]</span> <span style="color:#a6e22e">private</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> fs<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">List</span><span style="color:#f92672">[(</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">)])</span> <span style="color:#66d9ef">extends</span> <span style="color:#f92672">(</span>A <span style="color:#66d9ef">=&gt;</span> B<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
 
-<pre><code class="language-scala">final class ListF1[-A, +B] private (private val fs: List[(Any =&gt; Any)]) extends (A =&gt; B) {
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">(</span>a<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span><span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">B</span> <span style="color:#f92672">=</span>
+    fs<span style="color:#f92672">.</span>foldLeft<span style="color:#f92672">(</span>a<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">)((</span>x<span style="color:#f92672">,</span> f<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> f<span style="color:#f92672">(</span>x<span style="color:#f92672">)).</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">B</span><span style="color:#f92672">]</span>
 
-  override def apply(a: A): B =
-    fs.foldLeft(a: Any)((x, f) =&gt; f(x)).asInstanceOf[B]
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> compose<span style="color:#f92672">[</span><span style="color:#66d9ef">C</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">C</span> <span style="color:#f92672">=&gt;</span> A<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">ListF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">C</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>g<span style="color:#f92672">.</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">:</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">fs</span><span style="color:#f92672">)</span>
+<span style="color:#f92672">}</span>
 
-  override def compose[C](g: C =&gt; A): ListF1[C, B] =
-    new ListF1(g.asInstanceOf[Any =&gt; Any] :: fs)
-}
-
-object ListF1 {
-  def apply[A, B](f: A =&gt; B): ListF1[A, B] = f match {
-    case f: ListF1[A, B] =&gt; f
-    case _ =&gt; new ListF1(f.asInstanceOf[Any =&gt; Any] :: Nil)
-  }
-}
-</code></pre>
-
-<p>We represent the type level sequence with a <code>List[(Any =&gt; Any)]</code> and we enforce the &ldquo;type alignment&rdquo; property via the type signature of <code>compose</code>. The list always has at least one element thanks to <code>apply</code>. Each call to <code>compose</code> results in cons-ing a function on to the type aligned sequence. Finally, we implement <code>ListF1#apply</code> by applying each function in turn, using the output of the previous function as the input to the next.</p>
-
-<pre><code class="language-scala">// Normal function composition is not stack safe
-(0 until 1000000).foldLeft(identity[Int] _)((acc, i) =&gt; acc.compose(_ + 1))(0)
-// java.lang.StackOverflowError
-//   at scala.runtime.java8.JFunction1$mcII$sp.apply(JFunction1$mcII$sp.java:12)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
-
-// ListF1 composition is stack safe
-(0 until 1000000).foldLeft(ListF1(identity[Int]))((acc, i) =&gt; acc.compose(_ + 1))(0)
-// 1000000
-</code></pre>
-
-<p>This definition is sufficient to restore stack safety to <code>Coyoneda</code> and <code>Free</code>! We just need to wrap each <code>Function1</code> in a <code>ListF1</code> inside the definition of <code>Coyoneda#map</code>.</p>
-
+<span style="color:#66d9ef">object</span> <span style="color:#a6e22e">ListF1</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> B<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">ListF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> f <span style="color:#66d9ef">match</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">case</span> f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">ListF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=&gt;</span> f
+    <span style="color:#66d9ef">case</span> <span style="color:#66d9ef">_</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">.</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">:</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Nil</span><span style="color:#f92672">)</span>
+  <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>We represent the type level sequence with a <code>List[(Any =&gt; Any)]</code> and we enforce the &ldquo;type alignment&rdquo; property via the type signature of <code>compose</code>. The list always has at least one element thanks to <code>apply</code>. Each call to <code>compose</code> results in cons-ing a function on to the type aligned sequence. Finally, we implement <code>ListF1#apply</code> by applying each function in turn, using the output of the previous function as the input to the next.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#75715e">// Normal function composition is not stack safe
+</span><span style="color:#75715e"></span><span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>identity<span style="color:#f92672">[</span><span style="color:#66d9ef">Int</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc<span style="color:#f92672">.</span>compose<span style="color:#f92672">(</span><span style="color:#66d9ef">_</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">))(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+<span style="color:#75715e">// java.lang.StackOverflowError
+</span><span style="color:#75715e">//   at scala.runtime.java8.JFunction1$mcII$sp.apply(JFunction1$mcII$sp.java:12)
+</span><span style="color:#75715e">//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+</span><span style="color:#75715e">//   at scala.Function1.$anonfun$compose$1(Function1.scala:44)
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">// ListF1 composition is stack safe
+</span><span style="color:#75715e"></span><span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>identity<span style="color:#f92672">[</span><span style="color:#66d9ef">Int</span><span style="color:#f92672">]))((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc<span style="color:#f92672">.</span>compose<span style="color:#f92672">(</span><span style="color:#66d9ef">_</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">))(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+<span style="color:#75715e">// 1000000
+</span></code></pre></div><p>This definition is sufficient to restore stack safety to <code>Coyoneda</code> and <code>Free</code>! We just need to wrap each <code>Function1</code> in a <code>ListF1</code> inside the definition of <code>Coyoneda#map</code>.</p>
 <h2 id="generalized-stack-safe-function-composition">Generalized Stack Safe Function Composition</h2>
-
 <p>While <code>ListF1</code> provides a stack safe <code>compose</code>, it inherits the default <code>andThen</code> from <code>Function1</code>. This is very dangerous if we hope to provide a general purpose stack safe function wrapper. Extending <code>ListF1</code> to support both stack safe <code>compose</code> and <code>andThen</code> (and arbitrary interleavings) requires us to store the type aligned sequence in a data structure that has constant time cons and snoc operations. The only standard library collection that supports this is <code>Vector</code> (correction: <a href="https://twitter.com/nickstanch/status/840886207064203264">@nickstanch pointed out that <code>scala.collection.immutable.Queue</code> has O(1) cons and snoc and O(n) traversal</a> &ndash; benchmarks below have been updated to include a <code>Queue</code> based implementation).</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">-A</span>, <span style="color:#66d9ef">+B</span><span style="color:#f92672">]</span> <span style="color:#a6e22e">private</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> fs<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Vector</span><span style="color:#f92672">[(</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">)])</span> <span style="color:#66d9ef">extends</span> <span style="color:#f92672">(</span>A <span style="color:#66d9ef">=&gt;</span> B<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
 
-<pre><code class="language-scala">final class VectorF1[-A, +B] private (private val fs: Vector[(Any =&gt; Any)]) extends (A =&gt; B) {
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">(</span>a<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span><span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">B</span> <span style="color:#f92672">=</span>
+    fs<span style="color:#f92672">.</span>foldLeft<span style="color:#f92672">(</span>a<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">)((</span>x<span style="color:#f92672">,</span> f<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> f<span style="color:#f92672">(</span>x<span style="color:#f92672">)).</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">B</span><span style="color:#f92672">]</span>
 
-  override def apply(a: A): B =
-    fs.foldLeft(a: Any)((x, f) =&gt; f(x)).asInstanceOf[B]
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> compose<span style="color:#f92672">[</span><span style="color:#66d9ef">C</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">C</span> <span style="color:#f92672">=&gt;</span> A<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">VectorF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">C</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>g<span style="color:#f92672">.</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">]</span> <span style="color:#f92672">+:</span> fs<span style="color:#f92672">)</span>
 
-  override def compose[C](g: C =&gt; A): VectorF1[C, B] =
-    new VectorF1(g.asInstanceOf[Any =&gt; Any] +: fs)
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> andThen<span style="color:#f92672">[</span><span style="color:#66d9ef">C</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">B</span> <span style="color:#f92672">=&gt;</span> C<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">VectorF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">C</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>fs <span style="color:#66d9ef">:</span><span style="color:#66d9ef">+</span> <span style="color:#66d9ef">g.asInstanceOf</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">])</span>
+<span style="color:#f92672">}</span>
 
-  override def andThen[C](g: B =&gt; C): VectorF1[A, C] =
-    new VectorF1(fs :+ g.asInstanceOf[Any =&gt; Any])
-}
-
-object VectorF1 {
-  def apply[A, B](f: A =&gt; B): VectorF1[A, B] = f match {
-    case f: VectorF1[A, B] =&gt; f
-    case _ =&gt; new VectorF1(Vector(f.asInstanceOf[Any =&gt; Any]))
-  }
-}
-</code></pre>
-
-<p><code>VectorF1</code> seems perfect. It has stack safe <code>compose</code> and <code>andThen</code>. Unfortunately, it is terribly slow. Most composed functions are going to be made up of a small number of compositions &ndash; 2, 3, or 4 functions. It&rsquo;s uncommon to compose 1,000,000 functions. <code>Vector</code> has effectively constant time cons and snoc, but there are large constant factors. For example, a single element vector will allocate a 32-element array internally. These constant factors end up dominating the performance results, so this solution won&rsquo;t work.</p>
-
+<span style="color:#66d9ef">object</span> <span style="color:#a6e22e">VectorF1</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> B<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">VectorF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> f <span style="color:#66d9ef">match</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">case</span> f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">VectorF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=&gt;</span> f
+    <span style="color:#66d9ef">case</span> <span style="color:#66d9ef">_</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span><span style="color:#a6e22e">Vector</span><span style="color:#f92672">(</span>f<span style="color:#f92672">.</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">]))</span>
+  <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p><code>VectorF1</code> seems perfect. It has stack safe <code>compose</code> and <code>andThen</code>. Unfortunately, it is terribly slow. Most composed functions are going to be made up of a small number of compositions &ndash; 2, 3, or 4 functions. It&rsquo;s uncommon to compose 1,000,000 functions. <code>Vector</code> has effectively constant time cons and snoc, but there are large constant factors. For example, a single element vector will allocate a 32-element array internally. These constant factors end up dominating the performance results, so this solution won&rsquo;t work.</p>
 <p>Fortunately, FS2 has a data structure that performs better &ndash; <a href="https://oss.sonatype.org/service/local/repositories/releases/archive/co/fs2/fs2-core_2.12/0.9.4/fs2-core_2.12-0.9.4-javadoc.jar/!/fs2/util/Catenable.html"><code>fs2.util.Catenable</code></a>. It has O(1) cons, snoc, and concat, amortized O(1) uncons, O(n) traversal, and negligible constant factors for small collections.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#66d9ef">import</span> fs2.util.Catenable
 
-<pre><code class="language-scala">import fs2.util.Catenable
+<span style="color:#66d9ef">final</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">-A</span>, <span style="color:#66d9ef">+B</span><span style="color:#f92672">]</span> <span style="color:#a6e22e">private</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">private</span> <span style="color:#66d9ef">val</span> fs<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Catenable</span><span style="color:#f92672">[(</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">)])</span> <span style="color:#66d9ef">extends</span> <span style="color:#f92672">(</span>A <span style="color:#66d9ef">=&gt;</span> B<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
 
-final class CatenableF1[-A, +B] private (private val fs: Catenable[(Any =&gt; Any)]) extends (A =&gt; B) {
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">(</span>a<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span><span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">B</span> <span style="color:#f92672">=</span>
+    fs<span style="color:#f92672">.</span>foldLeft<span style="color:#f92672">(</span>a<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">)((</span>x<span style="color:#f92672">,</span> f<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> f<span style="color:#f92672">(</span>x<span style="color:#f92672">)).</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">B</span><span style="color:#f92672">]</span>
 
-  override def apply(a: A): B =
-    fs.foldLeft(a: Any)((x, f) =&gt; f(x)).asInstanceOf[B]
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> compose<span style="color:#f92672">[</span><span style="color:#66d9ef">C</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">C</span> <span style="color:#f92672">=&gt;</span> A<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">CatenableF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">C</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>g<span style="color:#f92672">.</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">]</span> <span style="color:#f92672">+:</span> fs<span style="color:#f92672">)</span>
 
-  override def compose[C](g: C =&gt; A): CatenableF1[C, B] =
-    new CatenableF1(g.asInstanceOf[Any =&gt; Any] +: fs)
+  <span style="color:#66d9ef">override</span> <span style="color:#66d9ef">def</span> andThen<span style="color:#f92672">[</span><span style="color:#66d9ef">C</span><span style="color:#f92672">](</span>g<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">B</span> <span style="color:#f92672">=&gt;</span> C<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">CatenableF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">C</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span>
+    <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>fs <span style="color:#66d9ef">:</span><span style="color:#66d9ef">+</span> <span style="color:#66d9ef">g.asInstanceOf</span><span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">])</span>
+<span style="color:#f92672">}</span>
 
-  override def andThen[C](g: B =&gt; C): CatenableF1[A, C] =
-    new CatenableF1(fs :+ g.asInstanceOf[Any =&gt; Any])
-}
-
-object CatenableF1 {
-  def apply[A, B](f: A =&gt; B): CatenableF1[A, B] = f match {
-    case f: CatenableF1[A, B] =&gt; f
-    case _ =&gt; new CatenableF1(Catenable.single(f.asInstanceOf[Any =&gt; Any]))
-  }
-}
-</code></pre>
-
-<h3 id="stack-safe-function-benchmarks">Stack Safe Function Benchmarks</h3>
-
+<span style="color:#66d9ef">object</span> <span style="color:#a6e22e">CatenableF1</span> <span style="color:#f92672">{</span>
+  <span style="color:#66d9ef">def</span> apply<span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">](</span>f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">A</span> <span style="color:#f92672">=&gt;</span> B<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">CatenableF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=</span> f <span style="color:#66d9ef">match</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">case</span> f<span style="color:#66d9ef">:</span> <span style="color:#66d9ef">CatenableF1</span><span style="color:#f92672">[</span><span style="color:#66d9ef">A</span>, <span style="color:#66d9ef">B</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">=&gt;</span> f
+    <span style="color:#66d9ef">case</span> <span style="color:#66d9ef">_</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">new</span> <span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span><span style="color:#a6e22e">Catenable</span><span style="color:#f92672">.</span>single<span style="color:#f92672">(</span>f<span style="color:#f92672">.</span>asInstanceOf<span style="color:#f92672">[</span><span style="color:#66d9ef">Any</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">Any</span><span style="color:#f92672">]))</span>
+  <span style="color:#f92672">}</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><h3 id="stack-safe-function-benchmarks">Stack Safe Function Benchmarks</h3>
 <p>Let&rsquo;s confirm our performance assumptions with a JMH benchmark:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-scala" data-lang="scala"><span style="color:#a6e22e">@State</span><span style="color:#f92672">(</span><span style="color:#a6e22e">Scope</span><span style="color:#f92672">.</span><span style="color:#a6e22e">Thread</span><span style="color:#f92672">)</span>
+<span style="color:#66d9ef">class</span> <span style="color:#a6e22e">FunctionBenchmark</span> <span style="color:#f92672">{</span>
 
-<pre><code class="language-scala">@State(Scope.Thread)
-class FunctionBenchmark {
+  <span style="color:#66d9ef">val</span> f <span style="color:#66d9ef">=</span> identity<span style="color:#f92672">[</span><span style="color:#66d9ef">Int</span><span style="color:#f92672">]</span> <span style="color:#66d9ef">_</span>
 
-  val f = identity[Int] _
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> unitary_Function1 <span style="color:#66d9ef">=</span> f<span style="color:#f92672">(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> unitary_ListF1 <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> unitary_VectorF1 <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> unitary_CatenableF1 <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> unitary_QueueF1 <span style="color:#66d9ef">=</span> <span style="color:#a6e22e">QueueF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
 
-  @Benchmark def unitary_Function1 = f(0)
-  @Benchmark def unitary_ListF1 = ListF1(f)(0)
-  @Benchmark def unitary_VectorF1 = VectorF1(f)(0)
-  @Benchmark def unitary_CatenableF1 = CatenableF1(f)(0)
-  @Benchmark def unitary_QueueF1 = QueueF1(f)(0)
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose2_Function1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span>f compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose2_ListF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose2_VectorF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose2_CatenableF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose2_QueueF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">QueueF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
 
-  @Benchmark def compose2_Function1 = (f compose f)(0)
-  @Benchmark def compose2_ListF1 = (ListF1(f) compose f)(0)
-  @Benchmark def compose2_VectorF1 = (VectorF1(f) compose f)(0)
-  @Benchmark def compose2_CatenableF1 = (CatenableF1(f) compose f)(0)
-  @Benchmark def compose2_QueueF1 = (QueueF1(f) compose f)(0)
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen2_Function1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span>f andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen2_ListF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen2_VectorF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen2_CatenableF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen2_QueueF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#a6e22e">QueueF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span> andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
 
-  @Benchmark def andThen2_Function1 = (f andThen f)(0)
-  @Benchmark def andThen2_ListF1 = (ListF1(f) andThen f)(0)
-  @Benchmark def andThen2_VectorF1 = (VectorF1(f) andThen f)(0)
-  @Benchmark def andThen2_CatenableF1 = (CatenableF1(f) andThen f)(0)
-  @Benchmark def andThen2_QueueF1 = (QueueF1(f) andThen f)(0)
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose1k_Function1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>f<span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose1k_ListF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose1k_VectorF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose1k_CatenableF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> compose1k_QueueF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">QueueF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc compose f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
 
-  @Benchmark def compose1k_Function1 = (0 until 1000).foldLeft(f)((acc, _) =&gt; acc compose f)(0)
-  @Benchmark def compose1k_ListF1 = (0 until 1000).foldLeft(ListF1(f))((acc, _) =&gt; acc compose f)(0)
-  @Benchmark def compose1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, _) =&gt; acc compose f)(0)
-  @Benchmark def compose1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, _) =&gt; acc compose f)(0)
-  @Benchmark def compose1k_QueueF1 = (0 until 1000).foldLeft(QueueF1(f))((acc, _) =&gt; acc compose f)(0)
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen1k_Function1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>f<span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen1k_ListF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Int</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">Int</span><span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen1k_VectorF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen1k_CatenableF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> andThen1k_QueueF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">QueueF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> <span style="color:#66d9ef">_</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
 
-  @Benchmark def andThen1k_Function1 = (0 until 1000).foldLeft(f)((acc, _) =&gt; acc andThen f)(0)
-  @Benchmark def andThen1k_ListF1 = (0 until 1000).foldLeft(ListF1(f): Int =&gt; Int)((acc, _) =&gt; acc andThen f)(0)
-  @Benchmark def andThen1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, _) =&gt; acc andThen f)(0)
-  @Benchmark def andThen1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, _) =&gt; acc andThen f)(0)
-  @Benchmark def andThen1k_QueueF1 = (0 until 1000).foldLeft(QueueF1(f))((acc, _) =&gt; acc andThen f)(0)
-
-  @Benchmark def interleaved1k_Function1 = (0 until 1000).foldLeft(f)((acc, i) =&gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_ListF1 = (0 until 1000).foldLeft(ListF1(f): Int =&gt; Int)((acc, i) =&gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_VectorF1 = (0 until 1000).foldLeft(VectorF1(f))((acc, i) =&gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_CatenableF1 = (0 until 1000).foldLeft(CatenableF1(f))((acc, i) =&gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-  @Benchmark def interleaved1k_QueueF1 = (0 until 1000).foldLeft(QueueF1(f))((acc, i) =&gt; if (i % 2 == 0) acc compose f else acc andThen f)(0)
-}
-</code></pre>
-
-<p>Running these tests via <code>jmh:run -i 20 -wi 10 -f1 -t2</code> results in:</p>
-
-<pre><code>[info] Benchmark                                     Mode  Cnt          Score          Error  Units
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> interleaved1k_Function1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span>f<span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> acc compose f <span style="color:#66d9ef">else</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> interleaved1k_ListF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">ListF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">)</span><span style="color:#66d9ef">:</span> <span style="color:#66d9ef">Int</span> <span style="color:#f92672">=&gt;</span> <span style="color:#a6e22e">Int</span><span style="color:#f92672">)((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> acc compose f <span style="color:#66d9ef">else</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> interleaved1k_VectorF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">VectorF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> acc compose f <span style="color:#66d9ef">else</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> interleaved1k_CatenableF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">CatenableF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> acc compose f <span style="color:#66d9ef">else</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+  <span style="color:#a6e22e">@Benchmark</span> <span style="color:#66d9ef">def</span> interleaved1k_QueueF1 <span style="color:#66d9ef">=</span> <span style="color:#f92672">(</span><span style="color:#ae81ff">0</span> until <span style="color:#ae81ff">1000</span><span style="color:#f92672">).</span>foldLeft<span style="color:#f92672">(</span><span style="color:#a6e22e">QueueF1</span><span style="color:#f92672">(</span>f<span style="color:#f92672">))((</span>acc<span style="color:#f92672">,</span> i<span style="color:#f92672">)</span> <span style="color:#66d9ef">=&gt;</span> <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">)</span> acc compose f <span style="color:#66d9ef">else</span> acc andThen f<span style="color:#f92672">)(</span><span style="color:#ae81ff">0</span><span style="color:#f92672">)</span>
+<span style="color:#f92672">}</span>
+</code></pre></div><p>Running these tests via <code>jmh:run -i 20 -wi 10 -f1 -t2</code> results in:</p>
+<pre tabindex="0"><code>[info] Benchmark                                     Mode  Cnt          Score          Error  Units
 [info] FunctionBenchmark.andThen1k_CatenableF1      thrpt   20      45571.159 ±     2335.498  ops/s
 [info] FunctionBenchmark.andThen1k_Function1        thrpt   20     126595.146 ±     9753.267  ops/s
 [info] FunctionBenchmark.andThen1k_ListF1           thrpt   20     122326.955 ±    10781.655  ops/s
@@ -381,14 +337,9 @@ class FunctionBenchmark {
 [info] FunctionBenchmark.unitary_ListF1             thrpt   20  172189813.428 ±  3269454.794  ops/s
 [info] FunctionBenchmark.unitary_QueueF1            thrpt   20   22289854.985 ±   500526.148  ops/s
 [info] FunctionBenchmark.unitary_VectorF1           thrpt   20   18913195.601 ±   502848.724  ops/s
-</code></pre>
-
-<p>Based on these tests, <code>CatenableF1</code> is about 3x faster than <code>VectorF1</code> for small compositions and about 1.5x - 2x <code>VectorF1</code> for large collections. <code>CatenableF1</code> is about 3x slower than <code>ListF1</code> and about 14x slower than <code>Function1</code> for small compositions and about equal to <code>ListF1</code> and 3x slower than <code>Function1</code> for large compositions. <code>CatenableF1</code> beats <code>QueueF1</code> which beats <code>VectorF1</code>.</p>
-
+</code></pre><p>Based on these tests, <code>CatenableF1</code> is about 3x faster than <code>VectorF1</code> for small compositions and about 1.5x - 2x <code>VectorF1</code> for large collections. <code>CatenableF1</code> is about 3x slower than <code>ListF1</code> and about 14x slower than <code>Function1</code> for small compositions and about equal to <code>ListF1</code> and 3x slower than <code>Function1</code> for large compositions. <code>CatenableF1</code> beats <code>QueueF1</code> which beats <code>VectorF1</code>.</p>
 <p>Not bad but stack safety comes at a runtime performance cost. One area for investigation is a dynamic algorithm that switches from <code>Function1</code> to <code>CatenableF1</code> when the composition stack reaches a certain depth.</p>
-
 <h2 id="conclusion">Conclusion</h2>
-
 <p>If you check the FS2 source, you might notice that <code>Free</code> does not do map fusion. We ended up not merging map fusion in to FS2 because we were able to get comparable performance gains with a simpler optimization that covers more use cases. We now eagerly evaluate <code>Bind(Pure(a), f)</code> structures when stepping a <code>Free</code>, which gives us the same performance boost as map fusion but covers more use cases and avoids the (minor) constant factor performance hit of <code>CatenableF1</code>.</p>
             </div>
         </div>
@@ -428,7 +379,7 @@ class FunctionBenchmark {
               <a href="#" class="pure-menu-heading pull-right" id="gototop-btn">↑↑</a>
           </div>
 		  
-		  <p id="foot-copyright">Copyright (c) 2012 - 2017 Michael Pilquist</p>
+		  <p id="foot-copyright">Copyright (c) 2012 - 2021 Michael Pilquist</p>
 		  
 		</div>
 	  </div>

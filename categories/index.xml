@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Categories on mpilquist</title>
@@ -6,23 +6,28 @@
     <description>Recent content in Categories on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Wed, 04 Jul 2018 15:24:47 -0400</lastBuildDate>
-    
-	<atom:link href="https://mpilquist.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
+    <lastBuildDate>Sat, 09 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Articles</title>
+      <title>articles</title>
       <link>https://mpilquist.github.io/categories/articles/</link>
-      <pubDate>Wed, 04 Jul 2018 15:24:47 -0400</pubDate>
+      <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/categories/articles/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>Keyboards</title>
+      <title>talks</title>
+      <link>https://mpilquist.github.io/categories/talks/</link>
+      <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/categories/talks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>keyboards</title>
       <link>https://mpilquist.github.io/categories/keyboards/</link>
       <pubDate>Sat, 22 Jul 2017 00:00:00 +0000</pubDate>
       
@@ -31,20 +36,11 @@
     </item>
     
     <item>
-      <title>Screencasts</title>
+      <title>screencasts</title>
       <link>https://mpilquist.github.io/categories/screencasts/</link>
       <pubDate>Fri, 20 May 2016 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/categories/screencasts/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Talks</title>
-      <link>https://mpilquist.github.io/categories/talks/</link>
-      <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
-      
-      <guid>https://mpilquist.github.io/categories/talks/</guid>
       <description></description>
     </item>
     

@@ -1,17 +1,13 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Scodec on mpilquist</title>
+    <title>scodec on mpilquist</title>
     <link>https://mpilquist.github.io/tags/scodec/</link>
-    <description>Recent content in Scodec on mpilquist</description>
+    <description>Recent content in scodec on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>Copyright (c) 2012 - 2017 Michael Pilquist</copyright>
-    <lastBuildDate>Mon, 21 Sep 2015 00:00:00 +0000</lastBuildDate>
-    
-	<atom:link href="https://mpilquist.github.io/tags/scodec/index.xml" rel="self" type="application/rss+xml" />
-    
-    
+    <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
+    <lastBuildDate>Mon, 21 Sep 2015 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/tags/scodec/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Practical Binary with Scodec: Applying Typelevel Programming and Shapeless to the Mundane</title>
       <link>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</link>
@@ -64,9 +60,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       <pubDate>Sun, 09 Jun 2013 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2013/06/09/scodec-part-3/</guid>
-      <description>&lt;p&gt;This is part 3 of a series of posts about &lt;a href=&#34;http://github.com/mpilquist/scodec/&#34;&gt;scodec&lt;/a&gt;. In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/&#34;&gt;Part 2&lt;/a&gt;, we saw how to create a &lt;code&gt;Codec[A]&lt;/code&gt; and xmap it in to a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll show how to use &lt;a href=&#34;http://github.com/milessabin/shapeless/&#34;&gt;Shapeless&lt;/a&gt; to perform automatic xmapping to case classes.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;This is part 3 of a series of posts about &lt;a href=&#34;http://github.com/mpilquist/scodec/&#34;&gt;scodec&lt;/a&gt;. In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/&#34;&gt;Part 2&lt;/a&gt;, we saw how to create a &lt;code&gt;Codec[A]&lt;/code&gt; and xmap it in to a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll show how to use &lt;a href=&#34;http://github.com/milessabin/shapeless/&#34;&gt;Shapeless&lt;/a&gt; to perform automatic xmapping to case classes.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -75,9 +69,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       <pubDate>Sat, 01 Jun 2013 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/</guid>
-      <description>&lt;p&gt;In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/05/27/scodec-intro/&#34;&gt;Part 1&lt;/a&gt;, we looked at the codec trait and a way to create a &lt;code&gt;Codec[(A, B)]&lt;/code&gt; out of a &lt;code&gt;Codec[A]&lt;/code&gt; and a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll look at converting a &lt;code&gt;Codec[A]&lt;/code&gt; to a &lt;code&gt;Codec[B]&lt;/code&gt; using a type driven approach and we&amp;rsquo;ll get our feet wet with some category theory.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+      <description>&lt;p&gt;In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/05/27/scodec-intro/&#34;&gt;Part 1&lt;/a&gt;, we looked at the codec trait and a way to create a &lt;code&gt;Codec[(A, B)]&lt;/code&gt; out of a &lt;code&gt;Codec[A]&lt;/code&gt; and a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll look at converting a &lt;code&gt;Codec[A]&lt;/code&gt; to a &lt;code&gt;Codec[B]&lt;/code&gt; using a type driven approach and we&amp;rsquo;ll get our feet wet with some category theory.&lt;/p&gt;</description>
     </item>
     
     <item>
@@ -87,11 +79,9 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       
       <guid>https://mpilquist.github.io/blog/2013/05/27/scodec-intro/</guid>
       <description>&lt;p&gt;I recently started the &lt;a href=&#34;http://github.com/mpilquist/scodec&#34;&gt;scodec&lt;/a&gt; project to simplify handling of binary data in Scala. From the project page:&lt;/p&gt;
-
 &lt;blockquote&gt;
 &lt;p&gt;This library focuses on contract-first and pure functional encoding and decoding of binary data.
 The following design constraints are considered:&lt;/p&gt;
-
 &lt;ul&gt;
 &lt;li&gt;Binary structure should mirror protocol definitions and be self-evident under casual reading&lt;/li&gt;
 &lt;li&gt;Mapping binary structures to types should be statically verified&lt;/li&gt;
@@ -99,14 +89,10 @@ The following design constraints are considered:&lt;/p&gt;
 &lt;li&gt;Failures in encoding and decoding should provide descriptive errors&lt;/li&gt;
 &lt;li&gt;Compiler plugin should not be used&lt;/li&gt;
 &lt;/ul&gt;
-
 &lt;p&gt;As a result, the library is implemented as a combinator based DSL.
 Performance is considered but yields to the above design constraints.&lt;/p&gt;
 &lt;/blockquote&gt;
-
-&lt;p&gt;This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of &lt;a href=&#34;http://github.com/milessabing/shapeless&#34;&gt;Shapeless&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
+&lt;p&gt;This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of &lt;a href=&#34;http://github.com/milessabing/shapeless&#34;&gt;Shapeless&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     
   </channel>

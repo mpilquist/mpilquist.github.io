@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on mpilquist</title>
+    <title>mpilquist</title>
     <link>https://mpilquist.github.io/post/</link>
-    <description>Recent content in Posts on mpilquist</description>
+    <description>Recent content on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>

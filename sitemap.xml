@@ -2,35 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://mpilquist.github.io/categories/articles/</loc>
-    <lastmod>2021-01-09T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://mpilquist.github.io/categories/</loc>
-    <lastmod>2021-01-09T00:00:00+00:00</lastmod>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/blog/2021/11/26/fs2/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/fp/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/post/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/tags/scala/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/tags/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/categories/talks/</loc>
+    <lastmod>2021-11-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/categories/articles/</loc>
     <lastmod>2021-01-09T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/blog/2021/01/09/intro-to-scala-3-via-8-queens/</loc>
     <lastmod>2021-01-09T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://mpilquist.github.io/</loc>
-    <lastmod>2021-01-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://mpilquist.github.io/post/</loc>
-    <lastmod>2021-01-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://mpilquist.github.io/tags/scala/</loc>
-    <lastmod>2021-01-09T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://mpilquist.github.io/tags/</loc>
-    <lastmod>2021-01-09T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://mpilquist.github.io/blog/2021/01/03/small-data-science-with-typelevel-libraries/</loc>
     <lastmod>2021-01-03T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://mpilquist.github.io/categories/talks/</loc>
-    <lastmod>2020-11-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</loc>
     <lastmod>2020-11-25T00:00:00+00:00</lastmod>

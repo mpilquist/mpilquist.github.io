@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
-    <lastBuildDate>Sat, 09 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 26 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Design of fs2.Chunk</title>
+      <link>https://mpilquist.github.io/blog/2021/11/26/fs2/</link>
+      <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
+      <description>Upcoming talk about the design of fs2.Chunk.
+Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
+    </item>
+    
     <item>
       <title>Intro to Scala 3 via 8 Queens</title>
       <link>https://mpilquist.github.io/blog/2021/01/09/intro-to-scala-3-via-8-queens/</link>

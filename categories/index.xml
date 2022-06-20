@@ -7,22 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
-    <lastBuildDate>Fri, 26 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 05 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>articles</title>
+      <link>https://mpilquist.github.io/categories/articles/</link>
+      <pubDate>Sun, 05 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/categories/articles/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>talks</title>
       <link>https://mpilquist.github.io/categories/talks/</link>
       <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
       
       <guid>https://mpilquist.github.io/categories/talks/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>articles</title>
-      <link>https://mpilquist.github.io/categories/articles/</link>
-      <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
-      
-      <guid>https://mpilquist.github.io/categories/articles/</guid>
       <description></description>
     </item>
     

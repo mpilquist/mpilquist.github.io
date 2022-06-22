@@ -3,27 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://mpilquist.github.io/post/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/categories/articles/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/categories/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/fp/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://mpilquist.github.io/blog/2022/06/05/scodec/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <loc>https://mpilquist.github.io/blog/2022/06/21/graph-unions-performance-case-study/</loc>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/scala/</loc>
-    <lastmod>2022-06-05T00:00:00+00:00</lastmod>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/</loc>
+    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/blog/2022/06/05/scodec/</loc>
     <lastmod>2022-06-05T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/blog/2021/11/26/fs2/</loc>

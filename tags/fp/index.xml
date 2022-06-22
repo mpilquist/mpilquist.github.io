@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
-    <lastBuildDate>Sun, 05 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/tags/fp/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 21 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/tags/fp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Graph Unions: Performance Case Study</title>
+      <link>https://mpilquist.github.io/blog/2022/06/21/graph-unions-performance-case-study/</link>
+      <pubDate>Tue, 21 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>https://mpilquist.github.io/blog/2022/06/21/graph-unions-performance-case-study/</guid>
+      <description>Published on GitHub</description>
+    </item>
+    
     <item>
       <title>hexdump4s: Building a simple command line application using scodec and scala-cli</title>
       <link>https://mpilquist.github.io/blog/2022/06/05/scodec/</link>

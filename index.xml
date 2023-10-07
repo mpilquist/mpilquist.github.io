@@ -6,7 +6,7 @@
     <description>Recent content on mpilquist</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <copyright>Copyright (c) 2012 - 2021 Michael Pilquist</copyright>
+    <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
     <lastBuildDate>Tue, 21 Jun 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Graph Unions: Performance Case Study</title>
@@ -33,7 +33,7 @@
       
       <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
       <description>Videos:
- SF Scala Scala Love Functional Conf  Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
+SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
     </item>
     
     <item>
@@ -107,8 +107,8 @@
       
       <guid>https://mpilquist.github.io/about/</guid>
       <description>My name is Michael Pilquist. I&amp;rsquo;m a software architect residing in the greater Philadelphia area. I frequently speak at conferences and user groups about functional programming and the Scala programming language.
-I&amp;rsquo;m also an active open source contributor. Notable projects include scodec, simulacrum, and fs2.
-This site includes articles about functional programming in Scala and links to my conference talks and screencasts. Reach me on Twitter or GitHub.</description>
+I&amp;rsquo;m also an active open source contributor. Notable projects include:
+scodec fs2 simulacrum I&amp;rsquo;m the author of the second edition of Functional Programming in Scala, built upon the work by Paul Chiusano and Rúnar Bjarnason from the first edition.</description>
     </item>
     
     <item>

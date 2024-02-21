@@ -5,6 +5,9 @@
     <loc>https://mpilquist.github.io/post/</loc>
     <lastmod>2024-02-20T00:00:00+00:00</lastmod>
   </url><url>
+    <loc>https://mpilquist.github.io/categories/articles/</loc>
+    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>https://mpilquist.github.io/categories/</loc>
     <lastmod>2024-02-20T00:00:00+00:00</lastmod>
   </url><url>
@@ -23,14 +26,11 @@
     <loc>https://mpilquist.github.io/tags/</loc>
     <lastmod>2024-02-20T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://mpilquist.github.io/categories/talks/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</loc>
     <lastmod>2023-10-26T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://mpilquist.github.io/categories/articles/</loc>
-    <lastmod>2022-06-21T00:00:00+00:00</lastmod>
+    <loc>https://mpilquist.github.io/categories/talks/</loc>
+    <lastmod>2023-10-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/blog/2022/06/21/graph-unions-performance-case-study/</loc>
     <lastmod>2022-06-21T00:00:00+00:00</lastmod>

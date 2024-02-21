@@ -7,15 +7,8 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
-    <lastBuildDate>Tue, 20 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 26 Oct 2023 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://mpilquist.github.io/categories/talks/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Optimizing Functional Walks of File Trees</title>
-      <link>https://mpilquist.github.io/blog/2024/02/20/fs2/</link>
-      <pubDate>Tue, 20 Feb 2024 00:00:00 +0000</pubDate>
-      <guid>https://mpilquist.github.io/blog/2024/02/20/fs2/</guid>
-      <description>Published on GitHub.</description>
-    </item>
     <item>
       <title>Functional Programming in Scala in 2023</title>
       <link>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</link>

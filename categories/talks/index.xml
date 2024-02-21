@@ -7,32 +7,35 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
-    <lastBuildDate>Thu, 26 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/categories/talks/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 20 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://mpilquist.github.io/categories/talks/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Optimizing Functional Walks of File Trees</title>
+      <link>https://mpilquist.github.io/blog/2024/02/20/fs2/</link>
+      <pubDate>Tue, 20 Feb 2024 00:00:00 +0000</pubDate>
+      <guid>https://mpilquist.github.io/blog/2024/02/20/fs2/</guid>
+      <description>Published on GitHub.</description>
+    </item>
     <item>
       <title>Functional Programming in Scala in 2023</title>
       <link>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</link>
       <pubDate>Thu, 26 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</guid>
       <description>Talk from NEScala 2023.
 Slides: https://mpilquist.github.io/talk-fpis/</description>
     </item>
-    
     <item>
       <title>Design of fs2.Chunk</title>
       <link>https://mpilquist.github.io/blog/2021/11/26/fs2/</link>
       <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
       <description>Videos:
 SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
     </item>
-    
     <item>
       <title>The Future of Typelevel Concurrency</title>
       <link>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</link>
       <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</guid>
       <description>&lt;p&gt;Talk given at:&lt;/p&gt;
 &lt;ul&gt;
@@ -41,12 +44,10 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
 &lt;/ul&gt;
 &lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Scodec for Scala 3</title>
       <link>https://mpilquist.github.io/blog/2020/04/18/scodec/</link>
       <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2020/04/18/scodec/</guid>
       <description>&lt;p&gt;Talk given at:&lt;/p&gt;
 &lt;ul&gt;
@@ -55,57 +56,45 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
 &lt;/ul&gt;
 &lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Compositional Streaming with FS2</title>
       <link>https://mpilquist.github.io/blog/2016/11/13/fs2/</link>
       <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2016/11/13/fs2/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scalae By The Bay 2016&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>From Simulacrum to Typeclassic</title>
       <link>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</link>
       <pubDate>Wed, 02 Mar 2016 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</guid>
       <description>&lt;p&gt;Talk given at the &lt;a href=&#34;http://typelevel.org/event/2016-03-summit-philadelphia/&#34;&gt;Typelevel Summit Philadelphia&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Practical Binary with Scodec: Applying Typelevel Programming and Shapeless to the Mundane</title>
       <link>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</link>
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.world&#34;&gt;Scala World&lt;/a&gt; in Penrith, UK. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/practical-binary-with-scodec-and-shapeless&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>A Tour of Functional Structures via Scodec and Simulacrum</title>
       <link>https://mpilquist.github.io/blog/2015/08/14/sbtb/</link>
       <pubDate>Fri, 14 Aug 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/08/14/sbtb/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scala By The Bay 2015&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/a-tour-of-functional-structures-via-scodec-and-simulacrum&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Introduction to generic programming with Shapeless, with applications from scodec</title>
       <link>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</link>
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://www.meetup.com/scala-phase/&#34;&gt;PHASE&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Explorations in Variance</title>
       <link>https://mpilquist.github.io/blog/2014/05/27/variance/</link>
       <pubDate>Tue, 27 May 2014 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2014/05/27/variance/</guid>
       <description>&lt;p&gt;A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:&lt;/p&gt;
 &lt;ul&gt;
@@ -119,33 +108,26 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
 &lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Future of the JVM Panel Discussion</title>
       <link>https://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel/</link>
       <pubDate>Wed, 03 Apr 2013 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2013/04/03/future-of-the-jvm-panel/</guid>
       <description>&lt;p&gt;Panel discussion at &lt;a href=&#34;http://phillyemergingtech.com/2013&#34;&gt;Philly ETE 2013&lt;/a&gt; with Jamie Allen, Doug Lea, Cliff Click, Charlie Hunt, and myself.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Scalaz State Monad</title>
       <link>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</link>
       <pubDate>Tue, 28 Aug 2012 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</guid>
       <description>&lt;p&gt;Introduction to the State Monad in Scalaz 7. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scalaz-state-monad&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Intro to Scalaz 7</title>
       <link>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</link>
       <pubDate>Thu, 24 May 2012 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</guid>
       <description>&lt;p&gt;Introduction to Scalaz 7. Slides available on &lt;a href=&#34;http://www.slideshare.net/mpilquist/scalaz-13068563&#34;&gt;Slideshare&lt;/a&gt; and &lt;a href=&#34;https://speakerdeck.com/mpilquist/intro-to-scalaz&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

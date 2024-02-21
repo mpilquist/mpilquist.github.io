@@ -7,68 +7,63 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
-    <lastBuildDate>Thu, 26 Oct 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://mpilquist.github.io/tags/scala/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 20 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://mpilquist.github.io/tags/scala/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Optimizing Functional Walks of File Trees</title>
+      <link>https://mpilquist.github.io/blog/2024/02/20/fs2/</link>
+      <pubDate>Tue, 20 Feb 2024 00:00:00 +0000</pubDate>
+      <guid>https://mpilquist.github.io/blog/2024/02/20/fs2/</guid>
+      <description>Published on GitHub.</description>
+    </item>
     <item>
       <title>Functional Programming in Scala in 2023</title>
       <link>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</link>
       <pubDate>Thu, 26 Oct 2023 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</guid>
       <description>Talk from NEScala 2023.
 Slides: https://mpilquist.github.io/talk-fpis/</description>
     </item>
-    
     <item>
       <title>Graph Unions: Performance Case Study</title>
       <link>https://mpilquist.github.io/blog/2022/06/21/graph-unions-performance-case-study/</link>
       <pubDate>Tue, 21 Jun 2022 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2022/06/21/graph-unions-performance-case-study/</guid>
       <description>Published on GitHub</description>
     </item>
-    
     <item>
       <title>hexdump4s: Building a simple command line application using scodec and scala-cli</title>
       <link>https://mpilquist.github.io/blog/2022/06/05/scodec/</link>
       <pubDate>Sun, 05 Jun 2022 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2022/06/05/scodec/</guid>
       <description>Published on GitHub</description>
     </item>
-    
     <item>
       <title>Design of fs2.Chunk</title>
       <link>https://mpilquist.github.io/blog/2021/11/26/fs2/</link>
       <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
       <description>Videos:
 SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
     </item>
-    
     <item>
       <title>Intro to Scala 3 via 8 Queens</title>
       <link>https://mpilquist.github.io/blog/2021/01/09/intro-to-scala-3-via-8-queens/</link>
       <pubDate>Sat, 09 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2021/01/09/intro-to-scala-3-via-8-queens/</guid>
       <description>Published on GitHub here: https://github.com/mpilquist/8queens#readme</description>
     </item>
-    
     <item>
       <title>Small Data Science with Typelevel Libraries</title>
       <link>https://mpilquist.github.io/blog/2021/01/03/small-data-science-with-typelevel-libraries/</link>
       <pubDate>Sun, 03 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2021/01/03/small-data-science-with-typelevel-libraries/</guid>
       <description>Published on GitHub here: https://github.com/mpilquist/strava-summary#readme</description>
     </item>
-    
     <item>
       <title>The Future of Typelevel Concurrency</title>
       <link>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</link>
       <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</guid>
       <description>&lt;p&gt;Talk given at:&lt;/p&gt;
 &lt;ul&gt;
@@ -77,12 +72,10 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
 &lt;/ul&gt;
 &lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Scodec for Scala 3</title>
       <link>https://mpilquist.github.io/blog/2020/04/18/scodec/</link>
       <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2020/04/18/scodec/</guid>
       <description>&lt;p&gt;Talk given at:&lt;/p&gt;
 &lt;ul&gt;
@@ -91,114 +84,90 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
 &lt;/ul&gt;
 &lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Inference Driven Design</title>
       <link>https://mpilquist.github.io/blog/2018/07/04/fs2/</link>
       <pubDate>Wed, 04 Jul 2018 15:24:47 -0400</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2018/07/04/fs2/</guid>
       <description>&lt;p&gt;Design is an exercise in balancing tradeoffs of various constraints. In this post, we&amp;rsquo;ll look at a library design issue faced in &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt; and how constraints like Scala&amp;rsquo;s type inference algorithm, minimization of explicit type annotations, and invariance under refactoring can be balanced.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Stackless Function Composition</title>
       <link>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</link>
       <pubDate>Sat, 11 Mar 2017 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2017/03/11/stackless-function-composition/</guid>
       <description>&lt;p&gt;Last fall I spent a lot of time optimizing the internals of &lt;a href=&#34;https://github.com/functional-streams-for-scala/fs2&#34;&gt;FS2&lt;/a&gt;. The &lt;code&gt;Free&lt;/code&gt; monad is used extensively in FS2 for modeling various algebras &amp;ndash; most notably, an algebra supporting &lt;code&gt;Stream&lt;/code&gt; and an algebra supporting &lt;code&gt;Pull&lt;/code&gt;. Almost any operation a user performs on a &lt;code&gt;Stream&lt;/code&gt; or &lt;code&gt;Pull&lt;/code&gt; results in one or more bounces on the trampoline inside &lt;code&gt;Free&lt;/code&gt;. As such, any optimization in &lt;code&gt;Free&lt;/code&gt; pays off big time. In this article, we&amp;rsquo;ll look at one of these optimizations &amp;ndash; &lt;em&gt;map fusion&lt;/em&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Compositional Streaming with FS2</title>
       <link>https://mpilquist.github.io/blog/2016/11/13/fs2/</link>
       <pubDate>Sun, 13 Nov 2016 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2016/11/13/fs2/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scalae By The Bay 2016&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/compositional-streaming-with-fs2&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Intro to Functional Streams for Scala (FS2)</title>
       <link>https://mpilquist.github.io/blog/2016/05/20/fs2/</link>
       <pubDate>Fri, 20 May 2016 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2016/05/20/fs2/</guid>
       <description>&lt;p&gt;Informal talk series that introduces Functional Streams for Scala (FS2).&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>From Simulacrum to Typeclassic</title>
       <link>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</link>
       <pubDate>Wed, 02 Mar 2016 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2016/03/02/simulacrum/</guid>
       <description>&lt;p&gt;Talk given at the &lt;a href=&#34;http://typelevel.org/event/2016-03-summit-philadelphia/&#34;&gt;Typelevel Summit Philadelphia&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/from-simulacrum-to-typeclassic&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Practical Binary with Scodec: Applying Typelevel Programming and Shapeless to the Mundane</title>
       <link>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</link>
       <pubDate>Mon, 21 Sep 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/09/21/scalaworld/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.world&#34;&gt;Scala World&lt;/a&gt; in Penrith, UK. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/practical-binary-with-scodec-and-shapeless&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>A Tour of Functional Structures via Scodec and Simulacrum</title>
       <link>https://mpilquist.github.io/blog/2015/08/14/sbtb/</link>
       <pubDate>Fri, 14 Aug 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/08/14/sbtb/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://scala.bythebay.io&#34;&gt;Scala By The Bay 2015&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/a-tour-of-functional-structures-via-scodec-and-simulacrum&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Invariant Shadows - Part 2: Monoidals</title>
       <link>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</link>
       <pubDate>Mon, 22 Jun 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</guid>
       <description>In the last post, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant FlatMap and Monad. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.
 Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</description>
     </item>
-    
     <item>
       <title>Invariant Shadows</title>
       <link>https://mpilquist.github.io/blog/2015/06/18/invariant-shadows/</link>
       <pubDate>Thu, 18 Jun 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/06/18/invariant-shadows/</guid>
       <description>A common use case when working with binary protocols is decoding a value and then using the decoded value to determine how to decode the remaining bits. For example, consider a simple framing structure, made up of a 2-byte big endian unsigned integer field followed by n bytes, where n is the value in the first field. In order to decode this structure, we need to first decode the 2-byte size field, then use the decoded size to take that number of bytes from the remainder.</description>
     </item>
-    
     <item>
       <title>Functional Structures in Scala Screencast Series</title>
       <link>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</link>
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</guid>
       <description>&lt;p&gt;Informal talk series that presents the major functional programming type classes in Scala.&lt;/p&gt;
 &lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/)&#34;&gt;http://www.manning.com/bjarnason/)&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Introduction to generic programming with Shapeless, with applications from scodec</title>
       <link>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</link>
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2015/04/22/intro-to-shapeless/</guid>
       <description>&lt;p&gt;Talk given at &lt;a href=&#34;http://www.meetup.com/scala-phase/&#34;&gt;PHASE&lt;/a&gt;. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/introduction-to-shapeless-with-applications-from-scodec&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Explorations in Variance</title>
       <link>https://mpilquist.github.io/blog/2014/05/27/variance/</link>
       <pubDate>Tue, 27 May 2014 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2014/05/27/variance/</guid>
       <description>&lt;p&gt;A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:&lt;/p&gt;
 &lt;ul&gt;
@@ -212,30 +181,24 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
 &lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>scodec - Part 3 - Shapeless</title>
       <link>https://mpilquist.github.io/blog/2013/06/09/scodec-part-3/</link>
       <pubDate>Sun, 09 Jun 2013 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2013/06/09/scodec-part-3/</guid>
       <description>&lt;p&gt;This is part 3 of a series of posts about &lt;a href=&#34;http://github.com/mpilquist/scodec/&#34;&gt;scodec&lt;/a&gt;. In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/&#34;&gt;Part 2&lt;/a&gt;, we saw how to create a &lt;code&gt;Codec[A]&lt;/code&gt; and xmap it in to a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll show how to use &lt;a href=&#34;http://github.com/milessabin/shapeless/&#34;&gt;Shapeless&lt;/a&gt; to perform automatic xmapping to case classes.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>scodec - Part 2 - Conversions</title>
       <link>https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/</link>
       <pubDate>Sat, 01 Jun 2013 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2013/06/01/scodec-part-2/</guid>
       <description>&lt;p&gt;In &lt;a href=&#34;https://mpilquist.github.io/blog/2013/05/27/scodec-intro/&#34;&gt;Part 1&lt;/a&gt;, we looked at the codec trait and a way to create a &lt;code&gt;Codec[(A, B)]&lt;/code&gt; out of a &lt;code&gt;Codec[A]&lt;/code&gt; and a &lt;code&gt;Codec[B]&lt;/code&gt;. In this post, we&amp;rsquo;ll look at converting a &lt;code&gt;Codec[A]&lt;/code&gt; to a &lt;code&gt;Codec[B]&lt;/code&gt; using a type driven approach and we&amp;rsquo;ll get our feet wet with some category theory.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>scodec - Part 1 - Introduction</title>
       <link>https://mpilquist.github.io/blog/2013/05/27/scodec-intro/</link>
       <pubDate>Mon, 27 May 2013 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2013/05/27/scodec-intro/</guid>
       <description>&lt;p&gt;I recently started the &lt;a href=&#34;http://github.com/mpilquist/scodec&#34;&gt;scodec&lt;/a&gt; project to simplify handling of binary data in Scala. From the project page:&lt;/p&gt;
 &lt;blockquote&gt;
@@ -253,24 +216,19 @@ Performance is considered but yields to the above design constraints.&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of &lt;a href=&#34;http://github.com/milessabing/shapeless&#34;&gt;Shapeless&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Scalaz State Monad</title>
       <link>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</link>
       <pubDate>Tue, 28 Aug 2012 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2012/08/28/scalaz-state-monad/</guid>
       <description>&lt;p&gt;Introduction to the State Monad in Scalaz 7. Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scalaz-state-monad&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Intro to Scalaz 7</title>
       <link>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</link>
       <pubDate>Thu, 24 May 2012 00:00:00 +0000</pubDate>
-      
       <guid>https://mpilquist.github.io/blog/2012/05/24/intro-to-scalaz-7/</guid>
       <description>&lt;p&gt;Introduction to Scalaz 7. Slides available on &lt;a href=&#34;http://www.slideshare.net/mpilquist/scalaz-13068563&#34;&gt;Slideshare&lt;/a&gt; and &lt;a href=&#34;https://speakerdeck.com/mpilquist/intro-to-scalaz&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

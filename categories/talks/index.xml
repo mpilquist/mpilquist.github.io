@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>talks on mpilquist</title>
+    <title>Talks on mpilquist</title>
     <link>https://mpilquist.github.io/categories/talks/</link>
-    <description>Recent content in talks on mpilquist</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Talks on mpilquist</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
     <lastBuildDate>Thu, 26 Oct 2023 00:00:00 +0000</lastBuildDate>
@@ -14,40 +14,28 @@
       <link>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</link>
       <pubDate>Thu, 26 Oct 2023 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</guid>
-      <description>Talk from NEScala 2023.
-Slides: https://mpilquist.github.io/talk-fpis/</description>
+      <description>Talk from NEScala 2023.&#xA;Slides: https://mpilquist.github.io/talk-fpis/</description>
     </item>
     <item>
       <title>Design of fs2.Chunk</title>
       <link>https://mpilquist.github.io/blog/2021/11/26/fs2/</link>
       <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
-      <description>Videos:
-SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
+      <description>Videos:&#xA;SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
     </item>
     <item>
       <title>The Future of Typelevel Concurrency</title>
       <link>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</link>
       <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</guid>
-      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Scodec for Scala 3</title>
       <link>https://mpilquist.github.io/blog/2020/04/18/scodec/</link>
       <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2020/04/18/scodec/</guid>
-      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Compositional Streaming with FS2</title>
@@ -89,17 +77,7 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
       <link>https://mpilquist.github.io/blog/2014/05/27/variance/</link>
       <pubDate>Tue, 27 May 2014 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2014/05/27/variance/</guid>
-      <description>&lt;p&gt;A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;A review of subtyping invariance&lt;/li&gt;
-&lt;li&gt;Functor typeclass&lt;/li&gt;
-&lt;li&gt;Contravariant functor typeclass&lt;/li&gt;
-&lt;li&gt;Invariant functor typeclass&lt;/li&gt;
-&lt;li&gt;Profunctor typeclass&lt;/li&gt;
-&lt;li&gt;Correspondence between subtyping variance and functor variance&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;A review of subtyping invariance&lt;/li&gt;&#xA;&lt;li&gt;Functor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Contravariant functor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Invariant functor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Profunctor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Correspondence between subtyping variance and functor variance&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Future of the JVM Panel Discussion</title>

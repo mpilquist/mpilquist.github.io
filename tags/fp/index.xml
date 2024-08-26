@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>fp on mpilquist</title>
+    <title>Fp on mpilquist</title>
     <link>https://mpilquist.github.io/tags/fp/</link>
-    <description>Recent content in fp on mpilquist</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Fp on mpilquist</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
-    <lastBuildDate>Tue, 20 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 26 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://mpilquist.github.io/tags/fp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Streaming Hash Computations</title>
+      <link>https://mpilquist.github.io/blog/2024/08/26/fs2/</link>
+      <pubDate>Mon, 26 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://mpilquist.github.io/blog/2024/08/26/fs2/</guid>
+      <description>Published on GitHub.</description>
+    </item>
     <item>
       <title>Optimizing Functional Walks of File Trees</title>
       <link>https://mpilquist.github.io/blog/2024/02/20/fs2/</link>
@@ -21,8 +28,7 @@
       <link>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</link>
       <pubDate>Thu, 26 Oct 2023 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</guid>
-      <description>Talk from NEScala 2023.
-Slides: https://mpilquist.github.io/talk-fpis/</description>
+      <description>Talk from NEScala 2023.&#xA;Slides: https://mpilquist.github.io/talk-fpis/</description>
     </item>
     <item>
       <title>Graph Unions: Performance Case Study</title>
@@ -43,8 +49,7 @@ Slides: https://mpilquist.github.io/talk-fpis/</description>
       <link>https://mpilquist.github.io/blog/2021/11/26/fs2/</link>
       <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
-      <description>Videos:
-SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
+      <description>Videos:&#xA;SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
     </item>
     <item>
       <title>Intro to Scala 3 via 8 Queens</title>
@@ -65,24 +70,14 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
       <link>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</link>
       <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</guid>
-      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Scodec for Scala 3</title>
       <link>https://mpilquist.github.io/blog/2020/04/18/scodec/</link>
       <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2020/04/18/scodec/</guid>
-      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Inference Driven Design</title>
@@ -131,8 +126,7 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
       <link>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</link>
       <pubDate>Mon, 22 Jun 2015 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</guid>
-      <description>In the last post, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant FlatMap and Monad. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.
-Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</description>
+      <description>In the last post, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant FlatMap and Monad. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.&#xA;Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</description>
     </item>
     <item>
       <title>Invariant Shadows</title>
@@ -146,9 +140,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       <link>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</link>
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</guid>
-      <description>&lt;p&gt;Informal talk series that presents the major functional programming type classes in Scala.&lt;/p&gt;
-&lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/)&#34;&gt;http://www.manning.com/bjarnason/)&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Informal talk series that presents the major functional programming type classes in Scala.&lt;/p&gt;&#xA;&lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/)&#34;&gt;http://www.manning.com/bjarnason/)&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

@@ -3,27 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://mpilquist.github.io/post/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/categories/articles/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/categories/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/fp/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://mpilquist.github.io/blog/2024/02/20/fs2/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/scala/</loc>
-    <lastmod>2024-02-20T00:00:00+00:00</lastmod>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/blog/2024/08/26/fs2/</loc>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/tags/</loc>
+    <lastmod>2024-08-26T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>https://mpilquist.github.io/blog/2024/02/20/fs2/</loc>
     <lastmod>2024-02-20T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</loc>

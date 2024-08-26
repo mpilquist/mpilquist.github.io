@@ -4,11 +4,18 @@
     <title>mpilquist</title>
     <link>https://mpilquist.github.io/</link>
     <description>Recent content on mpilquist</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2012 - 2023 Michael Pilquist</copyright>
-    <lastBuildDate>Tue, 20 Feb 2024 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 26 Aug 2024 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://mpilquist.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Streaming Hash Computations</title>
+      <link>https://mpilquist.github.io/blog/2024/08/26/fs2/</link>
+      <pubDate>Mon, 26 Aug 2024 00:00:00 +0000</pubDate>
+      <guid>https://mpilquist.github.io/blog/2024/08/26/fs2/</guid>
+      <description>Published on GitHub.</description>
+    </item>
     <item>
       <title>Optimizing Functional Walks of File Trees</title>
       <link>https://mpilquist.github.io/blog/2024/02/20/fs2/</link>
@@ -21,8 +28,7 @@
       <link>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</link>
       <pubDate>Thu, 26 Oct 2023 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2023/10/26/functional-programming-in-scala-in-2023/</guid>
-      <description>Talk from NEScala 2023.
-Slides: https://mpilquist.github.io/talk-fpis/</description>
+      <description>Talk from NEScala 2023.&#xA;Slides: https://mpilquist.github.io/talk-fpis/</description>
     </item>
     <item>
       <title>Graph Unions: Performance Case Study</title>
@@ -43,8 +49,7 @@ Slides: https://mpilquist.github.io/talk-fpis/</description>
       <link>https://mpilquist.github.io/blog/2021/11/26/fs2/</link>
       <pubDate>Fri, 26 Nov 2021 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2021/11/26/fs2/</guid>
-      <description>Videos:
-SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
+      <description>Videos:&#xA;SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chunk-talk/</description>
     </item>
     <item>
       <title>Intro to Scala 3 via 8 Queens</title>
@@ -65,24 +70,14 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
       <link>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</link>
       <pubDate>Wed, 25 Nov 2020 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2020/11/25/cats-effect/</guid>
-      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=xEkSDiz3XO0&amp;amp;t=6s&#34;&gt;Scala In The City&lt;/a&gt; on 2020-11-25&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=J_9DjHMCPKM&amp;amp;t=149s&#34;&gt;PHASE&lt;/a&gt; on 2021-02-25&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/the-future-of-typelevel-concurrency&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Scodec for Scala 3</title>
       <link>https://mpilquist.github.io/blog/2020/04/18/scodec/</link>
       <pubDate>Sat, 18 Apr 2020 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2020/04/18/scodec/</guid>
-      <description>&lt;p&gt;Talk given at:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Talk given at:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=UMsrLyvEobs&#34;&gt;Scala Love&lt;/a&gt; on 2020-04-18&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.youtube.com/watch?v=2eTwf78FJmc&#34;&gt;YOW! LambdaJam 2020&lt;/a&gt; on 2020-07-21&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/scodec-for-scala-3-yow-lambdajam-2020&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Inference Driven Design</title>
@@ -103,9 +98,7 @@ SF Scala Scala Love Functional Conf Slides: https://mpilquist.github.io/fs2-chun
       <link>https://mpilquist.github.io/about/</link>
       <pubDate>Sat, 11 Mar 2017 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/about/</guid>
-      <description>My name is Michael Pilquist. I&amp;rsquo;m a software architect residing in the greater Philadelphia area. I frequently speak at conferences and user groups about functional programming and the Scala programming language.
-I&amp;rsquo;m also an active open source contributor. Notable projects include:
-scodec fs2 simulacrum I&amp;rsquo;m the author of the second edition of Functional Programming in Scala, built upon the work by Paul Chiusano and Rúnar Bjarnason from the first edition.</description>
+      <description>My name is Michael Pilquist. I&amp;rsquo;m a software architect residing in the greater Philadelphia area. I frequently speak at conferences and user groups about functional programming and the Scala programming language.&#xA;I&amp;rsquo;m also an active open source contributor. Notable projects include:&#xA;scodec fs2 simulacrum I&amp;rsquo;m the author of the second edition of Functional Programming in Scala, built upon the work by Paul Chiusano and Rúnar Bjarnason from the first edition.</description>
     </item>
     <item>
       <title>Stackless Function Composition</title>
@@ -154,8 +147,7 @@ scodec fs2 simulacrum I&amp;rsquo;m the author of the second edition of Function
       <link>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</link>
       <pubDate>Mon, 22 Jun 2015 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2015/06/22/invariant-shadows-part-2/</guid>
-      <description>In the last post, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant FlatMap and Monad. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.
-Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</description>
+      <description>In the last post, we built type classes for a subset of invariant functors &amp;ndash; namely, type classes that drew inspiration from the covariant FlatMap and Monad. In this article, we&amp;rsquo;ll explore invariant shadows of the type classes supporting applicative functors.&#xA;Disclaimer: I am not a category theorist, and in both the previous article and this article, I use fairly loose reasoning to explore these type classes. Corrections are welcome.</description>
     </item>
     <item>
       <title>Invariant Shadows</title>
@@ -169,9 +161,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       <link>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</link>
       <pubDate>Wed, 22 Apr 2015 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2015/04/22/functional-structures/</guid>
-      <description>&lt;p&gt;Informal talk series that presents the major functional programming type classes in Scala.&lt;/p&gt;
-&lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/)&#34;&gt;http://www.manning.com/bjarnason/)&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Informal talk series that presents the major functional programming type classes in Scala.&lt;/p&gt;&#xA;&lt;p&gt;Talks are intended to complement the fantastic Functional Programming in Scala by Paul Chiusano and Rúnar Bjarnason (&lt;a href=&#34;http://www.manning.com/bjarnason/)&#34;&gt;http://www.manning.com/bjarnason/)&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Given the informal nature of the talks, there are mistakes. Errata will be posted on each talk in the descriptions.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Introduction to generic programming with Shapeless, with applications from scodec</title>
@@ -185,17 +175,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       <link>https://mpilquist.github.io/blog/2014/05/27/variance/</link>
       <pubDate>Tue, 27 May 2014 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2014/05/27/variance/</guid>
-      <description>&lt;p&gt;A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;A review of subtyping invariance&lt;/li&gt;
-&lt;li&gt;Functor typeclass&lt;/li&gt;
-&lt;li&gt;Contravariant functor typeclass&lt;/li&gt;
-&lt;li&gt;Invariant functor typeclass&lt;/li&gt;
-&lt;li&gt;Profunctor typeclass&lt;/li&gt;
-&lt;li&gt;Correspondence between subtyping variance and functor variance&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;A talk given at Philly Lambda on 5/27/2014 exploring subtyping variance and functor variance, including:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;A review of subtyping invariance&lt;/li&gt;&#xA;&lt;li&gt;Functor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Contravariant functor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Invariant functor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Profunctor typeclass&lt;/li&gt;&#xA;&lt;li&gt;Correspondence between subtyping variance and functor variance&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;Slides and code available on &lt;a href=&#34;https://github.com/mpilquist/variance-explorations&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;&#xA;&lt;p&gt;Slides available on &lt;a href=&#34;https://speakerdeck.com/mpilquist/explorations-in-variance&#34;&gt;SpeakerDeck&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>scodec - Part 3 - Shapeless</title>
@@ -216,21 +196,7 @@ Disclaimer: I am not a category theorist, and in both the previous article and t
       <link>https://mpilquist.github.io/blog/2013/05/27/scodec-intro/</link>
       <pubDate>Mon, 27 May 2013 00:00:00 +0000</pubDate>
       <guid>https://mpilquist.github.io/blog/2013/05/27/scodec-intro/</guid>
-      <description>&lt;p&gt;I recently started the &lt;a href=&#34;http://github.com/mpilquist/scodec&#34;&gt;scodec&lt;/a&gt; project to simplify handling of binary data in Scala. From the project page:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;This library focuses on contract-first and pure functional encoding and decoding of binary data.
-The following design constraints are considered:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Binary structure should mirror protocol definitions and be self-evident under casual reading&lt;/li&gt;
-&lt;li&gt;Mapping binary structures to types should be statically verified&lt;/li&gt;
-&lt;li&gt;Encoding and decoding should be purely functional&lt;/li&gt;
-&lt;li&gt;Failures in encoding and decoding should provide descriptive errors&lt;/li&gt;
-&lt;li&gt;Compiler plugin should not be used&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;As a result, the library is implemented as a combinator based DSL.
-Performance is considered but yields to the above design constraints.&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of &lt;a href=&#34;http://github.com/milessabing/shapeless&#34;&gt;Shapeless&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;I recently started the &lt;a href=&#34;http://github.com/mpilquist/scodec&#34;&gt;scodec&lt;/a&gt; project to simplify handling of binary data in Scala. From the project page:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;This library focuses on contract-first and pure functional encoding and decoding of binary data.&#xA;The following design constraints are considered:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Binary structure should mirror protocol definitions and be self-evident under casual reading&lt;/li&gt;&#xA;&lt;li&gt;Mapping binary structures to types should be statically verified&lt;/li&gt;&#xA;&lt;li&gt;Encoding and decoding should be purely functional&lt;/li&gt;&#xA;&lt;li&gt;Failures in encoding and decoding should provide descriptive errors&lt;/li&gt;&#xA;&lt;li&gt;Compiler plugin should not be used&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;p&gt;As a result, the library is implemented as a combinator based DSL.&#xA;Performance is considered but yields to the above design constraints.&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;This article will introduce some of the main abstractions in scodec and discuss some of the design decisions. Subsequent articles will discuss more interesting parts of scodec, including invariant functors and use of &lt;a href=&#34;http://github.com/milessabing/shapeless&#34;&gt;Shapeless&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Future of the JVM Panel Discussion</title>
